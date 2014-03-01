@@ -974,7 +974,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			return new InteractiveDetailsData(playSource, contentName,
 					contentProvider, channelName, serviceName, endUserPrice,
 					downloads, grossRevenue);
-			return null;
+			//return null;
 		}
 	}
 	
@@ -1099,8 +1099,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 	@Override
 	public List<RevenueShareData> retriveSingleRevenueRecord(Long id) {
-		final String sql ="select sp.start_value as startValue,sp.end_value as endValue,sp.percentage as percentage "+
-							"from bp_revenue_share_params sp,bp_revenue_share_master sm "+
+		final String sql ="select sp.start_value as startValue,sp.end_value as endValue,sp.percentage as percentage,"+
+							"sp.flat as flat from bp_revenue_share_params sp,bp_revenue_share_master sm "+
 							"where sp.revenue_share_master_id=sm.id and sp.revenue_share_master_id=?";
 				/* "select rsm.id as id,rsm.business_line as businessLine,rsm.media_category as mediaCategory,"
 				+ "rsm.revenue_share_type as revenueShareType,"
@@ -1121,22 +1121,22 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long startValue = rs.getLong("startValue");
 			final Long endValue = rs.getLong("endValue");
 			final BigDecimal percentage = rs.getBigDecimal("percentage");
-			
+			final BigDecimal flat=rs.getBigDecimal("flat");
 			return new RevenueShareData(null, null, null,
-					null, startValue, endValue, percentage, null);
+					null, startValue, endValue, percentage, flat);
 		}
 
 	}
 
 	@Override
-	public List<RevenueShareData> retriveEditRevenueRecord(Long id) {
+	public RevenueShareData retriveEditRevenueRecord(Long id) {
 		final String sql ="select rsm.id as id,rsm.business_line as businessLine,rsm.media_category as mediaCategory,"+
-							"rsm.revenue_share_type as revenueShareType,rsp.flat as flat "+
-							"from bp_revenue_share_master rsm,bp_revenue_share_params rsp "+
-							"where rsm.id=rsp.revenue_share_master_id and rsm.id=?";
+							"rsm.revenue_share_type as revenueShareType "+
+							"from bp_revenue_share_master rsm "+
+							"where rsm.id=?";
 	
 				RevenueMapperEditRow mapper = new RevenueMapperEditRow();
-				return jdbcTemplate.query(sql, mapper, new Object[] { id });	}
+				return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });	}
 	
 		private final static class RevenueMapperEditRow implements
 		RowMapper<RevenueShareData> {
@@ -1148,10 +1148,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long businessLine = rs.getLong("businessLine");
 			final Long mediaCategory = rs.getLong("mediaCategory");
 			final Long revenueShareType = rs.getLong("revenueShareType");
-			final BigDecimal flat = rs.getBigDecimal("flat");
-	
 			return new RevenueShareData(id, businessLine, mediaCategory,
-					revenueShareType, null, null, null, flat);
+					revenueShareType, null, null, null, null);
 }
 
 }

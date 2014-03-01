@@ -824,13 +824,19 @@ public class MediaSettlementApiResources {
     public String retriveSingleRevenueRecord(@Context final UriInfo uriInfo, @PathParam("id") final Long id){
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	
+    	RevenueShareData templateData=mediaSettlementReadPlatformService.retriveEditRevenueRecord(id);
     	Collection<MCodeData> mediaCategoryData = mCodeReadPlatformService.getCodeValue("Media Category");
     	Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
  		Collection<MCodeData>  	royaltyTypeData = mCodeReadPlatformService.getCodeValue("Royalty Type");
     	List<RevenueShareData> percentageDatas = mediaSettlementReadPlatformService.retriveSingleRevenueRecord(id);
-    	List<RevenueShareData> datas = mediaSettlementReadPlatformService.retriveEditRevenueRecord(id);
-    	RevenueShareData revenueShareData=new RevenueShareData(mediaCategoryData,businessLineData,royaltyTypeData,percentageDatas,datas);
-    	return toApiJsonSerializer.serialize(revenueShareData);
+    	templateData.setMediaCategoryData(mediaCategoryData);
+    	templateData.setBusinessLineData(businessLineData);
+    	templateData.setRoyaltyTypeData(royaltyTypeData);
+    	templateData.setPercentageDatas(percentageDatas);
+
+    	//List<RevenueShareData> datas = mediaSettlementReadPlatformService.retriveEditRevenueRecord(id);
+    	//RevenueShareData revenueShareData=new RevenueShareData(mediaCategoryData,businessLineData,royaltyTypeData,percentageDatas,datas);
+    	return toApiJsonSerializer.serialize(templateData);
     }
     
     @PUT

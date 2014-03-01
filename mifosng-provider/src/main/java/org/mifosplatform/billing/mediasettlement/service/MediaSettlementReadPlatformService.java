@@ -113,7 +113,7 @@ public interface MediaSettlementReadPlatformService {
 
 	List<RevenueShareData> retriveAllrevenueshareForThisClient(Long clientId);
 
-	List<RevenueShareData> retriveEditRevenueRecord(Long id);
+	RevenueShareData retriveEditRevenueRecord(Long id);
 
 	Collection<InteractiveDetailsData> retriveInteractiveDetailsData(
 			Long eventId);

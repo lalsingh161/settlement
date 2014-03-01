@@ -21,6 +21,38 @@ public class RevenueShareData {
 	Collection<MCodeData> mediaCategoryData;
 	Collection<MCodeData> businessLineData;
 	Collection<MCodeData> royaltyTypeData;
+	public Collection<MCodeData> getMediaCategoryData() {
+		return mediaCategoryData;
+	}
+
+	public void setMediaCategoryData(Collection<MCodeData> mediaCategoryData) {
+		this.mediaCategoryData = mediaCategoryData;
+	}
+
+	public Collection<MCodeData> getBusinessLineData() {
+		return businessLineData;
+	}
+
+	public void setBusinessLineData(Collection<MCodeData> businessLineData) {
+		this.businessLineData = businessLineData;
+	}
+
+	public Collection<MCodeData> getRoyaltyTypeData() {
+		return royaltyTypeData;
+	}
+
+	public void setRoyaltyTypeData(Collection<MCodeData> royaltyTypeData) {
+		this.royaltyTypeData = royaltyTypeData;
+	}
+
+	public List<RevenueShareData> getPercentageDatas() {
+		return percentageDatas;
+	}
+
+	public void setPercentageDatas(List<RevenueShareData> percentageDatas) {
+		this.percentageDatas = percentageDatas;
+	}
+
 	List<RevenueShareData> percentageDatas;
 	List<RevenueShareData> masterData;
 	private String businessLineStr;
