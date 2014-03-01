@@ -104,7 +104,7 @@ public interface MediaSettlementReadPlatformService {
 	
 	Collection<CurrencyData> retrieveCurrency();
 
-	Collection<PartnerAccountData> retrieveEventDetails(Long eventId);
+	
 
 	List<PartnerAccountData> retrieveAllPartnerType(String codeValue,
 			String codeName);

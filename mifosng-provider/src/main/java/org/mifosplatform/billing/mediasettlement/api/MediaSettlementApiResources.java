@@ -770,14 +770,14 @@ public class MediaSettlementApiResources {
    	@Consumes({MediaType.APPLICATION_JSON})
    	public String retriveInteractiveDetailTemplate(@Context UriInfo uriInfo,@PathParam("eventId") final Long eventId){
        	 Collection<MediaAssetData> mediaData=this.assetReadPlatformService.retrieveAllAssetdata();
-       	 Collection<PartnerAccountData> eventData=this.mediaSettlementReadPlatformService.retrieveEventDetails(eventId);
+       	 
        	 Collection<InteractiveHeaderData> interactiveHeaderData = this.mediaSettlementReadPlatformService.retrieveInteractiveHeaderData(eventId);
        	 Collection<InteractiveDetailsData> interactiveDetailsData = this.mediaSettlementReadPlatformService.retriveInteractiveDetailsData(eventId);
        	 Collection<MCodeData> playSource = mCodeReadPlatformService.getCodeValue("Play Source");
        	 Collection<PartnerAccountData> contentData=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");    	 
        	 Collection<PartnerAccountData>  	channelData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
        	 Collection<PartnerAccountData>  	serviceData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
-       	PartnerAccountData partnerAccountData = new PartnerAccountData(eventData,mediaData,playSource,contentData,channelData,serviceData);
+       	PartnerAccountData partnerAccountData = new PartnerAccountData(mediaData,playSource,contentData,channelData,serviceData,interactiveHeaderData,interactiveDetailsData);
        	return toApiJsonSerializer.serialize(partnerAccountData);
    	}
     

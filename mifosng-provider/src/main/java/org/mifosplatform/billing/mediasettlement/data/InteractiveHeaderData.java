@@ -28,6 +28,9 @@ public class InteractiveHeaderData {
 	private String chargeCode;
 	private Long id;
 	private Long externalId;
+	private Long businessLineL;
+	private Long mediaCategoryL;
+	private Long chargeCodeL;
 
 	public InteractiveHeaderData() {
 		
@@ -60,5 +63,17 @@ public class InteractiveHeaderData {
 		this.dataUploadedDate = date;
 		this.mediaCategory = mediaCategoryStr;
 		this.chargeCode = chargeCodeStr;
+	}
+
+	public InteractiveHeaderData(Long clientId, Long externalId,
+			Long activityMonth, Date date, Long businessLine,
+			Long mediaCategory, Long chargeCode) {
+		this.clientId = clientId;
+		this.externalId = externalId;
+		this.activityMonth = activityMonth;
+		this.dataUploadedDate = date;
+		this.businessLineL = businessLine;
+		this.mediaCategoryL = mediaCategory;
+		this.chargeCodeL = chargeCode;
 	}
 }

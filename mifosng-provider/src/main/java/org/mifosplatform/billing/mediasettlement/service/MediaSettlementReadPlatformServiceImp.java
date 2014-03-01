@@ -940,9 +940,32 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public Collection<InteractiveHeaderData> retrieveInteractiveHeaderData(
 			Long eventId) {
-		// TODO Auto-generated method stub
+		final String sql = "select client_id as clientId, client_external_id as externalId, activity_month as activityMonth, data_upload_date as dataUploadDate,"
+				+ "business_line as businessLine, media_category as mediaCategory, charge_code as chargeCode from bp_interactive_header";
+		
+		InteractiveHeaderMapper mapper = new InteractiveHeaderMapper();
+		
 		return null;
 	}
+	
+	
+	private static final class InteractiveHeaderMapper implements RowMapper<InteractiveHeaderData>{
+		
+		@Override
+		public InteractiveHeaderData mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+			final Long clientId = rs.getLong("clientId");
+			final Long externalId = rs.getLong("externalId");
+			final Long activityMonth = rs.getLong("activityMonth");
+			final LocalDate dataUploadDate = JdbcSupport.getLocalDate(rs, "dataUploadDate");
+			final Long businessLine = rs.getLong("businessLine");
+			final Long mediaCategory = rs.getLong("mediaCategory");
+			final Long chargeCode = rs.getLong("chargeCode");
+			return new InteractiveHeaderData(clientId,externalId,activityMonth,dataUploadDate!=null?dataUploadDate.toDate():null,businessLine,mediaCategory,chargeCode);
+		}
+		
+	}
+	
 	
 	@Override
 	public Collection<InteractiveDetailsData> retriveInteractiveDetailsData(
@@ -974,12 +997,11 @@ public class MediaSettlementReadPlatformServiceImp implements
 			return new InteractiveDetailsData(playSource, contentName,
 					contentProvider, channelName, serviceName, endUserPrice,
 					downloads, grossRevenue);
-			//return null;
 		}
 	}
 	
 	
-	@Override
+	/*@Override
 	public Collection<PartnerAccountData> retrieveEventDetails(Long eventId) {
 		final String sql ="select (select code_value from m_code_value where id = itd.play_source) as playSource,"
 				+ "(select title from b_media_asset where id = itd.content_name) as contentName,"
@@ -990,15 +1012,15 @@ public class MediaSettlementReadPlatformServiceImp implements
 				+ "itd where interactive_header_id=?";
 				
 				
-				/*"select itd.play_source as playSource,"
+				"select itd.play_source as playSource,"
 				+ "itd.content_name as contentName,"
 				+ "itd.content_provider as contentProvider,"
 				+ "itd.channel_name as channelName,"
 				+ "itd.service_name as serviceName,"
 				+ "itd.end_user_price as endUserPrice, itd.downloads as downloads, itd.gross_revenue as grossRevenue from bp_interactive_detail "
-				+ "itd where interactive_header_id=?";*/
+				+ "itd where interactive_header_id=?";
 		
-		/*
+		
 		 * select (select code_value from m_code_value where id = itd.play_source) as playSource,"
 				+ "(select title from b_media_asset where id = itd.content_name) as contentName,"
 				+ "(select partner_name from bp_account where id = itd.content_provider) as contentProvider,"
@@ -1006,19 +1028,19 @@ public class MediaSettlementReadPlatformServiceImp implements
 				+ "(select partner_name from bp_account where id = itd.service_name) as serviceName,"
 				+ "itd.end_user_price as endUserPrice, itd.downloads as downloads, itd.gross_revenue as grossRevenue from bp_interactive_detail "
 				+ "itd where interactive_header_id=?";
-		 * */
+		 * 
 
 		ViewInteractiveEventMapper mapper = new ViewInteractiveEventMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { eventId });
-	}
+	}*/
 
-	private final static class ViewInteractiveEventMapper implements
+	/*private final static class ViewInteractiveEventMapper implements
 			RowMapper<PartnerAccountData> {
 
 		@Override
 		public PartnerAccountData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			/*final Long playSource = rs.getLong("playSource");
+			final Long playSource = rs.getLong("playSource");
 			final Long contentName = rs.getLong("contentName");
 			final Long contentProvider = rs.getLong("contentProvider");
 			final Long channelName = rs.getLong("channelName");
@@ -1028,7 +1050,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final BigDecimal grossRevenue = rs.getBigDecimal("grossRevenue");
 			return new PartnerAccountData(playSource, contentName,
 					contentProvider, channelName, serviceName, endUserPrice,
-					downloads, grossRevenue);*/
+					downloads, grossRevenue);
 			
 			final String playSource = rs.getString("playSource");
 			final String contentName = rs.getString("contentName");
@@ -1044,7 +1066,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			
 		}
 
-	}
+	}*/
 
 	@Override
 	public List<PartnerAccountData> retrieveAllPartnerType(String codeValue,

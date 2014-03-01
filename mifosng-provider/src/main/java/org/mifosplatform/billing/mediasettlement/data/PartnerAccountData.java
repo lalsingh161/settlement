@@ -49,17 +49,19 @@ public class PartnerAccountData {
 	private Collection<PartnerAccountData> contentData;
 	private Collection<PartnerAccountData> channelData;
 	private Collection<PartnerAccountData> serviceData;
-	private String playSource;
-	private String contentName;
-	private String contentProvider;
-	private String channelName;
-	private String serviceName;
+	private Long playSource;
+	private Long contentName;
+	private Long contentProvider;
+	private Long channelName;
+	private Long serviceName;
 	private BigDecimal endUserPrice;
 	private BigDecimal downloads;
 	private BigDecimal grossRevenue;
 	private Long externalId;
 	private String contactNum;
 	private String emailId;
+	private Collection<InteractiveHeaderData> interacticeHeaderData;
+	private Collection<InteractiveDetailsData> interactiveDetailsData;
 
 	public PartnerAccountData(Collection<MCodeData> partnerType,
 			Collection<MCodeData> mediaCategory, List<PartnerAccountData> countryData) {
@@ -206,23 +208,28 @@ public class PartnerAccountData {
 		this.clientId=clientId;
 	}
 	
-	public PartnerAccountData(Collection<PartnerAccountData> eventData,
+	public PartnerAccountData(
 			Collection<MediaAssetData> mediaData,
 			Collection<MCodeData> playSource,
 			Collection<PartnerAccountData> contentData,
 			Collection<PartnerAccountData> channelData,
-			Collection<PartnerAccountData> serviceData) {
-		this.eventData = eventData;
+			Collection<PartnerAccountData> serviceData,
+			Collection<InteractiveHeaderData> interactiveHeaderData,
+			Collection<InteractiveDetailsData> interactiveDetailsData) {
+		
 		this.mediaData = mediaData;
 		this.playSourceData = playSource;
 		this.contentData = contentData;
 		this.channelData = channelData;
 		this.serviceData = serviceData;
+		this.interacticeHeaderData = interactiveHeaderData;
+		this.interactiveDetailsData = interactiveDetailsData;
+		
 	
 	}
 
-	public PartnerAccountData(String playSource, String contentName,
-			String contentProvider, String channelName, String serviceName,
+	public PartnerAccountData(Long playSource, Long contentName,
+			Long contentProvider, Long channelName, Long serviceName,
 			BigDecimal endUserPrice, BigDecimal downloads,
 			BigDecimal grossRevenue) {
 		this.playSource = playSource;
@@ -240,6 +247,8 @@ public class PartnerAccountData {
 			Long externalId, String contactNum, String emailId) {
 		
 	}
+
+	
 
 	public Collection<MCodeData> getPartnerType() {
 		return partnerTypeData;
