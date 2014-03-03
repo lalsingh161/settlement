@@ -40,7 +40,7 @@ public class PartnerAgreementData {
 	LocalDate endDate,
 	String agmtLocation,
 	String settlementSource,
-	String fileName,String partnerType){
+	String fileName){
 		
 		
 		this.id = id;
@@ -53,7 +53,6 @@ public class PartnerAgreementData {
 		this.agmtLocation = agmtLocation;
 		this.settlementSource=settlementSource;
 		this.fileName  = fileName;
-		this.partnerType = partnerType;
 	}
 	
 

@@ -133,12 +133,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public List<PartnerAgreementData> retrievePartnerAgreementDetails() {
 		
-		final String sql ="select a.id as id,ba.partner_name as partnerName,(select code_value from m_code_value where id = ba.partner_type) as partnerType ,"+
-                "(select code_value from m_code_value where id = a.agreement_type) as agreementType,(select code_value from m_code_value where id = a.agreement_category) as agreementCategory,"+
-               "(select code_value from m_code_value where id = a.settle_source) as settlementSource,(select code_value from m_code_value where id = a.royalty_type) as royaltyType,"+ 
-                "a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a , bp_account ba"+
-                 "where a.partner_account_id =ba.id and a.is_deleted='N' order by id asc";
-	/*final String sql = "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";*/
+	final String sql = "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";
 		PartnerAgreementMapper mapper = new PartnerAgreementMapper();
 		return jdbcTemplate.query(sql, mapper);
 	}
@@ -158,10 +153,9 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String agmtLocation = rs.getString("agmtLocation");
 			final String settlementSource = rs.getString("settlementSource");
 			final String fileName = rs.getString("fileName");
-			final String partnerType = rs.getString("partnerType");
 			return new PartnerAgreementData(id, partnerName, agreementType,
 					agreementCategory, royaltyType, startDate, endDate,
-					agmtLocation, settlementSource, fileName,partnerType);
+					agmtLocation, settlementSource, fileName);
 		}
 	}
 
