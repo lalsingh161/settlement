@@ -1154,5 +1154,21 @@ public class CommandWrapper {
 	public boolean isCreditDistributionResource() {
 		return this.entityName.equalsIgnoreCase("CREDITDISTRIBUTION");
 	}
+	
+	public boolean isCurrencyRateResource(){
+	    return this.entityName.equalsIgnoreCase("CURRENCYRATE");
+	}
+	
+	public boolean isCretaeCurrencyRate() {
+		return this.entityName.equalsIgnoreCase("CURRENCYRATE") && this.actionName.equalsIgnoreCase("CREATE");
+	}
+	
+	public boolean isUpdateCurrencyRate() {
+		return this.entityName.equalsIgnoreCase("CURRENCYRATE") && this.actionName.equalsIgnoreCase("UPDATE");
+	}
+	
+	public boolean isDeleteCurrencyRate() {
+		return this.entityName.equalsIgnoreCase("CURRENCYRATE") && this.actionName.equalsIgnoreCase("DELETE");
+	}
 
 }

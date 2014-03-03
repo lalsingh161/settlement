@@ -1174,6 +1174,54 @@ public class MediaSettlementReadPlatformServiceImp implements
 					revenueShareType, null, null, null, null);
 }
 
-}
+}    
+
+		@Override
+		public Collection<PartnerAccountData> retrieveAllCurrencyRateDetails() {
+			final String sql = "select cr.id as id ,(select code from m_currency where id = cr.source_currency) as sourceCurrency,(select code from m_currency where id = cr.target_currency ) as targetCurrency,cr.exchange_rate as exchangeRate," +
+					"cr.e_start_date as startDate,cr.e_end_date as endDate from bp_currency_rate cr where cr.is_deleted='N' order by cr.id asc";
+			currencyMapper mapper=new currencyMapper();
+			return jdbcTemplate.query(sql, mapper, new Object[]{});
+		}
+		
+		private final static class currencyMapper implements
+		RowMapper<PartnerAccountData> {
+			
+	   @Override
+	    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
+	     Long id = rs.getLong("id");   
+		 String  sourceCurrency= rs.getString("sourceCurrency");
+		 String  targetCurrency= rs.getString("targetCurrency");
+		 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
+		LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+		LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
+		return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
+	   }
+
+	}
+
+		@Override
+		public PartnerAccountData retrieveCurrencyRateDetail(Long id) {
+	     	context.authenticatedUser();
+			final String sql = "select cr.id as id , cr.source_currency as sourceCurrency,cr.target_currency as targetCurrency,cr.exchange_rate as exchangeRate," +
+					"cr.e_start_date as startDate,cr.e_end_date as endDate from bp_currency_rate cr where id= ?";						
+			EditCurrencyMapper mapper = new EditCurrencyMapper();
+			return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
+		
+	    }
+		private static final class EditCurrencyMapper implements
+		                                           RowMapper<PartnerAccountData> {
+			   @Override
+			    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
+			      Long id = rs.getLong("id");   
+				 Long  sourceCurrency= rs.getLong("sourceCurrency");
+				 Long  targetCurrency= rs.getLong("targetCurrency");
+				 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
+				LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+				LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
+				return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
+			   }
+
+			}
 
 }

@@ -40,7 +40,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     
     private final Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
     		"clientId","circle","externalId","activityMonth","businessLine","mediaCategory","contentName",
-    		"chargeCode","dataUploadedDate","cId","activeData"));
+    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate"));
 	
     private final Set<String> supportedParametersforRevenue = new HashSet<String>(
 			Arrays.asList("locale", "businessLine", "mediaCategory",
@@ -546,6 +546,34 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 		        	  throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		          }
 		      
+		}
+		
+		public void validateForCreateCurrency(String json) {
+			
+			   final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+		        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParametersforGameEvent);
+
+		        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+		        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("currency");
+
+		        final JsonElement element = fromApiJsonHelper.parse(json);
+			
+		        final Long sourceCurrency = fromApiJsonHelper.extractLongNamed("sourceCurrency", element);
+		        baseDataValidator.reset().parameter("sourceCurrency").value(sourceCurrency).notBlank();
+		        
+		        final Long targetCurrency = fromApiJsonHelper.extractLongNamed("targetCurrency", element);
+		        baseDataValidator.reset().parameter("targetCurrency").value(targetCurrency).notBlank();
+		        
+		        final BigDecimal exchangeRate = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("exchangeRate", element);
+		        baseDataValidator.reset().parameter("exchangeRate").value(exchangeRate).notBlank().notExceedingLengthOf(50); 
+		        
+		        final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed("startDate", element);
+		        baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();
+		        
+		        final LocalDate endDate = fromApiJsonHelper.extractLocalDateNamed("endDate", element);
+		        baseDataValidator.reset().parameter("endDate").value(endDate).notBlank();
+		        
+		        throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		}
 		
 	}
