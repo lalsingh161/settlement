@@ -60,7 +60,7 @@ public class PartnerAccountData {
 	private Long externalId;
 	private String contactNum;
 	private String emailId;
-	private Collection<InteractiveHeaderData> interacticeHeaderData;
+	private Collection<InteractiveHeaderData> interactiveHeaderData;
 	private Collection<InteractiveDetailsData> interactiveDetailsData;
 
 	public PartnerAccountData(Collection<MCodeData> partnerType,
@@ -208,7 +208,7 @@ public class PartnerAccountData {
 		this.clientId=clientId;
 	}
 	
-	public PartnerAccountData(
+	/*public PartnerAccountData(
 			Collection<MediaAssetData> mediaData,
 			Collection<MCodeData> playSource,
 			Collection<PartnerAccountData> contentData,
@@ -222,11 +222,11 @@ public class PartnerAccountData {
 		this.contentData = contentData;
 		this.channelData = channelData;
 		this.serviceData = serviceData;
-		this.interacticeHeaderData = interactiveHeaderData;
+		this.interactiveHeaderData = interactiveHeaderData;
 		this.interactiveDetailsData = interactiveDetailsData;
 		
 	
-	}
+	}*/
 
 	public PartnerAccountData(Long playSource, Long contentName,
 			Long contentProvider, Long channelName, Long serviceName,

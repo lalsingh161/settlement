@@ -59,6 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.lowagie.text.Header;
 
 @Service
 public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWritePlatformService{
@@ -694,8 +695,10 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	
 	private void handleCodeDataIntegrityIssues(JsonCommand command,
 			DataIntegrityViolationException dve) {
+		final Throwable realCause = dve.getMostSpecificCause();
 		 logger.error(dve.getMessage(), dve);
-	     throw new PlatformDataIntegrityException("Partner Type cannot be blank", "Partner Type cannot be blank" , "Partner Type cannot be blank");
+	        throw new PlatformDataIntegrityException("error.msg.settlement.create.unknown.data.integrity.issue",
+	                "Unknown data integrity issue with resource Settlement: " + realCause.getMessage());
 	   
 	}
 	
@@ -711,6 +714,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		
 		try{
 			fromApiJsonDeserializer.validateForCreateGameEvent(command.json());
+			
 			header = InteractiveHeader.fromJson(command);
 			
 			
@@ -722,7 +726,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		    	final JsonElement element = fromApiJsonHelper.parse(currentData);
 		    //	final Long eventId = fromApiJsonHelper.extractLongNamed("eventId", element);
 			     final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
-			     final Long contentName = fromApiJsonHelper.extractLongNamed("contentName", element);
+			     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 			     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
 			     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
 			     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
@@ -824,12 +828,35 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				context.authenticatedUser();
 				fromApiJsonDeserializer.validateForCreateRevenue(command.json());
 				
-				final RevenueMaster revenue = revenueMasterJpaRepository.findOne(command.entityId());
-				final Map<String,Object> changes = revenue.update(command);
-
-				revenue.updateRevenueParamters(command);
+				RevenueMaster revenueOld = revenueMasterJpaRepository.findOne(command.entityId());
+				revenueOld.getDetails().clear();
+				
+				RevenueMaster revenueNew = RevenueMaster.fromJson(command);
+				
+				revenueOld.setBusinessLine(revenueNew.getBusinessLine());
+				revenueOld.setMediaCategory(revenueNew.getMediaCategory());
+				revenueOld.setRevenueShareType(revenueNew.getRevenueShareType());
+				revenueOld.setClientId(revenueNew.getClientId());
+					
+				
+				final JsonArray revenueparamArray=command.arrayOfParameterNamed("percentageParams").getAsJsonArray();
+				
+				if(revenueparamArray!=null && revenueparamArray.size()>0){
+				     for (JsonElement jsonelement : revenueparamArray) {	
+				    	     final Long startValue = fromApiJsonHelper.extractLongNamed("startValue", jsonelement);
+				    	     final Long endValue = fromApiJsonHelper.extractLongNamed("endValue", jsonelement);
+				    	     final BigDecimal percentage = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("percentage", jsonelement);
+				    	     RevenueParam revenueParam=new RevenueParam(startValue,endValue,percentage);
+				    	     revenueOld.addRevenueParamValues(revenueParam);				 
+				     }
+				 }else{
+					 RevenueParam revenueParam=RevenueParam.fromJson(command);
+					 revenueOld.addRevenueParamValues(revenueParam);
+				 }
+				
+				
 		      
-		        this.revenueMasterJpaRepository.saveAndFlush(revenue);
+		        this.revenueMasterJpaRepository.saveAndFlush(revenueOld);
 		      
 		        return new CommandProcessingResultBuilder() //
 		                .withCommandId(command.commandId()) //
@@ -838,4 +865,62 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		                .build();
 
 			}
+	 	 
+	 	 @Override
+	 	public CommandProcessingResult editInteractiveData(Long entityId,
+	 			JsonCommand command) {
+	 		 
+	 		InteractiveHeader headerOld = null, headerNew = null;
+	 		
+	 		try{
+	 			fromApiJsonDeserializer.validateForCreateGameEvent(command.json());
+	 			headerOld = interactiveHeaderJpaRepository.findOne(entityId);
+	 			
+	 			headerNew = InteractiveHeader.fromJson(command);
+	 			
+	 			//clientId,externalId,activityMonth,businessLine,mediaCategory,chargeCode,dataUploadedDate
+	 			
+	 			headerOld.getInteractiveDetailData().clear();
+	 			
+	 			headerOld.setClientId(headerNew.getClientId());
+	 			headerOld.setExternalId(headerNew.getExternalId());
+	 			headerOld.setActivityMonth(headerNew.getActivityMonth());
+	 			headerOld.setBusinessLine(headerNew.getBusinessLine());
+	 			headerOld.setMediaCategory(headerNew.getMediaCategory());
+	 			headerOld.setChargeCode(headerNew.getChargeCode());
+	 			headerOld.setDataUploadedDate(headerNew.getDataUploadedDate());
+	 			
+	 			
+	 			
+	 			final JsonArray interactiveDataArray = command.arrayOfParameterNamed("activeData").getAsJsonArray();
+			    for(int i=0; i<interactiveDataArray.size();i++){
+			    	String currentData = interactiveDataArray.get(i).toString();
+			    	final JsonElement element = fromApiJsonHelper.parse(currentData);
+			    //	final Long eventId = fromApiJsonHelper.extractLongNamed("eventId", element);
+				     final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
+				     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
+				     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
+				     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
+				     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
+				     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
+				     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
+				     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
+				     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
+				     
+				     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads);
+				     headerOld.add(interactiveDetailData);
+			    }
+				
+			    interactiveHeaderJpaRepository.save(headerOld);
+	 			
+	 			
+	 			
+	 		}catch(DataIntegrityViolationException dev){
+	 			handleDataIntegrityIssue(dev);
+	 			return CommandProcessingResult.empty();
+	 		}
+	 		
+	 		
+	 		return new CommandProcessingResultBuilder().withEntityId(headerOld.getId()).build();
+	 	}
 }

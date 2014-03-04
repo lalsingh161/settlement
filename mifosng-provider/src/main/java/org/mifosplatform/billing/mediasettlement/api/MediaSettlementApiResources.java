@@ -34,6 +34,7 @@ import org.mifosplatform.billing.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.billing.media.data.MediaAssetData;
 import org.mifosplatform.billing.media.service.MediaAssetReadPlatformService;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementsData;
+import org.mifosplatform.billing.mediasettlement.data.InteractiveData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveHeaderData;
 import org.mifosplatform.billing.mediasettlement.data.MediaCategoryData;
@@ -736,11 +737,23 @@ public class MediaSettlementApiResources {
     	/*Collectin<StateDetails> circleData = this.mediaSettlementReadPlatformService.retrieveAllStateDetails();*/
     	Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
     	Collection<MCodeData> mediaCategoryData = this.mCodeReadPlatformService.getCodeValue("Media Category");
-    	/*Collection<MCodeData> playSourceData = this.mCodeReadPlatformService.getCodeValue("Play Source");*/
+    	Collection<MCodeData> playSourceData = this.mCodeReadPlatformService.getCodeValue("Play Source");
+    	Collection<PartnerAccountData> contentData=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");    	 
+      	Collection<PartnerAccountData> channelData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
+      	Collection<PartnerAccountData> serviceData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
     	/*List<MediaAssetData> contentNameData = this.mediaAssetReadPlatformService.retrieveAllAssetdata();*/
     	List<ChargesData> chargeCodesData = this.itemReadPlatformService.retrieveChargeCode();
-    	InteractiveHeaderData interactiveHeaderData = new InteractiveHeaderData(/*circleData*/null,businessLineData,mediaCategoryData,null/*playSourceData*/,null/*contentNameData*/,chargeCodesData);   	
-    	return toApiJsonSerializer.serialize(interactiveHeaderData);
+    	InteractiveData interactiveData = new InteractiveData();//circleData*/null,businessLineData,mediaCategoryData,playSourceData,contentNameData,chargeCodesData);
+    	
+    	interactiveData.setBisinessLineData(businessLineData);
+    	interactiveData.setMediaCategoryData(mediaCategoryData);
+    	interactiveData.setPlaySourceData(playSourceData);
+    	interactiveData.setContentData(contentData);
+    	interactiveData.setChannelData(channelData);
+    	interactiveData.setServiceData(serviceData);
+    	interactiveData.setChargeCodeData(chargeCodesData);
+    	
+    	return toApiJsonSerializer.serialize(interactiveData);
     }
     
     @GET
@@ -771,14 +784,33 @@ public class MediaSettlementApiResources {
    	public String retriveInteractiveDetailTemplate(@Context UriInfo uriInfo,@PathParam("eventId") final Long eventId){
        	 Collection<MediaAssetData> mediaData=this.assetReadPlatformService.retrieveAllAssetdata();
        	 
-       	 Collection<InteractiveHeaderData> interactiveHeaderData = this.mediaSettlementReadPlatformService.retrieveInteractiveHeaderData(eventId);
+       	 InteractiveData interactiveData = this.mediaSettlementReadPlatformService.retrieveInteractiveHeaderData(eventId);
+       	 
+       	 Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
+      	 Collection<MCodeData> mediaCategoryData = this.mCodeReadPlatformService.getCodeValue("Media Category"); 
+      	 List<ChargesData> chargeCodesData = this.itemReadPlatformService.retrieveChargeCode();
+      	 
+       	 
        	 Collection<InteractiveDetailsData> interactiveDetailsData = this.mediaSettlementReadPlatformService.retriveInteractiveDetailsData(eventId);
-       	 Collection<MCodeData> playSource = mCodeReadPlatformService.getCodeValue("Play Source");
+       	 
+       	 Collection<MCodeData> playSourceData = mCodeReadPlatformService.getCodeValue("Play Source");
        	 Collection<PartnerAccountData> contentData=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");    	 
-       	 Collection<PartnerAccountData>  	channelData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
-       	 Collection<PartnerAccountData>  	serviceData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
-       	PartnerAccountData partnerAccountData = new PartnerAccountData(mediaData,playSource,contentData,channelData,serviceData,interactiveHeaderData,interactiveDetailsData);
-       	return toApiJsonSerializer.serialize(partnerAccountData);
+       	 Collection<PartnerAccountData> channelData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
+       	 Collection<PartnerAccountData> serviceData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
+       	 
+       	 
+       	
+       	 interactiveData.setInteractiveDetailsData(interactiveDetailsData);
+       	 interactiveData.setPlaySourceData(playSourceData);
+       	 interactiveData.setContentData(contentData);
+       	 interactiveData.setChannelData(channelData);
+       	 interactiveData.setServiceData(serviceData);
+       	 interactiveData.setChargeCodeData(chargeCodesData);
+       	 interactiveData.setBisinessLineData(businessLineData);
+       	 interactiveData.setMediaCategoryData(mediaCategoryData);
+       	 
+       	 
+       	 return toApiJsonSerializer.serialize(interactiveData);
    	}
     
     
@@ -793,6 +825,17 @@ public class MediaSettlementApiResources {
        	CommandWrapper commandRequest= new CommandWrapperBuilder().createInteractiveDetails(eventId).withJson(jsonRequestMessageBody).build();
        	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
        	return toApiJsonSerializer.serialize(result);
+    }
+    
+    @PUT
+    @Path("/interactive/{eventId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public String updateClientInteractiveData(@PathParam("eventId") final Long eventId, final String jsonRequestMessageBody){
+    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissionsForGamePartner);
+    	CommandWrapper commandRequest = new CommandWrapperBuilder().updateInteractiveData(eventId).withJson(jsonRequestMessageBody).build();
+    	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    	return toApiJsonSerializer.serialize(result);
     }
     
     

@@ -101,4 +101,95 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		this.interactiveDetailData.add(interactiveDetailData);
 		
 	}
+
+
+	public Long getClientId() {
+		return clientId;
+	}
+
+
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
+	}
+
+
+	public Long getExternalId() {
+		return externalId;
+	}
+
+
+	public void setExternalId(Long externalId) {
+		this.externalId = externalId;
+	}
+
+
+	public Long getActivityMonth() {
+		return activityMonth;
+	}
+
+
+	public void setActivityMonth(Long activityMonth) {
+		this.activityMonth = activityMonth;
+	}
+
+
+	public Date getDataUploadedDate() {
+		return dataUploadedDate;
+	}
+
+
+	public void setDataUploadedDate(Date dataUploadedDate) {
+		this.dataUploadedDate = dataUploadedDate;
+	}
+
+
+	public Long getBusinessLine() {
+		return businessLine;
+	}
+
+
+	public void setBusinessLine(Long businessLine) {
+		this.businessLine = businessLine;
+	}
+
+
+	public Long getMediaCategory() {
+		return mediaCategory;
+	}
+
+
+	public void setMediaCategory(Long mediaCategory) {
+		this.mediaCategory = mediaCategory;
+	}
+
+
+	public Long getChargeCode() {
+		return chargeCode;
+	}
+
+
+	public void setChargeCode(Long chargeCode) {
+		this.chargeCode = chargeCode;
+	}
+
+
+	public Character getIsDeleted() {
+		return isDeleted;
+	}
+
+
+	public void setIsDeleted(Character isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
+
+	public List<InteractiveDetails> getInteractiveDetailData() {
+		return interactiveDetailData;
+	}
+
+
+	public void setInteractiveDetailData(
+			List<InteractiveDetails> interactiveDetailData) {
+		this.interactiveDetailData = interactiveDetailData;
+	}
 }

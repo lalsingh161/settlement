@@ -10,6 +10,7 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.billing.address.data.StateDetails;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementData;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementsData;
+import org.mifosplatform.billing.mediasettlement.data.InteractiveData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveHeaderData;
 import org.mifosplatform.billing.mediasettlement.data.MediaCategoryData;
@@ -22,7 +23,6 @@ import org.mifosplatform.billing.mediasettlement.data.PartnerGameDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueSettlementSequenceData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueShareData;
 import org.mifosplatform.billing.mediasettlement.domain.AccountPartnerJpaRepository;
-import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeader;
 import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeaderJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueOEMSettlementJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueSettlementJpaRepository;
@@ -938,21 +938,21 @@ public class MediaSettlementReadPlatformServiceImp implements
 	}
 
 	@Override
-	public Collection<InteractiveHeaderData> retrieveInteractiveHeaderData(
+	public InteractiveData retrieveInteractiveHeaderData(
 			Long eventId) {
 		final String sql = "select client_id as clientId, client_external_id as externalId, activity_month as activityMonth, data_upload_date as dataUploadDate,"
-				+ "business_line as businessLine, media_category as mediaCategory, charge_code as chargeCode from bp_interactive_header";
+				+ "business_line as businessLine, media_category as mediaCategory, charge_code as chargeCode from bp_interactive_header where id = ?";
 		
 		InteractiveHeaderMapper mapper = new InteractiveHeaderMapper();
 		
-		return null;
+		return jdbcTemplate.queryForObject(sql,mapper,new Object[]{eventId});
 	}
 	
 	
-	private static final class InteractiveHeaderMapper implements RowMapper<InteractiveHeaderData>{
+	private static final class InteractiveHeaderMapper implements RowMapper<InteractiveData>{
 		
 		@Override
-		public InteractiveHeaderData mapRow(ResultSet rs, int rowNum)
+		public InteractiveData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long clientId = rs.getLong("clientId");
 			final Long externalId = rs.getLong("externalId");
@@ -961,7 +961,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long businessLine = rs.getLong("businessLine");
 			final Long mediaCategory = rs.getLong("mediaCategory");
 			final Long chargeCode = rs.getLong("chargeCode");
-			return new InteractiveHeaderData(clientId,externalId,activityMonth,dataUploadDate!=null?dataUploadDate.toDate():null,businessLine,mediaCategory,chargeCode);
+			return new InteractiveData(clientId,externalId,activityMonth,dataUploadDate!=null?dataUploadDate.toDate():null,businessLine,mediaCategory,chargeCode);
 		}
 		
 	}
@@ -987,7 +987,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public InteractiveDetailsData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long playSource = rs.getLong("playSource");
-			final Long contentName = rs.getLong("contentName");
+			final String contentName = rs.getString("contentName");
 			final Long contentProvider = rs.getLong("contentProvider");
 			final Long channelName = rs.getLong("channelName");
 			final Long  serviceName = rs.getLong("serviceName");
@@ -1144,8 +1144,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long endValue = rs.getLong("endValue");
 			final BigDecimal percentage = rs.getBigDecimal("percentage");
 			final BigDecimal flat=rs.getBigDecimal("flat");
-			return new RevenueShareData(null, null, null,
-					null, startValue, endValue, percentage, flat);
+			return new RevenueShareData(startValue, endValue, percentage, flat);
 		}
 
 	}
@@ -1153,7 +1152,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public RevenueShareData retriveEditRevenueRecord(Long id) {
 		final String sql ="select rsm.id as id,rsm.business_line as businessLine,rsm.media_category as mediaCategory,"+
-							"rsm.revenue_share_type as revenueShareType "+
+							"rsm.revenue_share_type as revenueShareType, rsm.client_id as clientId "+
 							"from bp_revenue_share_master rsm "+
 							"where rsm.id=?";
 	
@@ -1167,11 +1166,12 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public RevenueShareData mapRow(ResultSet rs, int rowNum)
 		throws SQLException {
 			final Long id = rs.getLong("id");
+			final Long clientId = rs.getLong("clientId");
 			final Long businessLine = rs.getLong("businessLine");
 			final Long mediaCategory = rs.getLong("mediaCategory");
 			final Long revenueShareType = rs.getLong("revenueShareType");
 			return new RevenueShareData(id, businessLine, mediaCategory,
-					revenueShareType, null, null, null, null);
+					revenueShareType,clientId);
 }
 
 }

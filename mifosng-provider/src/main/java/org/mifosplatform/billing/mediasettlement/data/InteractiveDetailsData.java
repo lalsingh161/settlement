@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class InteractiveDetailsData {
 
 	private Long playSource;
-	private Long contentName;
+	private String contentName;
 	private Long contentProvider;
 	private Long channelName;
 	private Long serviceName;
@@ -13,7 +13,7 @@ public class InteractiveDetailsData {
 	private BigDecimal downloads;
 	private BigDecimal grossRevenue;
 
-	public InteractiveDetailsData(Long playSource, Long contentName,
+	public InteractiveDetailsData(Long playSource, String contentName,
 			Long contentProvider, Long channelName, Long serviceName,
 			BigDecimal endUserPrice, BigDecimal downloads,
 			BigDecimal grossRevenue) {

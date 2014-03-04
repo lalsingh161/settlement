@@ -2030,6 +2030,15 @@ public class CommandWrapperBuilder {
 		this.href = "/creditdistribution";
 		return this;
 	}
+
+	
+	public CommandWrapperBuilder updateInteractiveData(Long eventId) {
+		this.actionName = "EDIT";
+		this.entityName = "INTERACTIVEGAMEEVENT";
+		this.entityId = eventId;
+		this.href = "mediasettlements/interactive/" + eventId;
+		return this;
+	}
 	
 	
 }

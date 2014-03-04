@@ -1154,5 +1154,9 @@ public class CommandWrapper {
 	public boolean isCreditDistributionResource() {
 		return this.entityName.equalsIgnoreCase("CREDITDISTRIBUTION");
 	}
-
+	
+	public boolean isEditInteractiveData() {
+		return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
+				&& this.actionName.equalsIgnoreCase("EDIT");
+	}
 }

@@ -403,7 +403,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	 	    	final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", elements);
 		        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
 	 	    	
-		        final Long contentName = fromApiJsonHelper.extractLongNamed("contentName", elements);
+		        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", elements);
 		        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
 		        
 		        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", elements);
@@ -464,7 +464,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	 	    	final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", elements);
 		        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
 	 	    	
-		        final Long contentName = fromApiJsonHelper.extractLongNamed("contentName", elements);
+		        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", elements);
 		        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
 		        
 		        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", elements);

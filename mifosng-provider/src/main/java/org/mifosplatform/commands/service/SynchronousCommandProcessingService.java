@@ -873,6 +873,8 @@ public class SynchronousCommandProcessingService implements
 						 handler = applicationContext.getBean("createGameEventCommandHandler",NewCommandSourceHandler.class);
 					 }else if(wrapper.isCreateInteractiveDetails()){
 						 handler = applicationContext.getBean("createInteractiveDetailCommandHandler",NewCommandSourceHandler.class);
+					 }else if(wrapper.isEditInteractiveData()){
+						 handler = applicationContext.getBean("editInteractiveDetailCommandHandler", NewCommandSourceHandler.class);
 					 }
 				 }else if(wrapper.isCreditDistributionResource()){
 			         if(wrapper.isCreate()) {
