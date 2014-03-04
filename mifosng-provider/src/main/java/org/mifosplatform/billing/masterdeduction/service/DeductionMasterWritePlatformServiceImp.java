@@ -83,7 +83,6 @@ public class DeductionMasterWritePlatformServiceImp implements DeductionMasterWr
 		             deductionData.setDeductionCircle(deductionDatas.getDeductionCircle());
 		             deductionData.setLevelApplicable(deductionDatas.getLevelApplicable());
 		             deductionData.setBusiness(deductionDatas.getBusiness());
-		             deductionData.setCustomerType(deductionDatas.getCustomerType());
 	       
 	             this.deductionJpaRepository.save(deductionData);
 	         }

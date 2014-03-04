@@ -1159,4 +1159,20 @@ public class CommandWrapper {
 		return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
 				&& this.actionName.equalsIgnoreCase("EDIT");
 	}
+	public boolean isCurrencyRateResource(){
+	    return this.entityName.equalsIgnoreCase("CURRENCYRATE");
+	}
+	
+	public boolean isCretaeCurrencyRate() {
+		return this.entityName.equalsIgnoreCase("CURRENCYRATE") && this.actionName.equalsIgnoreCase("CREATE");
+	}
+	
+	public boolean isUpdateCurrencyRate() {
+		return this.entityName.equalsIgnoreCase("CURRENCYRATE") && this.actionName.equalsIgnoreCase("UPDATE");
+	}
+	
+	public boolean isDeleteCurrencyRate() {
+		return this.entityName.equalsIgnoreCase("CURRENCYRATE") && this.actionName.equalsIgnoreCase("DELETE");
+	}
+
 }

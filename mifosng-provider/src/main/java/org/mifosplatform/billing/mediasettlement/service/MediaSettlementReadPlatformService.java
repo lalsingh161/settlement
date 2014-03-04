@@ -120,6 +120,11 @@ public interface MediaSettlementReadPlatformService {
 
 	InteractiveData retrieveInteractiveHeaderData(Long eventId);
 
+	Collection<PartnerAccountData> retrieveAllCurrencyRateDetails();
+
+	PartnerAccountData retrieveCurrencyRateDetail(Long id);
+	
+	
 	
 
 	

@@ -2040,5 +2040,30 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 	
+	public CommandWrapperBuilder createCurrencyRate() {
+		this.actionName = "CREATE";
+		this.entityName = "CURRENCYRATE";
+		this.entityId = null;
+		this.href = "mediasettlements/currencyrate";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateCurrencyRateDetail(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "CURRENCYRATE";
+		this.entityId = id;
+		this.href = "mediasettlements/currencyrate"+id;
+		return this;	
+	}
+
+	public CommandWrapperBuilder deleteCurrencyRateDetail(Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "CURRENCYRATE";
+		this.entityId = id;
+		this.href = "mediasettlements/currencyrate"+id;
+		return this;
+		
+	}
+	
 	
 }

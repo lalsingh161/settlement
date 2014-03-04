@@ -31,8 +31,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 		@Column(name = "ded_source")
 		private String levelApplicable;
 		
-		@Column(name = "Customer_type")
-		private Long customerType;
+		/*@Column(name = "Customer_type")
+		private Long customerType;*/
 		
 		@Column(name = "ded_category")
 		private String business;
@@ -52,20 +52,15 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 		
 		
 		public DeductionCodes(String deductionCode, String deductionName,
-				String deductionType, Long customerType,
-				String levelApplicable, String circle ,String business) {
+				String deductionType,String levelApplicable, String circle ,String business) {
 			
 			this.deductionCode = deductionCode;
 			this.deductionName = deductionName;
 			this.deductionType = deductionType;
-			this.customerType = customerType;
 			this.levelApplicable = levelApplicable;
 			this.deductionCircle = circle;
 			this.business = business;
 		}
-
-
-		
 
 
 		public String getDeductionCircle() {
@@ -96,17 +91,6 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 		public void setBusiness(String business) {
 			this.business = business;
 		}
-
-
-		public Long getCustomerType() {
-			return customerType;
-		}
-
-
-		public void setCustomerType(Long customerType) {
-			this.customerType = customerType;
-		}
-
 
 		public void setDeductionCode(String deductionCode) {
 			this.deductionCode = deductionCode;
@@ -144,11 +128,10 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 			final String deductionCode = command.stringValueOfParameterNamed("deductionCode");
 			final String deductionName = command.stringValueOfParameterNamed("deductionName");
 			final String deductionType = command.stringValueOfParameterNamed("deductionType");
-			final Long customerType = command.longValueOfParameterNamed("customerType");
 			final String levelApplicable = command.stringValueOfParameterNamed("levelApplicable");
 			final String circle = command.stringValueOfParameterNamed("circle");
 			final String business = command.stringValueOfParameterNamed("business");
-			return new DeductionCodes(deductionCode,deductionName,deductionType,customerType,levelApplicable,circle,business);
+			return new DeductionCodes(deductionCode,deductionName,deductionType,levelApplicable,circle,business);
 		}
 
 		public void delete() {

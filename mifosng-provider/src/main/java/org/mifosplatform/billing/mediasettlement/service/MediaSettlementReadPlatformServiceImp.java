@@ -132,12 +132,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 	@Override
 	public List<PartnerAgreementData> retrievePartnerAgreementDetails() {
-		/*
-		 * final String sql =
-		 * "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id) as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation from bp_agreement a order by id asc"
-		 * ;
-		 */
-		final String sql = "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";
+		
+	final String sql = "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";
 		PartnerAgreementMapper mapper = new PartnerAgreementMapper();
 		return jdbcTemplate.query(sql, mapper);
 	}
@@ -152,8 +148,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String agreementType = rs.getString("agreementType");
 			final String agreementCategory = rs.getString("agreementCategory");
 			final String royaltyType = rs.getString("royaltyType");
-			final LocalDate startDate = JdbcSupport.getLocalDate(rs,
-					"startDate");
+			final LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
 			final LocalDate endDate = JdbcSupport.getLocalDate(rs, "endDate");
 			final String agmtLocation = rs.getString("agmtLocation");
 			final String settlementSource = rs.getString("settlementSource");
@@ -1174,6 +1169,54 @@ public class MediaSettlementReadPlatformServiceImp implements
 					revenueShareType,clientId);
 }
 
-}
+}    
+
+		@Override
+		public Collection<PartnerAccountData> retrieveAllCurrencyRateDetails() {
+			final String sql = "select cr.id as id ,(select code from m_currency where id = cr.source_currency) as sourceCurrency,(select code from m_currency where id = cr.target_currency ) as targetCurrency,cr.exchange_rate as exchangeRate," +
+					"cr.e_start_date as startDate,cr.e_end_date as endDate from bp_currency_rate cr where cr.is_deleted='N' order by cr.id asc";
+			currencyMapper mapper=new currencyMapper();
+			return jdbcTemplate.query(sql, mapper, new Object[]{});
+		}
+		
+		private final static class currencyMapper implements
+		RowMapper<PartnerAccountData> {
+			
+	   @Override
+	    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
+	     Long id = rs.getLong("id");   
+		 String  sourceCurrency= rs.getString("sourceCurrency");
+		 String  targetCurrency= rs.getString("targetCurrency");
+		 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
+		LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+		LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
+		return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
+	   }
+
+	}
+
+		@Override
+		public PartnerAccountData retrieveCurrencyRateDetail(Long id) {
+	     	context.authenticatedUser();
+			final String sql = "select cr.id as id , cr.source_currency as sourceCurrency,cr.target_currency as targetCurrency,cr.exchange_rate as exchangeRate," +
+					"cr.e_start_date as startDate,cr.e_end_date as endDate from bp_currency_rate cr where id= ?";						
+			EditCurrencyMapper mapper = new EditCurrencyMapper();
+			return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
+		
+	    }
+		private static final class EditCurrencyMapper implements
+		                                           RowMapper<PartnerAccountData> {
+			   @Override
+			    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
+			      Long id = rs.getLong("id");   
+				 Long  sourceCurrency= rs.getLong("sourceCurrency");
+				 Long  targetCurrency= rs.getLong("targetCurrency");
+				 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
+				LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+				LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
+				return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
+			   }
+
+			}
 
 }

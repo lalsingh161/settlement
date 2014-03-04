@@ -76,11 +76,11 @@ import org.springframework.stereotype.Component;
 	@Produces({ MediaType.APPLICATION_JSON })
     public String getMastersTemplate(@Context final UriInfo uriInfo){
     	 Collection<MCodeData> deductionTypeData = mCodeReadPlatformService.getCodeValue("type");
-    	 Collection<MCodeData>  customerTypes = mCodeReadPlatformService.getCodeValue("Client Category");
+    	// Collection<MCodeData>  customerTypes = mCodeReadPlatformService.getCodeValue("Client Category");
     	 Collection<MCodeData> levelApplicables = mCodeReadPlatformService.getCodeValue("Level Applicable");
     	 Collection<MCodeData> businessCategory = mCodeReadPlatformService.getCodeValue("Business");
     	 Collection<StateDetails> stateDatas=deductionReadPlatformService.retrieveAllStateDetails();
-    	 DeductionMasterData deductionData = new DeductionMasterData(deductionTypeData,customerTypes,levelApplicables,businessCategory,stateDatas);
+    	 DeductionMasterData deductionData = new DeductionMasterData(deductionTypeData,levelApplicables,businessCategory,stateDatas);
     	return toApiJsonSerializer.serialize(deductionData);
     }
     
@@ -114,10 +114,9 @@ import org.springframework.stereotype.Component;
     		
     		masterData = deductionReadPlatformService.retrieveDeductionDetail(id);
     		masterData.setDeductionTypeData(mCodeReadPlatformService.getCodeValue("type"));
-    		masterData.setCustomerTypes(mCodeReadPlatformService.getCodeValue("Client Category"));
     		masterData.setLevelApplicables(mCodeReadPlatformService.getCodeValue("Level Applicable"));
     		masterData.setBusinessCategory(mCodeReadPlatformService.getCodeValue("Business"));
-    		masterData.setStateData(deductionReadPlatformService.retrieveAllStateDetails());
+    		masterData.setStateDatas(deductionReadPlatformService.retrieveAllStateDetails());
     		
     	
     	}catch(EmptyResultDataAccessException accessException){

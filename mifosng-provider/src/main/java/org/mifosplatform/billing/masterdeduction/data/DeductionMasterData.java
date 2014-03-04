@@ -1,7 +1,7 @@
 package org.mifosplatform.billing.masterdeduction.data;
 
 
-	import java.util.Collection;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -14,27 +14,28 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 	private Long id;
 		
 		private String deductionCode;
-		private String deductionType;
+		private String deductionTypeStr;
 		private String deductionName;
-		private String levelApplicable;
-		private Long customerType;
-		private String business;
-		private String circle;
-		private List<DeductionMasterData> masterDatas;
-
+		private String levelApplicableStr;
+		private String businessStr;
+		private String circleStr;
+	    private List<DeductionMasterData> masterDatas;
 		private Collection<MCodeData> levelApplicables;
 		private Collection<MCodeData> deductionTypeData;
 	    private Collection<MCodeData> businessCategory;
-	    private Collection<MCodeData> customerTypes;
-	    private Collection<StateDetails> stateDatas;
+	    private  Collection<StateDetails> stateDatas;
+
+     	private Long circle;
+     	private Long deductionType;
+     	private Long business;
+		private Long levelApplicable;
 	   
 		public DeductionMasterData(Collection<MCodeData> deductionTypeData,
-				Collection<MCodeData> customerTypes, Collection<MCodeData> levelApplicables,
+			   Collection<MCodeData> levelApplicables,
 				Collection<MCodeData> businessCategory, Collection<StateDetails> stateDatas) {
 			this.deductionTypeData = deductionTypeData;
 			this.levelApplicables = levelApplicables;
 			this.businessCategory= businessCategory;
-			this.customerTypes = customerTypes;
 			this.stateDatas = stateDatas;
 			
 		}
@@ -42,21 +43,32 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 
 		public DeductionMasterData(Long id,String deductionCode,
 				String deductionName, String deductionType,
-				String levelApplicable, String business, Long customerType,
+				String levelApplicable, String business, 
 				String circle) {
 			this.id= id;
 			this.deductionCode = deductionCode;
 			this.deductionName = deductionName;
-			this.deductionType = deductionType;
-			this.levelApplicable = levelApplicable;
-			this.business = business;
-			this.circle = circle;
-			this.customerType = customerType;
+			this.deductionTypeStr = deductionType;
+			this.levelApplicableStr = levelApplicable;
+			this.businessStr = business;
+			this.circleStr = circle;
+		}
+		public DeductionMasterData(List<DeductionMasterData> masterDatas) {
+			this.masterDatas=masterDatas;
 		}
 
 
-		public DeductionMasterData(List<DeductionMasterData> masterDatas) {
-			this.masterDatas=masterDatas;
+		public DeductionMasterData(Long id, String deductionCode,
+				String deductionName, Long deductionType,
+				Long levelApplicable, Long business,
+				Long circle) {
+			this.id=id;
+			this.deductionCode=deductionCode;
+			this.deductionName=deductionName;
+			this.deductionType = deductionType;
+			this.levelApplicable = levelApplicable;
+			this.business = business;
+			this.circle = circle ;
 		}
 
 
@@ -80,8 +92,8 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 		}
 
 
-		public String getDeductionType() {
-			return deductionType;
+		public String getDeductionTypeStr() {
+			return deductionTypeStr;
 		}
 
 
@@ -100,46 +112,17 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 		}
 
 
-		public String getLevelApplicable() {
-			return levelApplicable;
+		public String getLevelApplicableStr() {
+			return levelApplicableStr;
 		}
 
-
-		public void setLevelApplicable(String levelApplicable) {
-			this.levelApplicable = levelApplicable;
+		public String getBusinessStr() {
+			return businessStr;
 		}
 
-
-		public Long getCustomerType() {
-			return customerType;
+		public String getCircleStr() {
+			return circleStr;
 		}
-
-
-		public void setCustomerType(Long customerType) {
-			this.customerType = customerType;
-		}
-
-
-		public String getBusiness() {
-			return business;
-		}
-
-
-		public void setBusiness(String business) {
-			this.business = business;
-		}
-
-
-		public String getCircle() {
-			return circle;
-		}
-
-
-		public void setCircle(String circle) {
-			this.circle = circle;
-		}
-
-		
 
 		public List<DeductionMasterData> getMasterDatas() {
 			return masterDatas;
@@ -170,17 +153,6 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 			this.businessCategory = businessCategory;
 		}
 
-
-		public Collection<MCodeData> getCustomerTypes() {
-			return customerTypes;
-		}
-
-
-		public void setCustomerTypes(Collection<MCodeData> customerTypes) {
-			this.customerTypes = customerTypes;
-		}
-
-
 		public void setLevelApplicables(Collection<MCodeData> levelApplicables) {
 			this.levelApplicables = levelApplicables;
 		}
@@ -191,14 +163,31 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 		}
 
 
-		public void setStateData(
-				Collection<StateDetails> retrieveAllStateDetails) {
-			this.stateDatas = retrieveAllStateDetails;
-			
+		public Collection<StateDetails> getStateDatas() {
+			return stateDatas;
 		}
 
 
-		
+		public void setStateDatas(Collection<StateDetails> stateDatas) {
+			this.stateDatas = stateDatas;
+		}
+
+
+		public Long getCircle() {
+			return circle;
+		}
+
+		public Long getDeductionType() {
+			return deductionType;
+		}
+
+		public Long getBusiness() {
+			return business;
+		}
+
+		public Long getLevelApplicable() {
+			return levelApplicable;
+		}
 		
 		
 	}
