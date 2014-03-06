@@ -53,6 +53,11 @@ public interface MediaSettlementWritePlatformService {
 			JsonCommand command);
 
 	CommandProcessingResult updateRevenue(JsonCommand command);
+	
+//	CommandProcessingResult createPAmediaCatregory(JsonCommand command);
+	
+	CommandProcessingResult updatePAmediaCatregory(JsonCommand command);
 
+	
 	
 }

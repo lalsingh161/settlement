@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
@@ -392,7 +393,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			// scope for the particular entities
 			final MediaSettlementCommandMapper mapper = new MediaSettlementCommandMapper(
 					false);
-			final String sql = "select " + mapper.schema() + " and g.id=? ";
+			final String sql = "select DISTINCT " + mapper.schema() + " and g.id=? ";
 			return this.jdbcTemplate.queryForObject(sql, mapper,
 					new Object[] { documentId });
 		} catch (final EmptyResultDataAccessException e) {
@@ -417,7 +418,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			 * ;
 			 * " g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType, g.start_date as startDate,g.end_date as endDate, a.media_category as mediaCategory,a.partner_type as partnerType,a.partner_name as partnerName, g.partner_account_id as partnerAccountId from bp_account a,bp_agreement g where g.partner_account_id=a.id and a.is_deleted='N'"
 			 */
-			return " g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.play_source as playSource,g.royalty_share as royaltyShare,g.royalty_sequence as royaltySequence,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, g.media_category as mediaCategory,g.partner_type as partnerType,a.partner_name as partnerName, g.partner_account_id as partnerAccountId from bp_account a,bp_agreement g where g.partner_account_id=a.id ";
+			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,d.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id   ";
 		}
 
 		@Override
@@ -425,9 +426,12 @@ public class MediaSettlementReadPlatformServiceImp implements
 				@SuppressWarnings("unused") final int rowNum)
 				throws SQLException {
 
+
+			final Long id = JdbcSupport.getLong(rs, "id");
+			
 			final Long partnerType = JdbcSupport.getLong(rs, "partnerType");
 
-			final Long mediaCategory = JdbcSupport.getLong(rs, "mediaCategory");
+			//final Long mediaCategory = JdbcSupport.getLong(rs, "mediaCategory");
 
 			final String partnerName = rs.getString("partnerName");
 
@@ -449,20 +453,20 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long settlementSource = JdbcSupport.getLong(rs,
 					"settlementSource");
 
-			final Long playSource = JdbcSupport.getLong(rs, "playSource");
-			final BigDecimal royaltyShare = JdbcSupport
-					.getBigDecimalDefaultToNullIfZero(rs, "royaltyShare");
-			final Long royaltySequence = JdbcSupport.getLong(rs,
-					"royaltySequence");
+			//final Long playSource = JdbcSupport.getLong(rs, "playSource");
+			//final BigDecimal royaltyShare = JdbcSupport
+			//		.getBigDecimalDefaultToNullIfZero(rs, "royaltyShare");
+			//final Long royaltySequence = JdbcSupport.getLong(rs,
+			//		"royaltySequence");
 
 			final BigDecimal mgAmount = JdbcSupport
 					.getBigDecimalDefaultToZeroIfNull(rs, "mgAmount");
+			
+			//final Long status = JdbcSupport	.getLong(rs, "status");
 
-			return new MediaSettlementCommand(partnerName, agreementType,
+			return new MediaSettlementCommand(id,partnerName, agreementType,
 					agreementCategory, royaltyType, startDate, endDate,
-					partnerType, mediaCategory, partnerAccountId,
-					settlementSource, playSource, royaltyShare,
-					royaltySequence, mgAmount);
+					 partnerAccountId,settlementSource,	 mgAmount,partnerType);
 		}
 
 	}
@@ -1175,5 +1179,60 @@ public class MediaSettlementReadPlatformServiceImp implements
 }
 
 }
+		
+		
+	@Override
+		public List<PartnerAgreementData> retrivePAmediaCategoryData(Long agmtId,
+				Long mediaCategory, Long partnerType) {
+			// TODO Auto-generated method stub
+		context.authenticatedUser();
+		final String sql = "SELECT id as id, media_category as mediaCategory,royalty_sequence as royaltySequence ,play_source as playSource ,royalty_share as royaltyShare, status as status from bp_agreement_dtl where  agmt_id =? and media_category =? and partner_type=? ";
+		PAmediaCategoryData mapper = new PAmediaCategoryData();
+		return jdbcTemplate.query(sql, mapper, new Object[] { agmtId ,mediaCategory,partnerType });
+		}	
+		
+		
+		
+		@Override
+		public List<PartnerAgreementData> retrivePAmediaCategoryData(
+				Long agmtId) {
+			// TODO Auto-generated method stub
+			context.authenticatedUser();
+			final String sql = "SELECT id as id, media_category as mediaCategory,royalty_sequence as royaltySequence ,play_source as playSource ,royalty_share as royaltyShare, status as status from bp_agreement_dtl where  agmt_id =? ";
+			PAmediaCategoryData mapper = new PAmediaCategoryData();
+			return jdbcTemplate.query(sql, mapper, new Object[] { agmtId });
+		}
+
+		private static final class PAmediaCategoryData implements
+				RowMapper<PartnerAgreementData> {
+			@Override
+			public PartnerAgreementData mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				final Long id = rs.getLong("id");
+				final Long mediaCategory=rs.getLong("mediaCategory");
+				final Long royaltySequence = rs.getLong("royaltySequence");
+				final Long playSource = rs.getLong("playSource");
+				final Long royaltyShare = rs.getLong("royaltyShare");
+				final Long status = rs.getLong("status");
+				
+				return new PartnerAgreementData(id,mediaCategory,royaltySequence, playSource, royaltyShare, status);
+			}
+		}
+		
+		
+		@Override
+		public Long checkPAgreementId(Long partnerAccountId, Long agreementType, Long agreementCategory,
+				 Long royaltyType,Long settlementSource) {
+			// TODO Auto-generated method stub
+			try {
+				context.authenticatedUser();
+				final String sql = "select id  from `bp_agreement` where partner_account_id=? and agreement_type=? and agreement_category =? and royalty_type=? and   settle_source =? ";
+				return jdbcTemplate.queryForLong(sql, new Object[] { partnerAccountId,
+						agreementType,agreementCategory, royaltyType, settlementSource });
+			} catch (final EmptyResultDataAccessException e) {
+				return null;
+			}
+
+		}
 
 }

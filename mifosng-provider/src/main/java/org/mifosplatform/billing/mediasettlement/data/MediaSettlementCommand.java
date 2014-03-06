@@ -3,6 +3,7 @@ package org.mifosplatform.billing.mediasettlement.data;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.joda.time.LocalDate;
@@ -31,14 +32,16 @@ public class MediaSettlementCommand {
 	private Long playSource;
 	private BigDecimal royaltyShare;
 	private Long royaltySequence;
-	
+	private Long status;
+	private List<PartnerAgreementData> partnerAgreementDatas;
+
 	/*mgAmount is minimum guarented amoun*/
 	private BigDecimal mgAmount;
 
 	
 	public MediaSettlementCommand (Set<String> modifiedParameters, Long id, Long partnerAccountId,	Long agreementType,Long agreementCategory,Long royaltyType,Date startDate,
 			Date endDate,String agmtLocation,InputStream inputStream, String fileName, Long settlementSource,Long playSource,
-			BigDecimal royaltyShare, Long royaltySequence,BigDecimal mgAmount, Long mediaCategory, Long partnerType){
+			BigDecimal royaltyShare, Long royaltySequence,BigDecimal mgAmount, Long mediaCategory, Long partnerType,Long status){
 		
 		this.modifiedParameters = modifiedParameters;
 		this.id = id;
@@ -58,15 +61,18 @@ public class MediaSettlementCommand {
 	 	this.mgAmount = mgAmount;
 	 	this.mediaCategory = mediaCategory;
 	 	this.partnerType = partnerType;
+	 	this.status=status;
 	}
 
 	
-	public MediaSettlementCommand (String partnerName,	Long agreementType,Long agreementCategory,Long royaltyType,LocalDate startDate,
+	/*public MediaSettlementCommand (Long id,String partnerName,	Long agreementType,Long agreementCategory,Long royaltyType,LocalDate startDate,
 			LocalDate endDate,Long partnerType,Long mediaCategory,Long partnerAccountId,Long settlementSource, Long playSource,
-			BigDecimal royaltyShare, Long royaltySequence,BigDecimal mgAmount){
+			BigDecimal royaltyShare, Long royaltySequence,BigDecimal mgAmount,Long status){
+	*/	public MediaSettlementCommand (Long id,String partnerName,	Long agreementType,Long agreementCategory,Long royaltyType,LocalDate startDate,
+				LocalDate endDate,Long partnerAccountId,Long settlementSource,BigDecimal mgAmount,Long partnerType){
+			
 		
-		
-   			 
+   		this.id=id;	 
 		this.partnerAccountId=partnerAccountId;
 		this.agreementType=agreementType;
 		this.agreementCategory=agreementCategory;
@@ -74,22 +80,22 @@ public class MediaSettlementCommand {
 		this.startDate=startDate.toDate();
 		this.endDate=endDate.toDate();
 		this.partnerName=partnerName;
-		this.mediaCategory=mediaCategory;
-		this.partnerType=partnerType;
+//		this.mediaCategory=mediaCategory;
 	 	this.settlementSource=settlementSource;
+	 	this.mgAmount = mgAmount;
+	 	this.partnerType=partnerType;
+	 	/*
 	 	this.playSource=playSource;
 	 	this.royaltyShare=royaltyShare;
 	 	this.royaltySequence=royaltySequence;
-	 	this.mgAmount = mgAmount;
+	 	this.status=status;*/
 	}
 
 	
 	
 	
 	public MediaSettlementCommand (Long id,String partnerName ){
-		
-		
-   			 
+
 		this.id=id;
 		this.partnerName=partnerName;
 	
@@ -102,10 +108,11 @@ public class MediaSettlementCommand {
 	    }
 
 	public MediaSettlementCommand(MediaSettlementCommand mediaSettlementCommand,
-			PartnerAccountData partnerAccountData) {
+			PartnerAccountData partnerAccountData,List<PartnerAgreementData> partnerAgreementDatas ) {
 		// TODO Auto-generated constructor stub
 		this.mediaSettlementCommand=mediaSettlementCommand;
 		this.partnerAccountData=partnerAccountData;
+		this.partnerAgreementDatas=partnerAgreementDatas;
 	}
 
 
@@ -264,6 +271,16 @@ public class MediaSettlementCommand {
 	}
 
 
+	public Long getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(Long status) {
+		this.status = status;
+	}
+
+
 	public Long getPartnerType() {
 		return partnerType;
 	}
@@ -400,5 +417,12 @@ public class MediaSettlementCommand {
 	public boolean isPartnerTypeChanged() {
 		return this.modifiedParameters.contains("partnerType");
 	}
+	
+	public boolean isStatusChanged() {
+		return this.modifiedParameters.contains("status");
+	}
+
     
+	
+	
 }

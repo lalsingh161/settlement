@@ -841,7 +841,9 @@ public class SynchronousCommandProcessingService implements
 						   handler = applicationContext.getBean("createRevenueCommandHandler",NewCommandSourceHandler.class);
 					   }else if(wrapper.isUpdateRevenue()){
 						   handler = applicationContext.getBean("updateRevenueCommandHandler",NewCommandSourceHandler.class);
-					   }
+					   }else if(wrapper.isUpdatePAdetail()) {
+				             handler = applicationContext.getBean("updatePartnerAgreementDetailCommandHandler",NewCommandSourceHandler.class);
+				         }
 				 
 				 }else if(wrapper.isMasterDeduction()){
 					 	if(wrapper.isCreateDeductionCodes()){

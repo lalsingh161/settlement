@@ -22,9 +22,14 @@ public class PartnerAgreementData {
 	private String agmtLocation;
 	private List<PartnerAgreementData> partnerAgreementDatas;
 	private String partnerType;
-	private String mediaCategory;
+	private Long mediaCategory;
 	private String fileName;
 	private String settlementSource;
+	private Long royaltySequence;
+	private Long royaltyShare;
+	private Long status;
+	private Long playSource;
+	
 	
 	public PartnerAgreementData() {
 		
@@ -71,6 +76,17 @@ public class PartnerAgreementData {
 	
 	
 	
+
+	public PartnerAgreementData(Long id,Long mediaCategory,Long royaltySequence, Long playSource,
+			Long royaltyShare, Long status) {
+		// TODO Auto-generated constructor stub
+		this.royaltySequence=royaltySequence;
+		this.playSource=playSource;
+		this.royaltyShare=royaltyShare;
+		this.status=status;
+		this.mediaCategory=mediaCategory;
+		this.id=id;
+	}
 
 	public Long getId() {
 		return id;
@@ -153,11 +169,11 @@ public class PartnerAgreementData {
 		this.partnerType = partnerType;
 	}
 
-	public String getMediaCategory() {
+	public Long getMediaCategory() {
 		return mediaCategory;
 	}
 
-	public void setMediaCategory(String mediaCategory) {
+	public void setMediaCategory(Long mediaCategory) {
 		this.mediaCategory = mediaCategory;
 	}
 
@@ -169,6 +185,36 @@ public class PartnerAgreementData {
 		this.fileName = fileName;
 	}
 
+	public Long getRoyaltySequence() {
+		return royaltySequence;
+	}
+
+	public void setRoyaltySequence(Long royaltySequence) {
+		this.royaltySequence = royaltySequence;
+	}
+
+	public Long getRoyaltyShare() {
+		return royaltyShare;
+	}
+
+	public void setRoyaltyShare(Long royaltyShare) {
+		this.royaltyShare = royaltyShare;
+	}
+
+	public Long getStatus() {
+		return status;
+	}
+
+	public void setStatus(Long status) {
+		this.status = status;
+	}
+	public Long getPlaySource() {
+		return playSource;
+	}
+
+	public void setPlaySource(Long playSource) {
+		this.playSource = playSource;
+	}
 	
 	
 	

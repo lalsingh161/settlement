@@ -20,6 +20,8 @@ import org.mifosplatform.billing.mediasettlement.domain.OperatorDeduction;
 import org.mifosplatform.billing.mediasettlement.domain.OperatorDeductionJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerAccount;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerAgreement;
+import org.mifosplatform.billing.mediasettlement.domain.PartnerAgreementDetail;
+import org.mifosplatform.billing.mediasettlement.domain.PartnerAgreementDetailRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerAgreementRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGame;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetails;
@@ -41,6 +43,7 @@ import org.mifosplatform.billing.mediasettlement.serialization.MediaSettlementCo
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
+import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
@@ -54,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +78,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private RevenueSettlementJpaRepository revenueSettlementJpaRepository;
 	final private RevenueOEMSettlementJpaRepository revenueOEMSettlementJpaRepository;
 	final private PartnerAgreementRepository partnerAgreementRepository;
+	final private PartnerAgreementDetailRepository partnerAgreementDetailRepository;
 	final private ChannelPartnerMappingJpaRepository channelPartnerJpaRepository;
 	final private SettlementSequenceJpaRepository settlementSequenceJpaRepository;
 	final private ClientRepository clientRepository;
@@ -100,7 +105,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final ClientRepository clientReposritory,
 			final InteractiveHeaderJpaRepository interactiveHeaderJpaRepository,
 			final InteractiveDetailsJpaRepository interactiveDetailsJpaRepository,
-			final RevenueMasterJpaRepository revenueMasterJpaRepository) {
+			final RevenueMasterJpaRepository revenueMasterJpaRepository,
+			final PartnerAgreementDetailRepository partnerAgreementDetailRepository) {
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
 		this.fromApiJsonDeserializer = apiJsonDeserializer;
@@ -118,6 +124,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		this.interactiveHeaderJpaRepository = interactiveHeaderJpaRepository;
 		this.interactiveDetailsJpaRepository = interactiveDetailsJpaRepository;
 		this.revenueMasterJpaRepository = revenueMasterJpaRepository;
+		this.partnerAgreementDetailRepository=partnerAgreementDetailRepository;
 	}
 	
 	
@@ -382,24 +389,36 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	public CommandProcessingResult createAgreement(MediaSettlementCommand command ) {
 		// TODO Auto-generated method stub
 
+		PartnerAgreement detail=null;
 		try {
 			
 	         String fileLocation=null;
 	         fileLocation = FileUtils.saveToFileSystem(command.getInputStream(), command.getAgmtLocation(),command.getFileName());
 	         context.authenticatedUser().getId();
-	         
-	         PartnerAgreement detail=PartnerAgreement.createNew(command.getPartnerAccountId(),command.getAgreementType(),command.getAgreementCategory(),
-	        		 command.getRoyaltyType(),command.getStartDate(),command.getEndDate(),fileLocation,command.getFileName(),command.getSettlementSource(), command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMgAmount(),command.getMediaCategory(),command.getPartnerType());
-	         
-	         this.partnerAgreementRepository.save(detail);
-	    
+	      	        		
+	          detail=PartnerAgreement.createNew(command.getPartnerAccountId(),command.getAgreementType(),command.getAgreementCategory(),
+	        		 command.getRoyaltyType(),command.getStartDate(),command.getEndDate(),fileLocation,command.getFileName(),command.getSettlementSource(),command.getMgAmount());
+//	         command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMgAmount(),command.getMediaCategory(),command.getPartnerType());
+	       
+	        if(detail.getId() == null){
+	        	Long agmtId = mediaSettlementReadPlatformService.checkPAgreementId(command.getPartnerAccountId(),command.getAgreementType(),command.getAgreementCategory(),
+		        		 command.getRoyaltyType(),command.getSettlementSource());
+			PartnerAgreementDetail details=PartnerAgreementDetail.createNew(agmtId,command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMediaCategory(),command.getPartnerType(),command.getStatus(),command.getPartnerAccountId());
+	        this.partnerAgreementDetailRepository.save(details);
+	        
+	        }else{
+	        	this.partnerAgreementRepository.save(detail);
+	        	PartnerAgreementDetail details=PartnerAgreementDetail.createNew(detail.getId(),command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMediaCategory(),command.getPartnerType(),command.getStatus(),command.getPartnerAccountId());
+	        	this.partnerAgreementDetailRepository.save(details);	        	
+	        }
 	         return new CommandProcessingResult( detail.getId());
 	         
 	         
 	} catch (DataIntegrityViolationException dve) {
-		 logger.error(dve.getMessage(), dve);
+		logger.error(dve.getMessage(), dve);
          throw new PlatformDataIntegrityException("error.msg.document.unknown.data.integrity.issue",
                  ""+dve.getMostSpecificCause().getMessage());
+         
 	}catch (final IOException ioe) {
         logger.error(ioe.getMessage(), ioe);
         throw new DocumentManagementException(command.getFileName());
@@ -418,7 +437,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
         try {
             this.context.authenticatedUser();
 
-            
+           /*PartnerAgreementDetail documentUpdate = this.partnerAgreementDetailRepository.findOne(documentCommand.getId());  
+           documentUpdate.update(documentCommand);*/
             
             String oldLocation = null;
             PartnerAgreement documentForUpdate = this.partnerAgreementRepository.findOne(documentCommand.getId());
@@ -452,7 +472,13 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
                 deleteFile(documentCommand.getFileName(), oldLocation);
             }
 
+            
+//            documentForUpdate.setLastModifiedDate(documentUpdate.getLastModifiedDate());
+            
             this.partnerAgreementRepository.saveAndFlush(documentForUpdate);
+//            this.partnerAgreementDetailRepository.saveAndFlush(documentUpdate);
+            
+           
 
             return new CommandProcessingResult(documentForUpdate.getId());
         } catch (final DataIntegrityViolationException dve) {
@@ -838,4 +864,102 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		                .build();
 
 			}
+	 	 
+	 /*	@Transactional	 	 
+	 	@Override
+	 	public CommandProcessingResult createPAmediaCatregory(JsonCommand command) {
+	 		// TODO Auto-generated method stub
+	 		PartnerAgreementDetail revenueMaster = PartnerAgreementDetail.fromJson(command);
+			
+			final JsonArray revenueparamArray=command.arrayOfParameterNamed("percentageParams").getAsJsonArray();
+			
+			if(revenueparamArray!=null && revenueparamArray.size()>0){
+			     for (JsonElement jsonelement : revenueparamArray) {	
+			    	     final Long startValue = fromApiJsonHelper.extractLongNamed("startValue", jsonelement);
+			    	     final Long endValue = fromApiJsonHelper.extractLongNamed("endValue", jsonelement);
+			    	     final BigDecimal percentage = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("percentage", jsonelement);
+			    	     RevenueParam revenueParam=new RevenueParam(startValue,endValue,percentage);
+			    	     revenueMaster.addRevenueParamValues(revenueParam);				 
+			     }
+			 }else{
+				 RevenueParam revenueParam=RevenueParam.fromJson(command);
+				 revenueMaster.addRevenueParamValues(revenueParam);
+			 }
+			revenueMasterJpaRepository.save(revenueMaster);
+		return new CommandProcessingResult(revenueMaster.getId());
+	 		 return null;
+	 	}*/
+	 	 
+	 	 
+	 	 
+	 	 @Transactional
+			@Override
+			public CommandProcessingResult updatePAmediaCatregory(JsonCommand command) {
+				
+				context.authenticatedUser();
+				
+				PartnerAgreementDetail detail= null;
+				
+				try{
+				
+					final JsonArray partnerAgreementDatasArray = command.arrayOfParameterNamed("partnerAgreementData").getAsJsonArray();
+					List<Long> id = new ArrayList<Long>();
+					for(int i=0; i<partnerAgreementDatasArray.size();i++){
+						String currentData = partnerAgreementDatasArray.get(i).toString();
+						final JsonElement element = fromApiJsonHelper.parse(currentData);
+						 final Long ids = fromApiJsonHelper.extractLongNamed("id", element);
+						//detail = this.partnerAgreementDetailRepository.findOne(id);
+						 id.add(ids);
+					}
+					for(int i=0; i<partnerAgreementDatasArray.size();i++){
+						
+						for (JsonElement jsonelement : partnerAgreementDatasArray) {
+						
+						detail = this.partnerAgreementDetailRepository.findOne(id.get(i));
+						Long elementId =fromApiJsonHelper.extractLongNamed("id", jsonelement);
+						if(detail.getId().equals(id.get(i) )  && detail.getId().equals(elementId)){
+						
+						 Long playSource =fromApiJsonHelper.extractLongNamed("playSource", jsonelement);
+			    		 Long royaltySequence =fromApiJsonHelper.extractLongNamed("royaltySequence", jsonelement);
+			    		 Long mediaCategory =fromApiJsonHelper.extractLongNamed("mediaCategory", jsonelement);
+			    		 Long partnerType =fromApiJsonHelper.extractLongNamed("partnerType", jsonelement);
+			    		 Long status =fromApiJsonHelper.extractLongNamed("status", jsonelement);
+			    		 BigDecimal royaltyShare = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("royaltyShare", jsonelement);
+			    		 
+				    		 if(!detail.getPlaySource().equals(playSource) ){
+				    			 detail.setPlaySource(playSource);				    		
+				    		 }
+				    		 if(!detail.getRoyaltySequence().equals(royaltySequence)){
+				    			 detail.setRoyaltySequence(royaltySequence);
+				    		 }
+				    		 if(!detail.getMediaCategory().equals(mediaCategory)){
+				    			 detail.setMediaCategory(mediaCategory);
+				    		 }
+				    		 if(!detail.getPartnerType().equals(partnerType)){
+				    			 detail.setPartnerType(partnerType);
+				    		 }
+				    		 if(!detail.getStatus().equals(status)){
+				    			 detail.setStatus(status);
+				    		 }
+				    		 if(!detail.getRoyaltyShare().equals(royaltyShare)){
+				    			 detail.setRoyaltyShare(royaltyShare);
+				    		 }
+						
+				    		 this.partnerAgreementDetailRepository.saveAndFlush(detail); 
+						}
+						}
+						
+					}
+					
+
+					
+			 	}catch (DataIntegrityViolationException dve) {
+					throw new PlatformDataIntegrityException(dve.getLocalizedMessage(), dve.getRootCause().getCause().getMessage(), "");
+				}
+				return new CommandProcessingResultBuilder() 
+                .withCommandId(command.commandId()) 
+                .withEntityId(command.entityId()) 
+                .build();
+				 
+	 	 }		
 }
