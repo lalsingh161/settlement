@@ -2064,6 +2064,26 @@ public class CommandWrapperBuilder {
 		return this;
 		
 	}
+	public CommandWrapperBuilder createBusinessLine() {
+		this.entityName = "BUSINESSLINE";
+		this.actionName = "CREATE";
+		this.href = "";
+		return this;
+	}
+	public CommandWrapperBuilder updateBusinessLine(Long eventId) {
+		this.entityName = "BUSINESSLINE";
+		this.actionName = "UPDATE";
+		this.entityId = eventId;
+		this.href = "";
+		return this;
+	}
+	public CommandWrapperBuilder deleteBusinessLine(Long eventId) {
+		this.entityName = "BUSINESSLINE";
+		this.actionName = "DELETE";
+		this.entityId = eventId;
+		this.href = "";
+		return this;
+	}
 	
 	
 }

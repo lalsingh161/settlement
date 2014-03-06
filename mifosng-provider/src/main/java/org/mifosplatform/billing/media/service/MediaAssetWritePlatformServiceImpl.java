@@ -83,8 +83,8 @@ public class MediaAssetWritePlatformServiceImpl implements MediaAssetWritePlatfo
 					     final String mediaattributeNickname= fromApiJsonHelper.extractStringNamed("attributeNickname", element);
 					     final String mediaattributeImage= fromApiJsonHelper.extractStringNamed("attributeImage", element);
 	                     MediaassetAttributes attributes=new MediaassetAttributes(mediaAttributeType,mediaattributeName,mediaattributeValue,
-			              mediaattributeNickname,mediaattributeImage);
-   	                       mediaAsset.add(attributes);
+			             mediaattributeNickname,mediaattributeImage);
+   	                     mediaAsset.add(attributes);
 				  }
 				 
 				  final JsonArray mediaassetLocationsArray=command.arrayOfParameterNamed("mediaAssetLocations").getAsJsonArray();

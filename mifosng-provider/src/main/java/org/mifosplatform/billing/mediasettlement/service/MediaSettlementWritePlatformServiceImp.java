@@ -62,7 +62,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.lowagie.text.Header;
 
 @Service
 public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWritePlatformService{
