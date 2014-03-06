@@ -82,7 +82,7 @@ BusinessLineWritePlatformService {
 	public CommandProcessingResult updateBusinessLine(JsonCommand command) {
 		try {
 			this.context.authenticatedUser();
-			//this.apiJsonDeserializer.validateForCreate(command.json());
+			this.apiJsonDeserializer.validateForCreate(command.json());
 			BusinessLineMaster newEvent = BusinessLineMaster.fromJsom(command);
 			System.out.println(command.entityId());
 			BusinessLineMaster oldEvent = this.businessLineMasterRepository.findOne(command.entityId());

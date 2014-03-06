@@ -48,11 +48,10 @@ public class BusinessLineFromApiJsonDeserializer {
 	     
 	     final String eventName = fromApiJsonHelper.extractStringNamed("eventName", element);
 	     baseDataValidator.reset().parameter("eventName").value(eventName).notBlank().notExceedingLengthOf(100);
-	     final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
-	     baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank().notExceedingLengthOf(100);
 	     final Long status = fromApiJsonHelper.extractLongNamed("status", element);
 	     baseDataValidator.reset().parameter("status").value(status).notNull();
-	     
+	     final String chargeCode = fromApiJsonHelper.extractStringNamed("chargeCode", element);
+	     baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank().notExceedingLengthOf(100);
 	     final String[] category = fromApiJsonHelper.extractArrayNamed("categoryData", element);
 	     baseDataValidator.reset().parameter("category").value(category).arrayNotEmpty();
 	     
