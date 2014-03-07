@@ -38,6 +38,7 @@ import org.mifosplatform.billing.mediasettlement.domain.SettlementSequence;
 import org.mifosplatform.billing.mediasettlement.domain.SettlementSequenceJpaRepository;
 import org.mifosplatform.billing.mediasettlement.exception.AccountPartnerNotFoundException;
 import org.mifosplatform.billing.mediasettlement.exception.CurrencyRateNotFoundException;
+import org.mifosplatform.billing.mediasettlement.exception.OperatorDeductionCodeNotFountException;
 import org.mifosplatform.billing.mediasettlement.exception.PartnerAgreementNotFoundException;
 import org.mifosplatform.billing.mediasettlement.exception.PartnerGameNotFoundException;
 import org.mifosplatform.billing.mediasettlement.serialization.MediaSettlementCommandFromApiJsonDeserializer;
@@ -541,6 +542,38 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			throw new PlatformApiDataValidationException(e.getDefaultUserMessage(), e.getGlobalisationMessageCode(),null);
 		}
 	}
+	
+	@Transactional
+	@Override
+	public CommandProcessingResult updateOperatorDeduction(JsonCommand command,
+			Long entityId) {
+
+		OperatorDeduction operatorDeduction = null;
+		try{
+			
+			operatorDeduction = operatorDeductionJpaRepository.findOne(entityId);
+			
+			if(null == operatorDeduction){
+				throw new OperatorDeductionCodeNotFountException(entityId.toString());
+			}
+			
+			fromApiJsonDeserializer.validateForUpdateDeductionCode(command.json());
+			
+			Map<String, Object> actualChanges = operatorDeduction.update(command);
+			if(!actualChanges.isEmpty()){
+				operatorDeductionJpaRepository.save(operatorDeduction);
+			}
+			
+			
+		}catch(DataIntegrityViolationException dve){
+			handleCodeDataIntegrityIssues(command, dve);
+		}
+		
+	
+		return new CommandProcessingResultBuilder().withEntityId(operatorDeduction.getId()).build();
+	}
+	
+	@Transactional
 	@Override
 	public CommandProcessingResult deletePartnerDocument(Long entityId) {
 		
@@ -557,6 +590,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 
 	}
 	
+	@Transactional
 	@Override
 	public CommandProcessingResult deletePartnerGame(Long entityId) {
 		
@@ -579,6 +613,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 
 	}
 	
+	@Transactional
 	@Override
 	public CommandProcessingResult updateSettlementSequenceData(
 			JsonCommand command) {
@@ -707,6 +742,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	   
 	}
 	
+	@Transactional
 	@Override
 	public CommandProcessingResult createGameEvent(JsonCommand command,
 			Long entityId) {

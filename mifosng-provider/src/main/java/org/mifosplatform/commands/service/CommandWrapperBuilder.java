@@ -2084,6 +2084,14 @@ public class CommandWrapperBuilder {
 		this.href = "";
 		return this;
 	}
+
+	public CommandWrapperBuilder updateOperatorDeductionCode(Long codeId) {
+		this.actionName = "UPDATE";
+		this.entityName = "OPERATORDEDUCTION";
+		this.entityId = codeId;
+		this.href = "/mediasettlements/deductionoperator/edit/"+codeId;
+		return this;
+	}
 	
 	
 }

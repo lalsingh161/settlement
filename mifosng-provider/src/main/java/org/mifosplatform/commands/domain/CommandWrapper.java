@@ -1186,5 +1186,9 @@ public class CommandWrapper {
 	public boolean isBusinessLineUpdate() {
         return this.actionName.equalsIgnoreCase("UPDATE");
     }
+	
+	public boolean isOperatorDeductionUpdate(){
+		return this.actionName.equalsIgnoreCase("UPDATE") && this.entityName.equalsIgnoreCase("OPERATORDEDUCTION");
+	}
 
 }

@@ -677,7 +677,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 	@Override
 	public Collection<OperatorDeductionData> getOperatorDeduction(Long clientId) {
-		final String sql = "select client_id as clientId, ded_code as deductionCode, ded_value as deductionValue from bp_operator_deduction where client_id = ? order by id";
+		final String sql = "select id as id,client_id as clientId, ded_code as deductionCode, ded_value as deductionValue from bp_operator_deduction where client_id = ? order by id";
 		OperatorDeductionMapper mapper = new OperatorDeductionMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 	}
@@ -688,10 +688,11 @@ public class MediaSettlementReadPlatformServiceImp implements
 		@Override
 		public OperatorDeductionData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
+			final Long id = rs.getLong("id");
 			final Long clientId = rs.getLong("clientId");
 			final String deductionCode = rs.getString("deductionCode");
-			final Long deductionValue = rs.getLong("deductionValue");
-			return new OperatorDeductionData(clientId, deductionCode,
+			final BigDecimal deductionValue = rs.getBigDecimal("deductionValue");
+			return new OperatorDeductionData(id,clientId, deductionCode,
 					deductionValue);
 		}
 	}
@@ -1204,19 +1205,39 @@ public class MediaSettlementReadPlatformServiceImp implements
 			return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
 		
 	    }
+
 		private static final class EditCurrencyMapper implements
-		                                           RowMapper<PartnerAccountData> {
-			   @Override
-			    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
-			      Long id = rs.getLong("id");   
-				 Long  sourceCurrency= rs.getLong("sourceCurrency");
-				 Long  targetCurrency= rs.getLong("targetCurrency");
-				 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
-				LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
-				LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
-				return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
-			   }
-
-			}
-
+	                                           RowMapper<PartnerAccountData> {
+		   @Override
+		    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		      Long id = rs.getLong("id");   
+			 Long  sourceCurrency= rs.getLong("sourceCurrency");
+			 Long  targetCurrency= rs.getLong("targetCurrency");
+			 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
+			LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+			LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
+			return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
+		   }
+		}
+		
+		@Override
+		public OperatorDeductionData getOperatorSingleDeductionCode(
+				Long codeId) {
+			final String sql = "select od.id as id, od.client_id as clientId,od.ded_code as dedCode, od.ded_value as dedValue from bp_operator_deduction od where od.id = ?";
+			OperatorDeductionEditMapper mapper = new OperatorDeductionEditMapper();
+			return jdbcTemplate.queryForObject(sql,mapper,new Object[]{codeId});
+		}
+		
+		private static final class OperatorDeductionEditMapper implements RowMapper<OperatorDeductionData>{
+			
+			public OperatorDeductionData mapRow(ResultSet rs, int rowNum) throws SQLException {
+				
+				final Long id = rs.getLong("id");
+				final String deductionCode = rs.getString("dedCode"); 
+				final BigDecimal deductionValue = rs.getBigDecimal("dedValue");
+				final Long clientId = rs.getLong("clientId");
+				
+				return new OperatorDeductionData(id, clientId, deductionCode, deductionValue);			
+			};
+		}
 }

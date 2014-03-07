@@ -296,6 +296,29 @@ public class MediaSettlementApiResources {
     	return toApiJsonSerializer.serialize(deductionCodes);
     }
     
+    @GET
+    @Path("deductionoperator/edit/{codeId}")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getOperatorSingleDeductionCode(final String jsonRequestBody, @PathParam("codeId") final Long codeId){
+    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+    	OperatorDeductionData operatorDeductionDatas = mediaSettlementReadPlatformService.getOperatorSingleDeductionCode(codeId);
+    	Collection<OperatorDeductionData> deductionCodes = mediaSettlementReadPlatformService.getDeductionCodes();
+    	OperatorDeductionData deductionData = new OperatorDeductionData(operatorDeductionDatas,deductionCodes);
+    	return toApiJsonSerializer.serialize(deductionData);
+    }
+    
+    @PUT
+    @Path("deductionoperator/edit/{codeId}")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String updateOperatorDeductionCode(final String jsonRequestBody, @PathParam("codeId") final Long codeId){
+    	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+    	final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOperatorDeductionCode(codeId).withJson(jsonRequestBody).build();
+    	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    	return toApiJsonSerializer.serialize(result);
+    }
+    
     @POST
     @Path("/deductionoperator/template")
     @Produces(MediaType.APPLICATION_JSON)

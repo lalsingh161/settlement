@@ -11,13 +11,10 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
-import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
-import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
 import org.mifosplatform.infrastructure.core.data.DataValidatorBuilder;
 import org.mifosplatform.infrastructure.core.exception.InvalidJsonException;
 import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidationException;
-import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 public class MediaSettlementCommandFromApiJsonDeserializer {
 
 	
-    private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList("partnerName","partnerType","mediaCategory",
+    private final static Set<String> supportedParameters = new HashSet<String>(Arrays.asList("partnerName","partnerType","mediaCategory",
     		"partnerAddress","gamePlaySource","gameMediaPartnerData","game","gDate","royaltySequence",
     		"royaltyValue","overwriteRoyaltyValue","playSource","price","sequence","locale",
     		"id","chData","deductionCodes","deductionData","clientId","deductionValue","deductionCode","country",
@@ -38,14 +35,16 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     		"partnerType5","partnerType6","royaltyType","currencyId","currencyCode","eventId","playSource","contentName",
     		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId"));
     
-    private final Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
+    private final static Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
     		"clientId","circle","externalId","activityMonth","businessLine","mediaCategory","contentName",
     		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate"));
 	
-    private final Set<String> supportedParametersforRevenue = new HashSet<String>(
+    private final static Set<String> supportedParametersforRevenue = new HashSet<String>(
 			Arrays.asList("locale", "businessLine", "mediaCategory",
 					"revenueShareType", "startValue", "endValue", "percentage",
 					"flat", "percentageParams"));
+    
+    private final static Set<String> supportedParametersForUpdateDeductionCode = new HashSet<String>(Arrays.asList("deductionCode","deductionValue","locale","clientId"));
     
     private final FromJsonHelper fromApiJsonHelper;
 	
@@ -574,6 +573,24 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 		        baseDataValidator.reset().parameter("endDate").value(endDate).notBlank();
 		        
 		        throwExceptionIfValidationWarningsExist(dataValidationErrors);
+		}
+
+		public void validateForUpdateDeductionCode(String json) {
+			final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+	        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParametersForUpdateDeductionCode);
+
+	        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+	        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("currency");
+
+	        final JsonElement element = fromApiJsonHelper.parse(json);
+		
+	        final String deductionCode = fromApiJsonHelper.extractStringNamed("deductionCode", element);
+	        baseDataValidator.reset().parameter("deductionCode").value(deductionCode).notBlank();
+	        
+	        final BigDecimal deductionValue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("deductionValue", element);
+	        baseDataValidator.reset().parameter("deductionValue").value(deductionValue).notBlank(); 
+	        
+	        throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		}
 		
 	}
