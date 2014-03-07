@@ -838,7 +838,7 @@ public class MediaSettlementApiResources {
     
     
        
-       
+     /*  
     @POST
     @Path("/interactive/{eventId}")
     @Produces({MediaType.APPLICATION_JSON})
@@ -848,7 +848,7 @@ public class MediaSettlementApiResources {
        	CommandWrapper commandRequest= new CommandWrapperBuilder().createInteractiveDetails(eventId).withJson(jsonRequestMessageBody).build();
        	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
        	return toApiJsonSerializer.serialize(result);
-    }
+    }*/
     
     @PUT
     @Path("/interactive/{eventId}")

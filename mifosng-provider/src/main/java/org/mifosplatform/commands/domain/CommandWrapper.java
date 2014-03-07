@@ -1132,11 +1132,7 @@ public class CommandWrapper {
 				&& this.actionName.equalsIgnoreCase("CREATE");
 	}
 
-	public boolean isCreateInteractiveDetails() {
-		return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
-				&& this.actionName.equalsIgnoreCase("CREATE");
-	}
-
+	
 	public boolean isRevenue() {
 		return this.entityName.equalsIgnoreCase("MEDIASETTLEMENT");
 	}

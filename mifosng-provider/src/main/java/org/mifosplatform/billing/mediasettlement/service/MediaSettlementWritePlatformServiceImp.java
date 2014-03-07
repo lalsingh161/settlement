@@ -792,50 +792,6 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	}
 	
 	
-	 	@Transactional
-		@Override
-		public CommandProcessingResult createInteractiveDetails(Long entityId,
-				JsonCommand command) {/*
-			
-			
-			final Long eventId=entityId;
-			
-			InteractiveDetails interactiveDetailData=null;
-			 
-			try {
-				context.authenticatedUser();
-				   this.fromApiJsonDeserializer.validateForCreateInteractive(command.json());
-				   
-				   
-				   
-					final JsonArray interactiveDataArray = command.arrayOfParameterNamed("activeData").getAsJsonArray();
-				    for(int i=0; i<interactiveDataArray.size();i++){
-				    	String currentData = interactiveDataArray.get(i).toString();
-				    	final JsonElement element = fromApiJsonHelper.parse(currentData);
-				    //	final Long eventId = fromApiJsonHelper.extractLongNamed("eventId", element);
-					     final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
-					     final Long contentName = fromApiJsonHelper.extractLongNamed("contentName", element);
-					     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
-					     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
-					     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
-					     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
-					     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
-					     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
-					     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
-					     
-					     interactiveDetailData= InteractiveDetails.fromJson(eventId,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads);
-					     this.interactiveDetailsJpaRepository.save(interactiveDetailData);
-				    }
-					    
-		
-			    return new CommandProcessingResult(interactiveDetailData.getId());
-				  
-			} catch (DataIntegrityViolationException dve) {
-				throw new PlatformDataIntegrityException(dve.getLocalizedMessage(), dve.getRootCause().getCause().getMessage(), "");
-			}
-		*/
-	 		return null;
-	 	}
 	 	
 	 	@Transactional
 		@Override
@@ -872,12 +828,12 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				RevenueMaster revenueOld = revenueMasterJpaRepository.findOne(command.entityId());
 				revenueOld.getDetails().clear();
 				
-				RevenueMaster revenueNew = RevenueMaster.fromJson(command);
+				revenueOld.update(command);
 				
-				revenueOld.setBusinessLine(revenueNew.getBusinessLine());
+				/*revenueOld.setBusinessLine(revenueNew.getBusinessLine());
 				revenueOld.setMediaCategory(revenueNew.getMediaCategory());
 				revenueOld.setRevenueShareType(revenueNew.getRevenueShareType());
-				revenueOld.setClientId(revenueNew.getClientId());
+				revenueOld.setClientId(revenueNew.getClientId());*/
 					
 				
 				final JsonArray revenueparamArray=command.arrayOfParameterNamed("percentageParams").getAsJsonArray();

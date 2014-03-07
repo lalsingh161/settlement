@@ -53,6 +53,7 @@ public class RevenueMaster extends AbstractAuditableCustom<AppUser, Long>{
 		final Long businessLine = command.longValueOfParameterNamed("businessLine");
 		final Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");
 		final Long revenueShareType = command.longValueOfParameterNamed("revenueShareType");
+		/*final Long clientId = command.longValueOfParameterNamed("clientId");*/
 		return new RevenueMaster(businessLine,mediaCategory,revenueShareType,command.entityId());
 	}
 

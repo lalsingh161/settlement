@@ -1997,14 +1997,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder createInteractiveDetails(Long eventId) {
-		this.actionName = "CREATE";
-		this.entityName = "INTERACTIVEGAMEEVENT";
-		this.entityId = eventId;
-		this.href = "mediasettlements/interactive/" + eventId;
-		return this;
 
-	}
 
 	public CommandWrapperBuilder createRevenue(Long clientId) {
 		this.actionName = "CREATEREVENUE";
