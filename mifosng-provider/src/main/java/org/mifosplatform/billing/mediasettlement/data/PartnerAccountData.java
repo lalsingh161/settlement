@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
+import org.joda.time.LocalDate;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 import org.mifosplatform.billing.media.data.MediaAssetData;
 import org.mifosplatform.organisation.monetary.data.CurrencyData;
@@ -60,8 +61,15 @@ public class PartnerAccountData {
 	private Long externalId;
 	private String contactNum;
 	private String emailId;
-	private Collection<InteractiveHeaderData> interacticeHeaderData;
+	private Collection<InteractiveHeaderData> interactiveHeaderData;
 	private Collection<InteractiveDetailsData> interactiveDetailsData;
+	private Long sourceCurrency;
+	private Long targetCurrency;
+	private BigDecimal exchangeRate;
+	private LocalDate startDate;
+	private LocalDate endDate;
+	private String sourceCurrencyStr;
+	private String targetCurrencyStr;
 
 	public PartnerAccountData(Collection<MCodeData> partnerType,
 			Collection<MCodeData> mediaCategory, List<PartnerAccountData> countryData) {
@@ -208,7 +216,7 @@ public class PartnerAccountData {
 		this.clientId=clientId;
 	}
 	
-	public PartnerAccountData(
+	/*public PartnerAccountData(
 			Collection<MediaAssetData> mediaData,
 			Collection<MCodeData> playSource,
 			Collection<PartnerAccountData> contentData,
@@ -222,11 +230,11 @@ public class PartnerAccountData {
 		this.contentData = contentData;
 		this.channelData = channelData;
 		this.serviceData = serviceData;
-		this.interacticeHeaderData = interactiveHeaderData;
+		this.interactiveHeaderData = interactiveHeaderData;
 		this.interactiveDetailsData = interactiveDetailsData;
 		
 	
-	}
+	}*/
 
 	public PartnerAccountData(Long playSource, Long contentName,
 			Long contentProvider, Long channelName, Long serviceName,
@@ -248,7 +256,31 @@ public class PartnerAccountData {
 		
 	}
 
+	public PartnerAccountData(final Long id, final String sourceCurrency,
+			final String targetCurrency, final BigDecimal exchangeRate,final LocalDate startDate,
+			final LocalDate endDate) {
 	
+		this.id =id;
+		this.sourceCurrencyStr = sourceCurrency;
+		this.targetCurrencyStr = targetCurrency;
+		this.exchangeRate = exchangeRate;
+		this.startDate =startDate;
+		this.endDate = endDate;
+			
+	}
+
+	public PartnerAccountData(Long id,final Long sourceCurrency,
+			final Long targetCurrency, final BigDecimal exchangeRate,
+			final LocalDate startDate, final LocalDate endDate) {
+		this.id =id;
+		this.sourceCurrency = sourceCurrency;
+		this.targetCurrency = targetCurrency;
+		this.exchangeRate = exchangeRate;
+		this.startDate =startDate;
+		this.endDate = endDate;
+		
+		
+	}
 
 	public Collection<MCodeData> getPartnerType() {
 		return partnerTypeData;
@@ -483,6 +515,54 @@ public class PartnerAccountData {
 
 	public void setCurrencyCodes(Collection<CurrencyData> currencyCodes) {
 		this.currencyCodes = currencyCodes;
+	}
+
+	public Long getSourceCurrency() {
+		return sourceCurrency;
+	}
+
+	public void setSourceCurrency(Long sourceCurrency) {
+		this.sourceCurrency = sourceCurrency;
+	}
+
+	public Long getTargetCurrency() {
+		return targetCurrency;
+	}
+
+	public void setTargetCurrency(Long targetCurrency) {
+		this.targetCurrency = targetCurrency;
+	}
+
+	public BigDecimal getExchangeRate() {
+		return exchangeRate;
+	}
+
+	public void setExchangeRate(BigDecimal exchangeRate) {
+		this.exchangeRate = exchangeRate;
+	}
+
+	public LocalDate getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getSourceCurrencyStr() {
+		return sourceCurrencyStr;
+	}
+
+	public void setSourceCurrencyStr(String sourceCurrencyStr) {
+		this.sourceCurrencyStr = sourceCurrencyStr;
+	}
+
+	public String getTargetCurrencyStr() {
+		return targetCurrencyStr;
+	}
+
+	public void setTargetCurrencyStr(String targetCurrencyStr) {
+		this.targetCurrencyStr = targetCurrencyStr;
 	}
 	
 	

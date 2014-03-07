@@ -35,6 +35,7 @@ public class ChargeCodeReadPlatformServiceImpl implements
 		
 		@Override
 		public ChargeCodeData mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+			
 			Long id = rs.getLong("id");
 			String chargeCode = rs.getString("chargeCode");
 			String chargeDescription = rs.getString("chargeDescription");
@@ -42,8 +43,8 @@ public class ChargeCodeReadPlatformServiceImpl implements
 			Integer chargeDuration = rs.getInt("chargeDuration");
 			String durationType = rs.getString("durationType");
 			Integer taxInclusive = rs.getInt("taxInclusive");
-			 
 			String billFrequencyCode = rs.getString("billFrequencyCode");
+			
 			return new ChargeCodeData(id,chargeCode, chargeDescription, chargeType, chargeDuration, durationType, taxInclusive, billFrequencyCode);
 		}
 	}

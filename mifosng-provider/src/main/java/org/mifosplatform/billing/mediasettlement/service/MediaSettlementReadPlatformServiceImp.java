@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.address.data.StateDetails;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementData;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementsData;
+import org.mifosplatform.billing.mediasettlement.data.InteractiveData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveHeaderData;
 import org.mifosplatform.billing.mediasettlement.data.MediaCategoryData;
@@ -23,7 +23,6 @@ import org.mifosplatform.billing.mediasettlement.data.PartnerGameDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueSettlementSequenceData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueShareData;
 import org.mifosplatform.billing.mediasettlement.domain.AccountPartnerJpaRepository;
-import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeader;
 import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeaderJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueOEMSettlementJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueSettlementJpaRepository;
@@ -133,12 +132,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 	@Override
 	public List<PartnerAgreementData> retrievePartnerAgreementDetails() {
-		/*
-		 * final String sql =
-		 * "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id) as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation from bp_agreement a order by id asc"
-		 * ;
-		 */
-		final String sql = "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";
+		
+	final String sql = "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";
 		PartnerAgreementMapper mapper = new PartnerAgreementMapper();
 		return jdbcTemplate.query(sql, mapper);
 	}
@@ -153,8 +148,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String agreementType = rs.getString("agreementType");
 			final String agreementCategory = rs.getString("agreementCategory");
 			final String royaltyType = rs.getString("royaltyType");
-			final LocalDate startDate = JdbcSupport.getLocalDate(rs,
-					"startDate");
+			final LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
 			final LocalDate endDate = JdbcSupport.getLocalDate(rs, "endDate");
 			final String agmtLocation = rs.getString("agmtLocation");
 			final String settlementSource = rs.getString("settlementSource");
@@ -942,21 +936,21 @@ public class MediaSettlementReadPlatformServiceImp implements
 	}
 
 	@Override
-	public Collection<InteractiveHeaderData> retrieveInteractiveHeaderData(
+	public InteractiveData retrieveInteractiveHeaderData(
 			Long eventId) {
 		final String sql = "select client_id as clientId, client_external_id as externalId, activity_month as activityMonth, data_upload_date as dataUploadDate,"
-				+ "business_line as businessLine, media_category as mediaCategory, charge_code as chargeCode from bp_interactive_header";
+				+ "business_line as businessLine, media_category as mediaCategory, charge_code as chargeCode from bp_interactive_header where id = ?";
 		
 		InteractiveHeaderMapper mapper = new InteractiveHeaderMapper();
 		
-		return null;
+		return jdbcTemplate.queryForObject(sql,mapper,new Object[]{eventId});
 	}
 	
 	
-	private static final class InteractiveHeaderMapper implements RowMapper<InteractiveHeaderData>{
+	private static final class InteractiveHeaderMapper implements RowMapper<InteractiveData>{
 		
 		@Override
-		public InteractiveHeaderData mapRow(ResultSet rs, int rowNum)
+		public InteractiveData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long clientId = rs.getLong("clientId");
 			final Long externalId = rs.getLong("externalId");
@@ -965,7 +959,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long businessLine = rs.getLong("businessLine");
 			final Long mediaCategory = rs.getLong("mediaCategory");
 			final Long chargeCode = rs.getLong("chargeCode");
-			return new InteractiveHeaderData(clientId,externalId,activityMonth,dataUploadDate!=null?dataUploadDate.toDate():null,businessLine,mediaCategory,chargeCode);
+			return new InteractiveData(clientId,externalId,activityMonth,dataUploadDate!=null?dataUploadDate.toDate():null,businessLine,mediaCategory,chargeCode);
 		}
 		
 	}
@@ -991,7 +985,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public InteractiveDetailsData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long playSource = rs.getLong("playSource");
-			final Long contentName = rs.getLong("contentName");
+			final String contentName = rs.getString("contentName");
 			final Long contentProvider = rs.getLong("contentProvider");
 			final Long channelName = rs.getLong("channelName");
 			final Long  serviceName = rs.getLong("serviceName");
@@ -1148,8 +1142,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long endValue = rs.getLong("endValue");
 			final BigDecimal percentage = rs.getBigDecimal("percentage");
 			final BigDecimal flat=rs.getBigDecimal("flat");
-			return new RevenueShareData(null, null, null,
-					null, startValue, endValue, percentage, flat);
+			return new RevenueShareData(startValue, endValue, percentage, flat);
 		}
 
 	}
@@ -1157,7 +1150,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public RevenueShareData retriveEditRevenueRecord(Long id) {
 		final String sql ="select rsm.id as id,rsm.business_line as businessLine,rsm.media_category as mediaCategory,"+
-							"rsm.revenue_share_type as revenueShareType "+
+							"rsm.revenue_share_type as revenueShareType, rsm.client_id as clientId "+
 							"from bp_revenue_share_master rsm "+
 							"where rsm.id=?";
 	
@@ -1171,12 +1164,14 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public RevenueShareData mapRow(ResultSet rs, int rowNum)
 		throws SQLException {
 			final Long id = rs.getLong("id");
+			final Long clientId = rs.getLong("clientId");
 			final Long businessLine = rs.getLong("businessLine");
 			final Long mediaCategory = rs.getLong("mediaCategory");
 			final Long revenueShareType = rs.getLong("revenueShareType");
 			return new RevenueShareData(id, businessLine, mediaCategory,
-					revenueShareType, null, null, null, null);
+					revenueShareType,clientId);
 }
+
 
 }
 		
@@ -1234,5 +1229,56 @@ public class MediaSettlementReadPlatformServiceImp implements
 			}
 
 		}
+
+    
+
+		@Override
+		public Collection<PartnerAccountData> retrieveAllCurrencyRateDetails() {
+			final String sql = "select cr.id as id ,(select code from m_currency where id = cr.source_currency) as sourceCurrency,(select code from m_currency where id = cr.target_currency ) as targetCurrency,cr.exchange_rate as exchangeRate," +
+					"cr.e_start_date as startDate,cr.e_end_date as endDate from bp_currency_rate cr where cr.is_deleted='N' order by cr.id asc";
+			currencyMapper mapper=new currencyMapper();
+			return jdbcTemplate.query(sql, mapper, new Object[]{});
+		}
+		
+		private final static class currencyMapper implements
+		RowMapper<PartnerAccountData> {
+			
+	   @Override
+	    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
+	     Long id = rs.getLong("id");   
+		 String  sourceCurrency= rs.getString("sourceCurrency");
+		 String  targetCurrency= rs.getString("targetCurrency");
+		 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
+		LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+		LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
+		return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
+	   }
+
+	}
+
+		@Override
+		public PartnerAccountData retrieveCurrencyRateDetail(Long id) {
+	     	context.authenticatedUser();
+			final String sql = "select cr.id as id , cr.source_currency as sourceCurrency,cr.target_currency as targetCurrency,cr.exchange_rate as exchangeRate," +
+					"cr.e_start_date as startDate,cr.e_end_date as endDate from bp_currency_rate cr where id= ?";						
+			EditCurrencyMapper mapper = new EditCurrencyMapper();
+			return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
+		
+	    }
+		private static final class EditCurrencyMapper implements
+		                                           RowMapper<PartnerAccountData> {
+			   @Override
+			    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
+			      Long id = rs.getLong("id");   
+				 Long  sourceCurrency= rs.getLong("sourceCurrency");
+				 Long  targetCurrency= rs.getLong("targetCurrency");
+				 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
+				LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+				LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
+				return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
+			   }
+
+			}
+
 
 }

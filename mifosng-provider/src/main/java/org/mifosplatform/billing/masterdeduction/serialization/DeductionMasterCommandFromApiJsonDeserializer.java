@@ -24,7 +24,7 @@ import com.google.gson.reflect.TypeToken;
 public class DeductionMasterCommandFromApiJsonDeserializer {
 
     private final Set<String> supportedParameters = new HashSet<String>(Arrays.asList(
-    		"deductionCode","deductionName","deductionType","levelApplicable","customerType","circle","business"));
+    		"deductionCode","deductionName","deductionType","levelApplicable","circle","business"));
     private final FromJsonHelper fromApiJsonHelper;
 
     @Autowired
@@ -50,20 +50,20 @@ public class DeductionMasterCommandFromApiJsonDeserializer {
         final String deductionName = fromApiJsonHelper.extractStringNamed("deductionName", element);
         baseDataValidator.reset().parameter("deductionName").value(deductionName).notBlank();
         
-        final String  deductionType = fromApiJsonHelper.extractStringNamed("deductionType", element);
+        final Long  deductionType = fromApiJsonHelper.extractLongNamed("deductionType", element);
         baseDataValidator.reset().parameter("deductionType").value(deductionType).notBlank();
         
-        final String  levelApplicable = fromApiJsonHelper.extractStringNamed("levelApplicable", element);
+        final Long  levelApplicable = fromApiJsonHelper.extractLongNamed("levelApplicable", element);
         baseDataValidator.reset().parameter("levelApplicable").value(levelApplicable).notBlank();
         
-        final String circle = fromApiJsonHelper.extractStringNamed("circle", element);
-        baseDataValidator.reset().parameter("circle").value(circle).notBlank();
+      //  final String circle = fromApiJsonHelper.extractStringNamed("circle", element);
+       // baseDataValidator.reset().parameter("circle").value(circle).notBlank();
         
 
-        final Long customerType = fromApiJsonHelper.extractLongNamed("customerType", element);
-        baseDataValidator.reset().parameter("customerType").value(customerType).notBlank();
+      //  final Long customerType = fromApiJsonHelper.extractLongNamed("customerType", element);
+       // baseDataValidator.reset().parameter("customerType").value(customerType).notBlank();
         
-        final String business = fromApiJsonHelper.extractStringNamed("business", element);
+        final Long business = fromApiJsonHelper.extractLongNamed("business", element);
         baseDataValidator.reset().parameter("business").value(business).notBlank();
         
         

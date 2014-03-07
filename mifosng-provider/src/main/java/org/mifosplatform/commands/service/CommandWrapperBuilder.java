@@ -2030,6 +2030,60 @@ public class CommandWrapperBuilder {
 		this.href = "/creditdistribution";
 		return this;
 	}
+
+	
+	public CommandWrapperBuilder updateInteractiveData(Long eventId) {
+		this.actionName = "EDIT";
+		this.entityName = "INTERACTIVEGAMEEVENT";
+		this.entityId = eventId;
+		this.href = "mediasettlements/interactive/" + eventId;
+		return this;
+	}
+	
+	public CommandWrapperBuilder createCurrencyRate() {
+		this.actionName = "CREATE";
+		this.entityName = "CURRENCYRATE";
+		this.entityId = null;
+		this.href = "mediasettlements/currencyrate";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateCurrencyRateDetail(Long id) {
+		this.actionName = "UPDATE";
+		this.entityName = "CURRENCYRATE";
+		this.entityId = id;
+		this.href = "mediasettlements/currencyrate"+id;
+		return this;	
+	}
+
+	public CommandWrapperBuilder deleteCurrencyRateDetail(Long id) {
+		this.actionName = "DELETE";
+		this.entityName = "CURRENCYRATE";
+		this.entityId = id;
+		this.href = "mediasettlements/currencyrate"+id;
+		return this;
+		
+	}
+	public CommandWrapperBuilder createBusinessLine() {
+		this.entityName = "BUSINESSLINE";
+		this.actionName = "CREATE";
+		this.href = "";
+		return this;
+	}
+	public CommandWrapperBuilder updateBusinessLine(Long eventId) {
+		this.entityName = "BUSINESSLINE";
+		this.actionName = "UPDATE";
+		this.entityId = eventId;
+		this.href = "";
+		return this;
+	}
+	public CommandWrapperBuilder deleteBusinessLine(Long eventId) {
+		this.entityName = "BUSINESSLINE";
+		this.actionName = "DELETE";
+		this.entityId = eventId;
+		this.href = "";
+		return this;
+	}
 	
 	public CommandWrapperBuilder createPartnerAgreementDetail(Long clientId) {
 		this.actionName = "CREATEPADETAIL";

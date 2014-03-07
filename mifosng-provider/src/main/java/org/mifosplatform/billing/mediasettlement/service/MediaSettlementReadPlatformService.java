@@ -8,6 +8,7 @@ import java.util.List;
 import org.mifosplatform.billing.address.data.StateDetails;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementData;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementsData;
+import org.mifosplatform.billing.mediasettlement.data.InteractiveData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveHeaderData;
 import org.mifosplatform.billing.mediasettlement.data.MediaCategoryData;
@@ -19,7 +20,6 @@ import org.mifosplatform.billing.mediasettlement.data.PartnerGameData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerGameDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueSettlementSequenceData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueShareData;
-import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeader;
 import org.mifosplatform.organisation.monetary.data.CurrencyData;
 
 
@@ -120,8 +120,13 @@ public interface MediaSettlementReadPlatformService {
 	Collection<InteractiveDetailsData> retriveInteractiveDetailsData(
 			Long eventId);
 
-	Collection<InteractiveHeaderData> retrieveInteractiveHeaderData(Long eventId);
+	InteractiveData retrieveInteractiveHeaderData(Long eventId);
 
+	Collection<PartnerAccountData> retrieveAllCurrencyRateDetails();
+
+	PartnerAccountData retrieveCurrencyRateDetail(Long id);
+	
+	
 	
 
 	List<PartnerAgreementData> retrivePAmediaCategoryData(Long agmtId);	

@@ -12,6 +12,8 @@ import org.joda.time.LocalDate;
 import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
 import org.mifosplatform.billing.mediasettlement.domain.AccountPartnerJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.ChannelPartnerMappingJpaRepository;
+import org.mifosplatform.billing.mediasettlement.domain.CurrencyRate;
+import org.mifosplatform.billing.mediasettlement.domain.CurrencyRateJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.InteractiveDetails;
 import org.mifosplatform.billing.mediasettlement.domain.InteractiveDetailsJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeader;
@@ -37,13 +39,13 @@ import org.mifosplatform.billing.mediasettlement.domain.RevenueSettlementJpaRepo
 import org.mifosplatform.billing.mediasettlement.domain.SettlementSequence;
 import org.mifosplatform.billing.mediasettlement.domain.SettlementSequenceJpaRepository;
 import org.mifosplatform.billing.mediasettlement.exception.AccountPartnerNotFoundException;
+import org.mifosplatform.billing.mediasettlement.exception.CurrencyRateNotFoundException;
 import org.mifosplatform.billing.mediasettlement.exception.PartnerAgreementNotFoundException;
 import org.mifosplatform.billing.mediasettlement.exception.PartnerGameNotFoundException;
 import org.mifosplatform.billing.mediasettlement.serialization.MediaSettlementCommandFromApiJsonDeserializer;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
-import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
@@ -57,7 +59,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,6 +86,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private InteractiveHeaderJpaRepository interactiveHeaderJpaRepository;
 	final private InteractiveDetailsJpaRepository interactiveDetailsJpaRepository;	
 	final private RevenueMasterJpaRepository revenueMasterJpaRepository;
+	final private CurrencyRateJpaRepository currencyRateJpaRepository;
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(MediaSettlementWritePlatformServiceImp.class);
 	
@@ -106,7 +108,9 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final InteractiveHeaderJpaRepository interactiveHeaderJpaRepository,
 			final InteractiveDetailsJpaRepository interactiveDetailsJpaRepository,
 			final RevenueMasterJpaRepository revenueMasterJpaRepository,
-			final PartnerAgreementDetailRepository partnerAgreementDetailRepository) {
+			final PartnerAgreementDetailRepository partnerAgreementDetailRepository,
+			final  CurrencyRateJpaRepository currencyRateJpaRepository) {
+
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
 		this.fromApiJsonDeserializer = apiJsonDeserializer;
@@ -124,7 +128,11 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		this.interactiveHeaderJpaRepository = interactiveHeaderJpaRepository;
 		this.interactiveDetailsJpaRepository = interactiveDetailsJpaRepository;
 		this.revenueMasterJpaRepository = revenueMasterJpaRepository;
+
 		this.partnerAgreementDetailRepository=partnerAgreementDetailRepository;
+
+		this.currencyRateJpaRepository = currencyRateJpaRepository;
+
 	}
 	
 	
@@ -720,8 +728,10 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	
 	private void handleCodeDataIntegrityIssues(JsonCommand command,
 			DataIntegrityViolationException dve) {
+		final Throwable realCause = dve.getMostSpecificCause();
 		 logger.error(dve.getMessage(), dve);
-	     throw new PlatformDataIntegrityException("Partner Type cannot be blank", "Partner Type cannot be blank" , "Partner Type cannot be blank");
+	        throw new PlatformDataIntegrityException("error.msg.settlement.create.unknown.data.integrity.issue",
+	                "Unknown data integrity issue with resource Settlement: " + realCause.getMessage());
 	   
 	}
 	
@@ -737,6 +747,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		
 		try{
 			fromApiJsonDeserializer.validateForCreateGameEvent(command.json());
+			
 			header = InteractiveHeader.fromJson(command);
 			
 			
@@ -748,7 +759,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		    	final JsonElement element = fromApiJsonHelper.parse(currentData);
 		    //	final Long eventId = fromApiJsonHelper.extractLongNamed("eventId", element);
 			     final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
-			     final Long contentName = fromApiJsonHelper.extractLongNamed("contentName", element);
+			     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 			     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
 			     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
 			     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
@@ -850,12 +861,35 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				context.authenticatedUser();
 				fromApiJsonDeserializer.validateForCreateRevenue(command.json());
 				
-				final RevenueMaster revenue = revenueMasterJpaRepository.findOne(command.entityId());
-				final Map<String,Object> changes = revenue.update(command);
-
-				revenue.updateRevenueParamters(command);
+				RevenueMaster revenueOld = revenueMasterJpaRepository.findOne(command.entityId());
+				revenueOld.getDetails().clear();
+				
+				RevenueMaster revenueNew = RevenueMaster.fromJson(command);
+				
+				revenueOld.setBusinessLine(revenueNew.getBusinessLine());
+				revenueOld.setMediaCategory(revenueNew.getMediaCategory());
+				revenueOld.setRevenueShareType(revenueNew.getRevenueShareType());
+				revenueOld.setClientId(revenueNew.getClientId());
+					
+				
+				final JsonArray revenueparamArray=command.arrayOfParameterNamed("percentageParams").getAsJsonArray();
+				
+				if(revenueparamArray!=null && revenueparamArray.size()>0){
+				     for (JsonElement jsonelement : revenueparamArray) {	
+				    	     final Long startValue = fromApiJsonHelper.extractLongNamed("startValue", jsonelement);
+				    	     final Long endValue = fromApiJsonHelper.extractLongNamed("endValue", jsonelement);
+				    	     final BigDecimal percentage = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("percentage", jsonelement);
+				    	     RevenueParam revenueParam=new RevenueParam(startValue,endValue,percentage);
+				    	     revenueOld.addRevenueParamValues(revenueParam);				 
+				     }
+				 }else{
+					 RevenueParam revenueParam=RevenueParam.fromJson(command);
+					 revenueOld.addRevenueParamValues(revenueParam);
+				 }
+				
+				
 		      
-		        this.revenueMasterJpaRepository.saveAndFlush(revenue);
+		        this.revenueMasterJpaRepository.saveAndFlush(revenueOld);
 		      
 		        return new CommandProcessingResultBuilder() //
 		                .withCommandId(command.commandId()) //
@@ -864,34 +898,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		                .build();
 
 			}
-	 	 
-	 /*	@Transactional	 	 
-	 	@Override
-	 	public CommandProcessingResult createPAmediaCatregory(JsonCommand command) {
-	 		// TODO Auto-generated method stub
-	 		PartnerAgreementDetail revenueMaster = PartnerAgreementDetail.fromJson(command);
-			
-			final JsonArray revenueparamArray=command.arrayOfParameterNamed("percentageParams").getAsJsonArray();
-			
-			if(revenueparamArray!=null && revenueparamArray.size()>0){
-			     for (JsonElement jsonelement : revenueparamArray) {	
-			    	     final Long startValue = fromApiJsonHelper.extractLongNamed("startValue", jsonelement);
-			    	     final Long endValue = fromApiJsonHelper.extractLongNamed("endValue", jsonelement);
-			    	     final BigDecimal percentage = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("percentage", jsonelement);
-			    	     RevenueParam revenueParam=new RevenueParam(startValue,endValue,percentage);
-			    	     revenueMaster.addRevenueParamValues(revenueParam);				 
-			     }
-			 }else{
-				 RevenueParam revenueParam=RevenueParam.fromJson(command);
-				 revenueMaster.addRevenueParamValues(revenueParam);
-			 }
-			revenueMasterJpaRepository.save(revenueMaster);
-		return new CommandProcessingResult(revenueMaster.getId());
-	 		 return null;
-	 	}*/
-	 	 
-	 	 
-	 	 
+
+ 
 	 	 @Transactional
 			@Override
 			public CommandProcessingResult updatePAmediaCatregory(JsonCommand command) {
@@ -962,4 +970,124 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
                 .build();
 				 
 	 	 }		
+
+	 	 @Transactional
+	 	 @Override
+	 	public CommandProcessingResult editInteractiveData(Long entityId,
+	 			JsonCommand command) {
+	 		 
+	 		InteractiveHeader headerOld = null, headerNew = null;
+	 		
+	 		try{
+	 			fromApiJsonDeserializer.validateForCreateGameEvent(command.json());
+	 			headerOld = interactiveHeaderJpaRepository.findOne(entityId);
+	 			
+	 			headerNew = InteractiveHeader.fromJson(command);
+	 			
+	 			//clientId,externalId,activityMonth,businessLine,mediaCategory,chargeCode,dataUploadedDate
+	 			
+	 			headerOld.getInteractiveDetailData().clear();
+	 			
+	 			headerOld.setClientId(headerNew.getClientId());
+	 			headerOld.setExternalId(headerNew.getExternalId());
+	 			headerOld.setActivityMonth(headerNew.getActivityMonth());
+	 			headerOld.setBusinessLine(headerNew.getBusinessLine());
+	 			headerOld.setMediaCategory(headerNew.getMediaCategory());
+	 			headerOld.setChargeCode(headerNew.getChargeCode());
+	 			headerOld.setDataUploadedDate(headerNew.getDataUploadedDate());
+	 			
+	 			
+	 			
+	 			final JsonArray interactiveDataArray = command.arrayOfParameterNamed("activeData").getAsJsonArray();
+			    for(int i=0; i<interactiveDataArray.size();i++){
+			    	String currentData = interactiveDataArray.get(i).toString();
+			    	final JsonElement element = fromApiJsonHelper.parse(currentData);
+			    //	final Long eventId = fromApiJsonHelper.extractLongNamed("eventId", element);
+				     final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
+				     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
+				     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
+				     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
+				     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
+				     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
+				     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
+				     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
+				     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
+				     
+				     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads);
+				     headerOld.add(interactiveDetailData);
+			    }
+				
+			    interactiveHeaderJpaRepository.save(headerOld);
+	 			
+	 			
+	 			
+	 		}catch(DataIntegrityViolationException dev){
+	 			handleDataIntegrityIssue(dev);
+	 			return CommandProcessingResult.empty();
+	 		}
+	 		
+	 		
+	 		return new CommandProcessingResultBuilder().withEntityId(headerOld.getId()).build();
+	 	}
+		 	@Transactional
+			@Override
+			public CommandProcessingResult createCurrencyRate(JsonCommand command) {
+			
+		 		try {
+					context.authenticatedUser();
+					   this.fromApiJsonDeserializer.validateForCreateCurrency(command.json());
+				       final CurrencyRate currencyRate=CurrencyRate.fromjson(command);
+					   this.currencyRateJpaRepository.save(currencyRate);
+					   return new  CommandProcessingResultBuilder().withEntityId(currencyRate.getId()).build();
+			
+			}catch(DataIntegrityViolationException dve){
+				throw new PlatformDataIntegrityException("unknown.data.integrity.issue","unkown.currency.data.issue","unkown.currency.data.issue");
+			}
+	}
+		 	@Transactional
+			@Override
+			public CommandProcessingResult updateCurrencyRateDetail(Long id,
+					JsonCommand command) {
+						    context.authenticatedUser();
+						    CurrencyRate currencyData=null;
+						    CurrencyRate currencyRateData=null;
+						    
+						    try
+						    {
+						    this.fromApiJsonDeserializer.validateForCreateCurrency(command.json());
+						    currencyData=this.currencyRateJpaRepository.findOne(id);
+						    currencyRateData=CurrencyRate.fromjson(command);
+						    currencyData.setSourceCurrency(currencyRateData.getSourceCurrency());
+						    currencyData.setTargetCurrency(currencyRateData.getTargetCurrency());
+						    currencyData.setExchangeRate(currencyRateData.getExchangeRate());
+						    currencyData.setStartDate(currencyRateData.getStartDate());
+						    currencyData.setEndDate(currencyRateData.getEndDate());
+						    this.currencyRateJpaRepository.save(currencyData);
+				             
+			         }
+						    catch(DataIntegrityViolationException e){
+								//logger.error(e.getMessage(), e);
+								return new CommandProcessingResult(Long.valueOf(-1L));
+							}
+						    
+			         return new CommandProcessingResultBuilder() .withCommandId(command.commandId()).withEntityId(id).build(); 
+				}
+
+		 	@Transactional
+			@Override
+			public CommandProcessingResult deleteCurrencyRateDetail(Long entityId,
+					JsonCommand command) {
+					    	 this.context.authenticatedUser();
+					    	 CurrencyRate currencyRate=this.currencyRateJpaRepository.findOne(entityId);
+					    	 
+					    	 if(currencyRate==null){
+					    		 throw new CurrencyRateNotFoundException(entityId.toString());
+					    	 }
+					    	 
+					    	 currencyRate.delete();
+					    	 this.currencyRateJpaRepository.save(currencyRate);
+					    	 return new CommandProcessingResult(entityId);
+					     
+						}
+
 }

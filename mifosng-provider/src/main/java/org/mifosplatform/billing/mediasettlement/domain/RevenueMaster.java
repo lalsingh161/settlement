@@ -114,6 +114,46 @@ public class RevenueMaster extends AbstractAuditableCustom<AppUser, Long>{
 		this.details.addAll(parameters);
 
 	}
+
+	public Long getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
+	}
+
+	public Long getBusinessLine() {
+		return businessLine;
+	}
+
+	public void setBusinessLine(Long businessLine) {
+		this.businessLine = businessLine;
+	}
+
+	public Long getMediaCategory() {
+		return mediaCategory;
+	}
+
+	public void setMediaCategory(Long mediaCategory) {
+		this.mediaCategory = mediaCategory;
+	}
+
+	public Long getRevenueShareType() {
+		return revenueShareType;
+	}
+
+	public void setRevenueShareType(Long revenueShareType) {
+		this.revenueShareType = revenueShareType;
+	}
+
+	public List<RevenueParam> getDetails() {
+		return details;
+	}
+
+	public void setDetails(List<RevenueParam> details) {
+		this.details = details;
+	}
 	
 	
 }

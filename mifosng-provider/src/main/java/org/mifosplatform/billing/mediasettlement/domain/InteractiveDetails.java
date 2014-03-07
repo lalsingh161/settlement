@@ -26,7 +26,7 @@ public class InteractiveDetails extends AbstractAuditableCustom<AppUser, Long>{
 	private Long playSource;
 	
 	@Column(name="content_name", nullable=false)
-	private Long contentName;
+	private String contentName;
 	
 	@Column(name="content_provider", nullable=false)
 	private Long contentProvider;
@@ -56,7 +56,7 @@ public class InteractiveDetails extends AbstractAuditableCustom<AppUser, Long>{
 	}
 	
 	
-       public InteractiveDetails(Long playSource, Long contentName,
+       public InteractiveDetails(Long playSource, String contentName,
 			Long contentProvider, Long channelName, Long serviceName,
 			BigDecimal endUserPrice, Long downloads, BigDecimal grossRevenue) {
 		
@@ -79,14 +79,6 @@ public class InteractiveDetails extends AbstractAuditableCustom<AppUser, Long>{
 
 	public void setPlaySource(Long playSource) {
 		this.playSource = playSource;
-	}
-
-	public Long getContentName() {
-		return contentName;
-	}
-
-	public void setContentName(Long contentName) {
-		this.contentName = contentName;
 	}
 
 	public Long getContentProvider() {
@@ -165,7 +157,7 @@ public class InteractiveDetails extends AbstractAuditableCustom<AppUser, Long>{
 
 
 	public static InteractiveDetails fromJson(Long playSource,
-			Long contentName, Long contentProvider, Long channelName,
+			String contentName, Long contentProvider, Long channelName,
 			Long serviceName, BigDecimal endUserPrice, BigDecimal grossRevenue,
 			Long downloads) {
 		

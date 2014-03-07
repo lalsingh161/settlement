@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.mifosplatform.billing.address.data.StateDetails;
 import org.mifosplatform.billing.masterdeduction.data.DeductionMasterData;
-import org.mifosplatform.billing.masterdeduction.domain.DeductionJpaRepository;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,28 +18,24 @@ import org.springframework.stereotype.Service;
 public class DeductionMasterReadPlatformServiceImp implements DeductionMasterReadPlatformService {
 
 	final private PlatformSecurityContext context;
-	final private DeductionJpaRepository deductionJpaRepository;
 	final private JdbcTemplate jdbcTemplate;
 	
 	
 	@Autowired
 	public DeductionMasterReadPlatformServiceImp(
 			final PlatformSecurityContext context,
-			final DeductionJpaRepository deductionJpaRepository,
 			final TenantAwareRoutingDataSource dataSource
 			) {
 		this.context = context;
-		this.deductionJpaRepository = deductionJpaRepository;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	
-	
 	@Override
 	public List<DeductionMasterData> retrieveAllDeductionDetails() {
 	
 		context.authenticatedUser();
-		final String sql = " SELECT id as id ,ded_code as deductionCode,deduction as deductionName,ded_type as deductionType,ded_source as levelApplicable,ded_category as business,Customer_type as customerType,circle as circle FROM bp_deduction_codes dc where dc.is_deleted='N' order by dc.id asc";
+		final String sql = " SELECT id as id ,ded_code as deductionCode,deduction as deductionName,(select code_value from m_code_value  where id = dc.ded_type) as deductionType,(select code_value from m_code_value  where id = dc.ded_source) as levelApplicable," +
+				"(select code_value from m_code_value  where id = dc.ded_category) as business,(select state_name from b_state where id=dc.circle) as circle FROM bp_deduction_codes dc where dc.is_deleted='N' order by dc.id asc";
 		DeductionMapper mapper = new DeductionMapper();
 		return jdbcTemplate.query(sql, mapper,new Object[]{} );
 	
@@ -56,18 +51,17 @@ public class DeductionMasterReadPlatformServiceImp implements DeductionMasterRea
 			final String  deductionType = rs.getString("deductionType");
 			final String  levelApplicable = rs.getString("levelApplicable");
 			final String  business = rs.getString("business");
-			final Long   customerType = rs.getLong("customerType");
 			final String  circle = rs.getString("circle");
 			
 			
-			return new DeductionMasterData(id,deductionCode,deductionName,deductionType,levelApplicable,business,customerType,circle);
+			return new DeductionMasterData(id,deductionCode,deductionName,deductionType,levelApplicable,business,circle);
 		}
 	}
 
 	@Override
 	public DeductionMasterData retrieveDeductionDetail(Long id) {
 		context.authenticatedUser();
-		final String sql = " SELECT id as id ,ded_code as deductionCode,deduction as deductionName,ded_type as deductionType,ded_source as levelApplicable,ded_category as business,Customer_type as customerType,circle as circle FROM bp_deduction_codes dc where dc.id=?";
+		final String sql = " SELECT id as id ,ded_code as deductionCode,deduction as deductionName,ded_type as deductionType,ded_source as levelApplicable,ded_category as business,circle as circle FROM bp_deduction_codes dc where dc.id=?";
 		EditDeductionMapper mapper = new EditDeductionMapper();
 		return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
 	
@@ -81,12 +75,11 @@ public class DeductionMasterReadPlatformServiceImp implements DeductionMasterRea
  		final Long id = rs.getLong("id");
 		final String  deductionCode = rs.getString("deductionCode");
 		final String  deductionName = rs.getString("deductionName");
-		final String  deductionType = rs.getString("deductionType");
-		final String  levelApplicable = rs.getString("levelApplicable");
-		final String  business = rs.getString("business");
-		final Long   customerType = rs.getLong("customerType");
-		final String  circle = rs.getString("circle");
-	return new DeductionMasterData(id,deductionCode,deductionName,deductionType,levelApplicable,business,customerType,circle);
+		final Long  deductionType = rs.getLong("deductionType");
+		final Long  levelApplicable = rs.getLong("levelApplicable");
+		final Long  business = rs.getLong("business");
+		final Long  circle = rs.getLong("circle");
+	return new DeductionMasterData(id,deductionCode,deductionName,deductionType,levelApplicable,business,circle);
   }
    }
 	
@@ -98,7 +91,6 @@ public class DeductionMasterReadPlatformServiceImp implements DeductionMasterRea
 		return jdbcTemplate.query(sql, mapper,new Object[]{} );
 	
 	}
-	
 	private static final class StateMapper implements  RowMapper<StateDetails>{
 
 		@Override
@@ -112,5 +104,4 @@ public class DeductionMasterReadPlatformServiceImp implements DeductionMasterRea
 		}
 	
 	}
-	
 }

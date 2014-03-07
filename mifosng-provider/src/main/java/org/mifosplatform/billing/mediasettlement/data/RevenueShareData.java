@@ -73,10 +73,11 @@ public class RevenueShareData {
 			
 	}
 	
-	public RevenueShareData(Long id, Long businessLine, Long mediaCategory,
+	/*public RevenueShareData(Long id, Long businessLine, Long mediaCategory,
 			Long revenueShareType, Long startValue, Long endValue, BigDecimal percentage, BigDecimal flat) {
 		
 			this.id=id;
+			this.clientId = clientId;
 			this.businessLine=businessLine;
 			this.mediaCategory=mediaCategory;
 			this.revenueShareType=revenueShareType;
@@ -85,7 +86,7 @@ public class RevenueShareData {
 			this.percentage=percentage;
 			this.flat=flat;
 	}
-
+*/
 	public RevenueShareData(Collection<MCodeData> mediaCategoryData,
 			Collection<MCodeData> businessLineData,
 			Collection<MCodeData> royaltyTypeData,
@@ -106,6 +107,23 @@ public class RevenueShareData {
 		this.mediaCategoryStr = mediaCategory;
 		this.revenueShareTypeStr = revenueShareType;
 
+	}
+
+	public RevenueShareData(Long id, Long businessLine, Long mediaCategory,
+			Long revenueShareType, Long clientId) {
+		this.id=id;
+		this.businessLine=businessLine;
+		this.mediaCategory=mediaCategory;
+		this.revenueShareType=revenueShareType;
+		this.clientId = clientId;
+	}
+
+	public RevenueShareData(Long startValue, Long endValue,
+			BigDecimal percentage, BigDecimal flat) {
+		this.startValue = startValue;
+		this.endValue = endValue;
+		this.percentage = percentage;
+		this.flat = flat;
 	}
 
 }
