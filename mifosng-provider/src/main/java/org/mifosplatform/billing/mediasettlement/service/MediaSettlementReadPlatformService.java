@@ -1,6 +1,8 @@
 package org.mifosplatform.billing.mediasettlement.service;
 
+import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.mifosplatform.billing.address.data.StateDetails;
@@ -129,6 +131,11 @@ public interface MediaSettlementReadPlatformService {
 	
 	
 
+	List<PartnerAgreementData> retrivePAmediaCategoryData(Long agmtId);	
 	
+	List<PartnerAgreementData> retrivePAmediaCategoryData(Long agmtId,Long mediaCategory,Long partnerType);	
 	
+	Long checkPAgreementId(Long partnerAccountId, Long agreementType, Long agreementCategory,
+			 Long royaltyType, Long settlementSource);
+
 }

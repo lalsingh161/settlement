@@ -53,6 +53,8 @@ public interface MediaSettlementWritePlatformService {
 
 	CommandProcessingResult updateRevenue(JsonCommand command);
 
+	CommandProcessingResult updatePAmediaCatregory(JsonCommand command);
+
 	public CommandProcessingResult createCurrencyRate(JsonCommand command);
 
 	public CommandProcessingResult updateCurrencyRateDetail(Long entityId,
@@ -63,8 +65,6 @@ public interface MediaSettlementWritePlatformService {
 
 	public CommandProcessingResult editInteractiveData(Long entityId,
 			JsonCommand command);
-
 	public CommandProcessingResult updateOperatorDeduction(JsonCommand command,
 			Long entityId);
-
 }

@@ -2086,5 +2086,23 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 	
+	public CommandWrapperBuilder createPartnerAgreementDetail(Long clientId) {
+		this.actionName = "CREATEPADETAIL";
+		this.entityName = "MEDIASETTLEMENT";
+		this.entityId = clientId;
+		this.href = "parrtnerAgreementMediaC/" + clientId;
+		return this;
+
+	}
+	
+	public CommandWrapperBuilder updatePartnerAgreementDetail(Long clientId) {
+		this.actionName = "UPDATEPADETAIL";
+		this.entityName = "MEDIASETTLEMENT";
+		this.entityId = clientId;
+		this.href = "parrtnerAgreementMediaC/" + clientId;
+		return this;
+
+	}
+	
 	
 }

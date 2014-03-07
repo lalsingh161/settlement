@@ -1150,6 +1150,13 @@ public class CommandWrapper {
 	public boolean isCreditDistributionResource() {
 		return this.entityName.equalsIgnoreCase("CREDITDISTRIBUTION");
 	}
+		
+	public boolean isUpdatePAdetail() {
+		return this.entityName.equalsIgnoreCase("MEDIASETTLEMENT")
+		&&	 this.actionName.equalsIgnoreCase("UPDATEPADETAIL");
+	}
+
+
 
 	public boolean isEditInteractiveData() {
 		return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
@@ -1188,3 +1195,4 @@ public class CommandWrapper {
 	}
 
 }
+

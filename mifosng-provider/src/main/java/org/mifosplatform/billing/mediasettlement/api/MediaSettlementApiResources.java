@@ -515,7 +515,10 @@ public class MediaSettlementApiResources {
     	
     	MediaSettlementCommand mediaSettlementCommand = mediaSettlementReadPlatformService.retrieveDocument(documentId);
     	
-    	MediaSettlementCommand mediaSettlement=new MediaSettlementCommand(mediaSettlementCommand,partnerAccountData);
+    	List<PartnerAgreementData> partnerAgreementDatas= mediaSettlementReadPlatformService.retrivePAmediaCategoryData(documentId);
+    	
+    	
+    	MediaSettlementCommand mediaSettlement=new MediaSettlementCommand(mediaSettlementCommand,partnerAccountData,partnerAgreementDatas);
         
     	return toApiJsonSerializer.serialize(mediaSettlement);
        
@@ -532,7 +535,8 @@ public class MediaSettlementApiResources {
             @FormDataParam("agreementCategory") Long agreementCategory, @FormDataParam("royaltyType") Long royaltyType,
             @FormDataParam("settlementSource") Long settlementSource,@FormDataParam("startDate") Date startDate, @FormDataParam("endDate") Date endDate,
             @FormDataParam("playSource") Long playSource,@FormDataParam("royaltyShare") BigDecimal royaltyShare,@FormDataParam("royaltySequence") Long royaltySequence,
-            @FormDataParam("mgAmount") BigDecimal mgAmount,@FormDataParam("mediaCategory") Long mediaCategory,@FormDataParam("partnerType") Long partnerType) {
+            @FormDataParam("mgAmount") BigDecimal mgAmount,@FormDataParam("mediaCategory") Long mediaCategory,@FormDataParam("partnerType") Long partnerType,
+            @FormDataParam("status") Long status){
     	
     	FileUtils.validateFileSizeWithinPermissibleRange(fileSize, null, ApiConstants.MAX_FILE_UPLOAD_SIZE_IN_MB);
         /*inputStreamObject=inputStream;*/
@@ -547,7 +551,7 @@ public class MediaSettlementApiResources {
 
         
         MediaSettlementCommand mediaSettlementCommand=new MediaSettlementCommand(null,null,partnerAccountId,agreementType,
-        		agreementCategory,royaltyType,startDate,endDate,fileUploadLocation,inputStream,fileName,settlementSource,playSource,royaltyShare,royaltySequence,mgAmount,mediaCategory,partnerType);
+        		agreementCategory,royaltyType,startDate,endDate,fileUploadLocation,inputStream,fileName,settlementSource,playSource,royaltyShare,royaltySequence,mgAmount,mediaCategory,partnerType,status);
         CommandProcessingResult result = this.mediaSettlementWritePlatformService.createAgreement(mediaSettlementCommand);
         return toApiJsonSerializer.serialize(result);
     }
@@ -564,7 +568,8 @@ public class MediaSettlementApiResources {
             @FormDataParam("agreementCategory") Long agreementCategory, @FormDataParam("royaltyType") Long royaltyType,
             @FormDataParam("settlementSource") Long settlementSource,@FormDataParam("startDate") Date startDate, @FormDataParam("endDate") Date endDate,
             @FormDataParam("playSource") Long playSource,@FormDataParam("royaltyShare") BigDecimal royaltyShare,@FormDataParam("royaltySequence") Long royaltySequence,
-            @FormDataParam("mgAmount") BigDecimal mgAmount,@FormDataParam("mediaCategory") Long mediaCategory,@FormDataParam("partnerType") Long partnerType) {
+            @FormDataParam("mgAmount") BigDecimal mgAmount,@FormDataParam("mediaCategory") Long mediaCategory,@FormDataParam("partnerType") Long partnerType,
+            @FormDataParam("status") Long status) {
 
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
         FileUtils.validateFileSizeWithinPermissibleRange(fileSize, null, ApiConstants.MAX_FILE_UPLOAD_SIZE_IN_MB);
@@ -580,13 +585,13 @@ public class MediaSettlementApiResources {
         modifiedParams.add("startDate");
         modifiedParams.add("endDate");
         modifiedParams.add("settlementSource");
-        modifiedParams.add("playSource");
+        modifiedParams.add("mgAmount");
+        /*modifiedParams.add("playSource");
         modifiedParams.add("royaltyShare");
         modifiedParams.add("royaltySequence");
-        modifiedParams.add("mgAmount");
         modifiedParams.add("mediaCategory");
         modifiedParams.add("partnerType");
-        
+        modifiedParams.add("status");*/        
         
         /***
          * Populate Document command based on whether a file has also been
@@ -599,11 +604,11 @@ public class MediaSettlementApiResources {
             modifiedParams.add("agmtLocation");
           
             documentCommand=new MediaSettlementCommand(modifiedParams,documentId,partnerAccountId,agreementType,
-            		agreementCategory,royaltyType,startDate,endDate,null,inputStream,fileName,settlementSource,playSource,royaltyShare,royaltySequence,mgAmount,mediaCategory,partnerType);
+            		agreementCategory,royaltyType,startDate,endDate,null,inputStream,fileName,settlementSource,playSource,royaltyShare,royaltySequence,mgAmount,mediaCategory,partnerType,status);
            
         } else {
         	documentCommand=new MediaSettlementCommand(modifiedParams,documentId,partnerAccountId,agreementType,
-            		agreementCategory,royaltyType,startDate,endDate,null,inputStream,fileName,settlementSource,playSource,royaltyShare,royaltySequence,mgAmount,mediaCategory,partnerType);
+            		agreementCategory,royaltyType,startDate,endDate,null,inputStream,fileName,settlementSource,playSource,royaltyShare,royaltySequence,mgAmount,mediaCategory,partnerType,status);
         }
         /***
          * TODO: does not return list of changes, should be done for consistency
@@ -916,6 +921,30 @@ public class MediaSettlementApiResources {
     	return toApiJsonSerializer.serialize(result);
     }
     
+    @GET
+    @Path("/parrtnerAgreementMediaC")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getPartnerMediaCategoryTemplate(@Context final UriInfo uriInfo, @QueryParam("agmtId") final Long agmtId,@QueryParam("partnerType") final Long partnerType,@QueryParam("mediaCategory") final Long mediaCategory){
+    	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
+    	List<PartnerAgreementData> partnerAgreementDatas= mediaSettlementReadPlatformService.retrivePAmediaCategoryData(agmtId,mediaCategory,partnerType);
+    	
+    	PartnerAgreementData data = new PartnerAgreementData(partnerAgreementDatas);
+    	return toApiJsonSerializer.serialize(data);
+    }
+
+    
+    
+    @PUT
+    @Path("/parrtnerAgreementMediaC/{clientId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public String updatePAmediaCategoryDetails(@PathParam("clientId") final Long clientId,final String jsonRequestMessageBody){
+    	
+    	CommandWrapper commandRequest= new CommandWrapperBuilder().updatePartnerAgreementDetail(clientId).withJson(jsonRequestMessageBody).build();
+    	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    	return toApiJsonSerializer.serialize(result);
+    }
     //currency rate
     @GET
     @Path("/currency")
@@ -991,8 +1020,7 @@ public class MediaSettlementApiResources {
    return this.toApiJsonSerializer.serialize(result);
 
 }
-    
-    
+
 }
 
 

@@ -44,39 +44,22 @@ public class PartnerAgreement extends AbstractAuditableCustom<AppUser, Long>{
 	@Column(name="settle_source")
 	private Long settlementSource;
 	
-	
 	@Column(name = "is_deleted")
 	private char isDeleted='N';
-	
-	@Column(name="play_source")
-	private Long playSource;
 
-	@Column(name="royalty_share")
-	private BigDecimal royaltyShare;
-
-	@Column(name="royalty_sequence")
-	private Long royaltySequence;
-	
 	@Column(name="mg_amount")
 	private BigDecimal mgAmount;
-	
-	@Column(name="media_category")
-	private Long mediaCategory;
-	
-	@Column(name="partner_type")
-	private Long partnerType;
-	
-	
+
+		
 	public PartnerAgreement(){}
-	
+
 	public static PartnerAgreement createNew( Long partnerAccountId, Long agreementType, Long agreementCategory,
-			 Long royaltyType, Date startDate, Date endDate, String agmtLocation,String fileName,Long settlementSource,Long playSource,BigDecimal royaltyShare, Long royaltySequence,BigDecimal mgAmount,Long mediaCategory, Long partnerType) {
-		return new PartnerAgreement(partnerAccountId,agreementType,agreementCategory,royaltyType,startDate,endDate,agmtLocation,fileName,settlementSource,playSource,royaltyShare,royaltySequence,mgAmount,mediaCategory,partnerType);
-    }
+			 Long royaltyType, Date startDate, Date endDate, String agmtLocation,String fileName,Long settlementSource,BigDecimal mgAmount) {
+		return new PartnerAgreement(partnerAccountId,agreementType,agreementCategory,royaltyType,startDate,endDate,agmtLocation,fileName,settlementSource,mgAmount);
+   }
 		
 	public PartnerAgreement ( Long partnerAccountId, Long agreementType, Long agreementCategory,
-			 Long royaltyType, Date startDate, Date endDate, String agmtLocation,String fileName,Long settlementSource,Long playSource, BigDecimal royaltyShare,
-				Long royaltySequence,BigDecimal mgAmount, Long mediaCategory,Long partnerType) {
+			 Long royaltyType, Date startDate, Date endDate, String agmtLocation,String fileName,Long settlementSource,BigDecimal mgAmount) {
 		this.partnerAccountId=partnerAccountId;
 		this.agreementType=agreementType;
 		this.agreementCategory=agreementCategory;
@@ -86,12 +69,8 @@ public class PartnerAgreement extends AbstractAuditableCustom<AppUser, Long>{
 		this.agmtLocation=agmtLocation;
 		this.fileName=fileName;
 		this.settlementSource=settlementSource;
-		this.playSource=playSource;
-		this.royaltyShare=royaltyShare;
-		this.royaltySequence=royaltySequence;
 		this.mgAmount=mgAmount;
-		this.mediaCategory = mediaCategory;
-		this.partnerType = partnerType;
+
 	}
 
 
@@ -211,24 +190,11 @@ public class PartnerAgreement extends AbstractAuditableCustom<AppUser, Long>{
         if (command.isSettlementSourceChanged()) {
             this.settlementSource = command.getSettlementSource();
         }
-        if (command.isPlaySourceChanged()) {
-            this.playSource = command.getPlaySource();
-        }
-        if (command.isRoyaltyShareChanged()) {
-            this.royaltyShare = command.getRoyaltyShare();
-        }
-        if (command.isRoyaltySequenceChanged()) {
-            this.royaltySequence = command.getRoyaltySequence();
-        }
+        
         if (command.isMgAmountChanged()) {
             this.mgAmount = command.getMgAmount();
         }
-        if (command.isMediaCategoryChanged()){
-        	this.mediaCategory=command.getMediaCategory();
-        }
-        if(command.isPartnerTypeChanged()){
-        	this.partnerType=command.getPartnerType();
-        }
+       
 	}
 
 	
