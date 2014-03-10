@@ -553,12 +553,6 @@ public class SynchronousCommandProcessingService implements
 				handler = applicationContext.getBean("deleteItemCommandHandler",NewCommandSourceHandler.class);
 			}
 		}
-			else if (wrapper.isInvoiceResource()) {
-				if (wrapper.isCreate()) {
-					handler = applicationContext.getBean("createInvoiceCommandHandler",NewCommandSourceHandler.class);
-				}
-			
-		} 
 			
 			else if (wrapper.isAdjustmentResource()) {
 
@@ -897,7 +891,8 @@ public class SynchronousCommandProcessingService implements
 			         if(wrapper.isCreate()) {
 			             handler = applicationContext.getBean("createCreditDistributionCommandHandler",NewCommandSourceHandler.class);
 			         }
-				 }else {
+
+			 }else {
 			               throw new UnsupportedCommandException(wrapper.commandName());
 		              }
 			       

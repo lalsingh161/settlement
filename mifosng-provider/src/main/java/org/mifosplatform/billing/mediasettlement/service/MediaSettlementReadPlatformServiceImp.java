@@ -412,7 +412,10 @@ public class MediaSettlementReadPlatformServiceImp implements
 			 * ;
 			 * " g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType, g.start_date as startDate,g.end_date as endDate, a.media_category as mediaCategory,a.partner_type as partnerType,a.partner_name as partnerName, g.partner_account_id as partnerAccountId from bp_account a,bp_agreement g where g.partner_account_id=a.id and a.is_deleted='N'"
 			 */
-			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,d.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND d.partner_account_id = a.id   ";
+
+			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,d.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND d.partner_account_id = a.id  ";
+
+
 		}
 
 		@Override
@@ -607,7 +610,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			Long month, String partnerName, Long partnerTypeId) {
 		context.authenticatedUser();
 		final String sql = "SELECT branch as branch,city as city,state as state ,client as client, invoiceId as invoiceId,"
-				+ "invoiceAmount as invoiceAmount,invoiceDate as invoiceDate,videoGame as videoGame,partnerTypeId as partnerTypeId,"
+				+ "invoiceAmount as invoiceAmount,invoiceDate as invoiceDate,Media_Category as mediaCategory,partnerTypeId as partnerTypeId,"
 				+ "amountSharable as amountSharable,sequence as sequence,playSource as playSource ,partnerName as partnerName,"
 				+ "royaltyType as royaltyType,	partnerType as partnerType,commPercent as commPercent,"
 				+ "royaltyAmount as royaltyAmount ,netAmount as netAmount FROM  bp_settle_vw s WHERE MONTH(invoiceDate)=? and "
@@ -633,7 +636,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 					.getBigDecimalDefaultToZeroIfNull(rs, "invoiceAmount");
 			final LocalDate invoiceDate = JdbcSupport.getLocalDate(rs,
 					"invoiceDate");
-			final String videoGame = rs.getString("videoGame");
+			final Long mediaCategory = rs.getLong("mediaCategory");
 			final BigDecimal partnerTypeId = rs.getBigDecimal("partnerTypeId");
 			final String amountSharable = rs.getString("amountSharable");
 			final Long sequence = rs.getLong("sequence");
@@ -649,13 +652,15 @@ public class MediaSettlementReadPlatformServiceImp implements
 					.getBigDecimalDefaultToZeroIfNull(rs, "netAmount");
 
 			return new DisbursementsData(branch, city, state, client,
-					invoiceId, invoiceAmount, invoiceDate, videoGame,
+					invoiceId, invoiceAmount, invoiceDate, mediaCategory,
 					partnerTypeId, amountSharable, sequence, playSource,
 					partnerName, royaltyType, partnerType, commPercent,
 					royaltyAmount, netAmount);
 		}
 	}
 
+
+	
 		@Override 
 	  public List<DisbursementsData> retrieveAllPartnerName(Long
 	  partnerType, Long mediaCategory) { // TODO Auto-generated method stub
@@ -676,6 +681,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	  
 	  
 	  return new DisbursementsData(partnerName); } }
+
 	 
 
 	@Override
@@ -759,6 +765,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		// TODO Auto-generated method stub
 		context.authenticatedUser();
 		 final String sql = "select DISTINCT a.id as partnerAccountId, a.partner_name as partnerName,d.royalty_sequence as royaltySequence ,"
+
 
 				+ "(select partner_type from bp_royalty_seq where seq=1 and "
 				+ "oem_id =a.id and active_flag='Y' ) as partnerType4,"
