@@ -486,7 +486,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public PartnerAccountData retrieveContentProviderPartnerId(
 			String mediaCategory) {
-		final String sql = "select pa.id as partnerId ,mcv.code_value as partnerType from bp_account pa inner join m_code_value mcv on mcv.id = pa.partner_type where pa.id = ? and pa.is_deleted='N'";
+		/*final String sql = "select pa.id as partnerId ,mcv.code_value as partnerType from bp_account pa inner join m_code_value mcv on mcv.id = pa.partner_type where pa.id = ? and pa.is_deleted='N'";*/
+		final String sql = "select pa.partner_account_id as partnerId, mcv.code_value as partnerType, pad.partner_type as pType from bp_agreement pa inner join bp_agreement_dtl pad on pa.id=pad.agmt_id inner join m_code_value mcv on mcv.id=pad.partner_type inner join bp_account a on a.id=pa.partner_account_id where pa.partner_account_id=180 and a.is_deleted='N' and pa.is_deleted='N'";
 		RetrivePartnerTypeMapper mapper = new RetrivePartnerTypeMapper();
 		return jdbcTemplate.queryForObject(sql, mapper,
 				new Object[] { mediaCategory });

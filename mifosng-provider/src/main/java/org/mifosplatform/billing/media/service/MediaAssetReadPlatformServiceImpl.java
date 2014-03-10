@@ -513,7 +513,8 @@ private static final class MediaLocationDataMapper implements RowMapper<MediaLoc
 		@Override
 		public Collection<GameMediaDetailsData> retriveContentProvider() {
 			// TODO Auto-generated method stub
-			final String sql = " select  pa.id as id,pa.partner_name as partnerName, mcv.code_value as contenetProvider from    bp_account pa  inner join m_code_value mcv ON pa.partner_type = mcv.id where mcv.code_value = 'Content Provider'";
+			/*final String sql = "select  pa.id as id,pa.partner_name as partnerName, mcv.code_value as contenetProvider from    bp_account pa  inner join m_code_value mcv ON pa.partner_type = mcv.id where mcv.code_value = 'Content Provider'";*/
+			final String sql = "select a.id as id, a.partner_name as partnerName, mcv.code_value as contentProvider from bp_account a inner join bp_agreement_dtl ad on a.id=ad.partner_account_id inner join m_code_value mcv on mcv.id=ad.partner_type where mcv.code_value='Content Provider'";
 			ContentProvider names = new ContentProvider();
 			return jdbcTemplate.query(sql,names);
 		}

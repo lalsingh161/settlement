@@ -387,6 +387,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
             }
 		}catch(DataIntegrityViolationException e){
 			logger.error(e.getMessage(), e);
+			handleCodeDataIntegrityIssues(command, e);
 			return new CommandProcessingResult(Long.valueOf(-1L));
 		}
 		
