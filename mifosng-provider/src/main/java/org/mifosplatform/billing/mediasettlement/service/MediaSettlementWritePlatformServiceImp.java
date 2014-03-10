@@ -408,17 +408,19 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	        		 command.getRoyaltyType(),command.getStartDate(),command.getEndDate(),fileLocation,command.getFileName(),command.getSettlementSource(),command.getMgAmount());
 //	         command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMgAmount(),command.getMediaCategory(),command.getPartnerType());
 	       
-	        if(detail.getId() == null){
-	        	Long agmtId = mediaSettlementReadPlatformService.checkPAgreementId(command.getPartnerAccountId(),command.getAgreementType(),command.getAgreementCategory(),
-		        		 command.getRoyaltyType(),command.getSettlementSource());
-			PartnerAgreementDetail details=PartnerAgreementDetail.createNew(agmtId,command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMediaCategory(),command.getPartnerType(),command.getStatus(),command.getPartnerAccountId());
-	        this.partnerAgreementDetailRepository.save(details);
-	        
-	        }else{
-	        	this.partnerAgreementRepository.save(detail);
-	        	PartnerAgreementDetail details=PartnerAgreementDetail.createNew(detail.getId(),command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMediaCategory(),command.getPartnerType(),command.getStatus(),command.getPartnerAccountId());
-	        	this.partnerAgreementDetailRepository.save(details);	        	
-	        }
+	          
+	          try{
+	        	  this.partnerAgreementRepository.save(detail);
+		        	PartnerAgreementDetail details=PartnerAgreementDetail.createNew(detail.getId(),command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMediaCategory(),command.getPartnerType(),command.getStatus(),command.getPartnerAccountId());
+		        	this.partnerAgreementDetailRepository.save(details);
+	          }catch(DataIntegrityViolationException dev){
+	        	  Long agmtId = mediaSettlementReadPlatformService.checkPAgreementId(command.getPartnerAccountId(),command.getAgreementType(),command.getAgreementCategory(),
+			        		 command.getRoyaltyType(),command.getSettlementSource());
+				PartnerAgreementDetail details=PartnerAgreementDetail.createNew(agmtId,command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMediaCategory(),command.getPartnerType(),command.getStatus(),command.getPartnerAccountId());
+		        this.partnerAgreementDetailRepository.save(details);
+	          }
+	          
+	         
 	         return new CommandProcessingResult( detail.getId());
 	         
 	         

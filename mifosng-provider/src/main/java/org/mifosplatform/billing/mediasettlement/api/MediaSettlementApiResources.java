@@ -135,12 +135,12 @@ public class MediaSettlementApiResources {
     @Produces({MediaType.APPLICATION_JSON})
     public String getPartnerAccountTemplate(@Context final UriInfo uriInfo){
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
-    	/*Collection<MCodeData> partnerType = mCodeReadPlatformService.getCodeValue("Partner Type");
-    	Collection<MCodeData> mediaCategory = mCodeReadPlatformService.getCodeValue("Media Category");*/
+    	Collection<MCodeData> partnerType = mCodeReadPlatformService.getCodeValue("Partner Type");
+    	Collection<MCodeData> mediaCategory = mCodeReadPlatformService.getCodeValue("Media Category");
     	Collection<CurrencyData> currencyCodes = this.mediaSettlementReadPlatformService.retrieveCurrency();
     	
     	/*List<PartnerAccountData> countryData = this.mediaSettlementReadPlatformService.retrieveCountryDetails();*/
-    	PartnerAccountData accountData = new PartnerAccountData(null,null,currencyCodes);
+    	PartnerAccountData accountData = new PartnerAccountData(partnerType,mediaCategory,currencyCodes);
     	return toApiJsonSerializer.serialize(accountData);
     }
     
@@ -640,7 +640,7 @@ public class MediaSettlementApiResources {
     }
     
     
-    /*@GET
+    @GET
     @Path("/partnername")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
@@ -652,7 +652,7 @@ public class MediaSettlementApiResources {
     	
     	return toApiJsonSerializer.serialize(partnerNameDate);
     	
-    }*/
+    }
     
     @GET
     @Path("/procedureCall")

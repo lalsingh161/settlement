@@ -76,7 +76,7 @@ public interface MediaSettlementReadPlatformService {
 	
 	List<DisbursementsData> retrieveAllDisbursementsDataDetails(Long month,String partnerName,Long partnerTypeId);
 
-	/*List<DisbursementsData> retrieveAllPartnerName(Long partnerType,Long mediaCategory);*/
+	List<DisbursementsData> retrieveAllPartnerName(Long partnerType,Long mediaCategory);
 
 	Long getPartnerId(String stringCellValue);
 	
