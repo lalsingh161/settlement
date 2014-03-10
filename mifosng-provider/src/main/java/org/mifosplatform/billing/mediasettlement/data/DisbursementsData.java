@@ -28,6 +28,7 @@ public class DisbursementsData {
 	private BigDecimal royaltyAmount;
 	private BigDecimal netAmount;
 	private String partnerName;
+	private Long mediaCategory;
 	
 	List<DisbursementsData> distributionData;
 	
@@ -51,7 +52,7 @@ public class DisbursementsData {
 			 String invoiceId,
 			 BigDecimal invoiceAmount,
 			 LocalDate invoiceDate,
-			 String videoGame,
+			 Long mediaCategory,
 			 BigDecimal partnerTypeId,
 			 String amountSharable,
 			 Long  sequence,
@@ -71,7 +72,7 @@ public class DisbursementsData {
 		this.invoiceId=invoiceId;
 		this.invoiceAmount=invoiceAmount;
 		this.invoiceDate=invoiceDate.toDate();
-		this.videoGame=videoGame;
+		this.mediaCategory=mediaCategory;
 		this.partnerTypeId=partnerTypeId;
 		this.amountSharable=amountSharable;
 		this.sequence=sequence;
@@ -121,7 +122,14 @@ public class DisbursementsData {
 		return partnerTypeId;
 	}
 
-	
+
+	public Long getMediaCategory() {
+		return mediaCategory;
+	}
+
+	public void setMediaCategory(Long mediaCategory) {
+		this.mediaCategory = mediaCategory;
+	}
 
 	public Long getSequence() {
 		return sequence;

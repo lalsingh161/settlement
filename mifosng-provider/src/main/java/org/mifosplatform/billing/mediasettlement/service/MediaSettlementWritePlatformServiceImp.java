@@ -410,6 +410,10 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	        		 command.getRoyaltyType(),command.getStartDate(),command.getEndDate(),fileLocation,command.getFileName(),command.getSettlementSource(),command.getMgAmount());
 //	         command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMgAmount(),command.getMediaCategory(),command.getPartnerType());
 	       
+
+
+
+
 	          try{
 	        	  this.partnerAgreementRepository.save(detail);
 		        	PartnerAgreementDetail details=PartnerAgreementDetail.createNew(detail.getId(),command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMediaCategory(),command.getPartnerType(),command.getStatus(),command.getPartnerAccountId());
@@ -420,6 +424,11 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				PartnerAgreementDetail details=PartnerAgreementDetail.createNew(agmtId,command.getPlaySource(),command.getRoyaltyShare(),command.getRoyaltySequence(), command.getMediaCategory(),command.getPartnerType(),command.getStatus(),command.getPartnerAccountId());
 		        this.partnerAgreementDetailRepository.save(details);
 	          }
+
+	          
+	         
+
+
 	         return new CommandProcessingResult( detail.getId());
 	         
 	         
@@ -1081,5 +1090,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 					    	 return new CommandProcessingResult(entityId);
 					     
 						}
+		 	
+		 	
 
 }
