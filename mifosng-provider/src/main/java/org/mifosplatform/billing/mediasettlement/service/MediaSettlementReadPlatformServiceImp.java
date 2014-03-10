@@ -412,7 +412,10 @@ public class MediaSettlementReadPlatformServiceImp implements
 			 * ;
 			 * " g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType, g.start_date as startDate,g.end_date as endDate, a.media_category as mediaCategory,a.partner_type as partnerType,a.partner_name as partnerName, g.partner_account_id as partnerAccountId from bp_account a,bp_agreement g where g.partner_account_id=a.id and a.is_deleted='N'"
 			 */
+
 			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,d.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND d.partner_account_id = a.id  ";
+
+
 		}
 
 		@Override
@@ -656,34 +659,34 @@ public class MediaSettlementReadPlatformServiceImp implements
 		}
 	}
 
+
 	
-		  @Override 
-		  public List<DisbursementsData> retrieveAllPartnerName(Long
-			  partnerType, Long mediaCategory) { // TODO Auto-generated method stub
-			  context.authenticatedUser(); final String sql =
-			  " SELECT DISTINCT a.partner_name as partnerName FROM bp_account a, bp_agreement_dtl g WHERE g.partner_type =? AND g.media_category =? and a.is_deleted='N' AND a.id = g.partner_account_id "
-			  ; PartnerNameMapper mapper = new PartnerNameMapper(); return
-			  jdbcTemplate.query(sql, mapper,new Object[]{partnerType,mediaCategory} );
-			  
-			  }
-		  
-		private static final class PartnerNameMapper implements
-			  RowMapper<DisbursementsData>{
-			  
-			  @Override public DisbursementsData mapRow(ResultSet rs, int rowNum)
-			  throws SQLException {
-			  
-			  final String partnerName = rs.getString("partnerName");
-			  
-			  
-			  return new DisbursementsData(partnerName); 
-			  }
-	     }
+		@Override 
+	  public List<DisbursementsData> retrieveAllPartnerName(Long
+	  partnerType, Long mediaCategory) { // TODO Auto-generated method stub
+	  context.authenticatedUser(); final String sql =
+	  " SELECT DISTINCT a.partner_name as partnerName FROM bp_account a, bp_agreement_dtl g WHERE g.partner_type =? AND g.media_category =? and a.is_deleted='N' AND a.id = g.partner_account_id"
+	  ; PartnerNameMapper mapper = new PartnerNameMapper(); return
+	  jdbcTemplate.query(sql, mapper,new Object[]{partnerType,mediaCategory} );
+	  
+	  }
+	  
+	  private static final class PartnerNameMapper implements
+	  RowMapper<DisbursementsData>{
+	  
+	  @Override public DisbursementsData mapRow(ResultSet rs, int rowNum)
+	  throws SQLException {
+	  
+	  final String partnerName = rs.getString("partnerName");
+	  
+	  
+	  return new DisbursementsData(partnerName); } }
+
 	 
 
 	@Override
 	public Collection<OperatorDeductionData> getOperatorDeduction(Long clientId) {
-		final String sql = "select client_id as clientId, ded_code as deductionCode, ded_value as deductionValue from bp_operator_deduction where client_id = ? order by id";
+		final String sql = "select id as id,client_id as clientId, ded_code as deductionCode, ded_value as deductionValue from bp_operator_deduction where client_id = ? order by id";
 		OperatorDeductionMapper mapper = new OperatorDeductionMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 	}
@@ -694,10 +697,11 @@ public class MediaSettlementReadPlatformServiceImp implements
 		@Override
 		public OperatorDeductionData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
+			final Long id = rs.getLong("id");
 			final Long clientId = rs.getLong("clientId");
 			final String deductionCode = rs.getString("deductionCode");
-			final Long deductionValue = rs.getLong("deductionValue");
-			return new OperatorDeductionData(clientId, deductionCode,
+			final BigDecimal deductionValue = rs.getBigDecimal("deductionValue");
+			return new OperatorDeductionData(id,clientId, deductionCode,
 					deductionValue);
 		}
 	}
@@ -760,7 +764,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 			Long categoryId) {
 		// TODO Auto-generated method stub
 		context.authenticatedUser();
-		final String sql = "select DISTINCT a.id as partnerAccountId, a.partner_name as partnerName,d.royalty_sequence as royaltySequence ,"
+		 final String sql = "select DISTINCT a.id as partnerAccountId, a.partner_name as partnerName,d.royalty_sequence as royaltySequence ,"
+
 
 				+ "(select partner_type from bp_royalty_seq where seq=1 and "
 				+ "oem_id =a.id and active_flag='Y' ) as partnerType4,"
@@ -896,7 +901,9 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public List<InteractiveHeaderData> retriveAllInteractiveForThisClient(
 			Long clientId) {
-		final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select mc1.code_value from m_code_value mc1 where mc1.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory,(select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";
+		/*final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select mc1.code_value from m_code_value mc1 where mc1.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory,(select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";*/
+		final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select im.int_event_code from bp_intevent_master im where im.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory,(select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";
+		
 		InteractiveHeaderDataMapper mapper = new InteractiveHeaderDataMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 	}
@@ -1095,7 +1102,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public List<RevenueShareData> retriveAllrevenueshareForThisClient(
 			Long clientId) {
-		final String sql = "select sm.id as id,(select code_value from m_code_value where sm.business_line=id) as businessLine,"+
+		final String sql = "select sm.id as id,(select int_event_desc from bp_intevent_master where sm.business_line=id) as businessLine,"+
 				"(select code_value from m_code_value where sm.media_category=id) as mediaCategory,"+
 				"(select code_value from m_code_value where sm.revenue_share_type=id) as revenueShareType "+
 				"from bp_revenue_share_master sm where client_id=?";
@@ -1268,20 +1275,39 @@ public class MediaSettlementReadPlatformServiceImp implements
 			return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
 		
 	    }
+
 		private static final class EditCurrencyMapper implements
-		                                           RowMapper<PartnerAccountData> {
-			   @Override
-			    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
-			      Long id = rs.getLong("id");   
-				 Long  sourceCurrency= rs.getLong("sourceCurrency");
-				 Long  targetCurrency= rs.getLong("targetCurrency");
-				 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
-				LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
-				LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
-				return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
-			   }
-
-			}
-
-
+	                                           RowMapper<PartnerAccountData> {
+		   @Override
+		    public PartnerAccountData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		      Long id = rs.getLong("id");   
+			 Long  sourceCurrency= rs.getLong("sourceCurrency");
+			 Long  targetCurrency= rs.getLong("targetCurrency");
+			 BigDecimal exchangeRate = rs.getBigDecimal("exchangeRate");
+			LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+			LocalDate endDate = JdbcSupport.getLocalDate(rs,"endDate");
+			return new PartnerAccountData(id,sourceCurrency,targetCurrency,exchangeRate,startDate,endDate);
+		   }
+		}
+		
+		@Override
+		public OperatorDeductionData getOperatorSingleDeductionCode(
+				Long codeId) {
+			final String sql = "select od.id as id, od.client_id as clientId,od.ded_code as dedCode, od.ded_value as dedValue from bp_operator_deduction od where od.id = ?";
+			OperatorDeductionEditMapper mapper = new OperatorDeductionEditMapper();
+			return jdbcTemplate.queryForObject(sql,mapper,new Object[]{codeId});
+		}
+		
+		private static final class OperatorDeductionEditMapper implements RowMapper<OperatorDeductionData>{
+			
+			public OperatorDeductionData mapRow(ResultSet rs, int rowNum) throws SQLException {
+				
+				final Long id = rs.getLong("id");
+				final String deductionCode = rs.getString("dedCode"); 
+				final BigDecimal deductionValue = rs.getBigDecimal("dedValue");
+				final Long clientId = rs.getLong("clientId");
+				
+				return new OperatorDeductionData(id, clientId, deductionCode, deductionValue);			
+			};
+		}
 }

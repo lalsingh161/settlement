@@ -1997,14 +1997,7 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
-	public CommandWrapperBuilder createInteractiveDetails(Long eventId) {
-		this.actionName = "CREATE";
-		this.entityName = "INTERACTIVEGAMEEVENT";
-		this.entityId = eventId;
-		this.href = "mediasettlements/interactive/" + eventId;
-		return this;
 
-	}
 
 	public CommandWrapperBuilder createRevenue(Long clientId) {
 		this.actionName = "CREATEREVENUE";
@@ -2082,6 +2075,14 @@ public class CommandWrapperBuilder {
 		this.actionName = "DELETE";
 		this.entityId = eventId;
 		this.href = "";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateOperatorDeductionCode(Long codeId) {
+		this.actionName = "UPDATE";
+		this.entityName = "OPERATORDEDUCTION";
+		this.entityId = codeId;
+		this.href = "/mediasettlements/deductionoperator/edit/"+codeId;
 		return this;
 	}
 	

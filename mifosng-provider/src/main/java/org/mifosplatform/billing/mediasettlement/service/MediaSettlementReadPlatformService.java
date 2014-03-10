@@ -125,6 +125,8 @@ public interface MediaSettlementReadPlatformService {
 	Collection<PartnerAccountData> retrieveAllCurrencyRateDetails();
 
 	PartnerAccountData retrieveCurrencyRateDetail(Long id);
+
+	OperatorDeductionData getOperatorSingleDeductionCode(Long codeId);
 	
 	
 	

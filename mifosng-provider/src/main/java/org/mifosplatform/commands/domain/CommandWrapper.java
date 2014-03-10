@@ -1132,11 +1132,7 @@ public class CommandWrapper {
 				&& this.actionName.equalsIgnoreCase("CREATE");
 	}
 
-	public boolean isCreateInteractiveDetails() {
-		return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
-				&& this.actionName.equalsIgnoreCase("CREATE");
-	}
-
+	
 	public boolean isRevenue() {
 		return this.entityName.equalsIgnoreCase("MEDIASETTLEMENT");
 	}
@@ -1193,6 +1189,15 @@ public class CommandWrapper {
 	public boolean isBusinessLineUpdate() {
         return this.actionName.equalsIgnoreCase("UPDATE");
     }
+	
+	public boolean isOperatorDeductionUpdate(){
+		return this.actionName.equalsIgnoreCase("UPDATE") && this.entityName.equalsIgnoreCase("OPERATORDEDUCTION");
+	}
+
+	 public boolean isCreateInteractiveDetails() {
+			return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
+					&& this.actionName.equalsIgnoreCase("CREATE");
+		}
 
 }
 

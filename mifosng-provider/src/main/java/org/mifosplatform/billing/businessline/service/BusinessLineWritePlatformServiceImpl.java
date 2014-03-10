@@ -7,8 +7,6 @@ import org.mifosplatform.billing.businessline.domain.BusinessLineDetails;
 import org.mifosplatform.billing.businessline.domain.BusinessLineMaster;
 import org.mifosplatform.billing.businessline.domain.BusinessLineMasterRepository;
 import org.mifosplatform.billing.businessline.serialization.BusinessLineFromApiJsonDeserializer;
-import org.mifosplatform.billing.eventmaster.domain.EventDetails;
-import org.mifosplatform.billing.eventmaster.domain.EventMaster;
 import org.mifosplatform.billing.media.data.MediaAssetData;
 import org.mifosplatform.billing.media.domain.MediaAsset;
 import org.mifosplatform.billing.media.service.MediaAssetReadPlatformService;
@@ -82,7 +80,7 @@ BusinessLineWritePlatformService {
 	public CommandProcessingResult updateBusinessLine(JsonCommand command) {
 		try {
 			this.context.authenticatedUser();
-			//this.apiJsonDeserializer.validateForCreate(command.json());
+			this.apiJsonDeserializer.validateForCreate(command.json());
 			BusinessLineMaster newEvent = BusinessLineMaster.fromJsom(command);
 			System.out.println(command.entityId());
 			BusinessLineMaster oldEvent = this.businessLineMasterRepository.findOne(command.entityId());

@@ -14,12 +14,13 @@ public interface MediaSettlementWritePlatformService {
 			Long entityId);
 
 	public CommandProcessingResult createPartnerGame(JsonCommand command);
-/*
-	public CommandProcessingResult updatePartnerGame(JsonCommand command,
-			Long entityId);*/
+
+	/*
+	 * public CommandProcessingResult updatePartnerGame(JsonCommand command,
+	 * Long entityId);
+	 */
 
 	public CommandProcessingResult createRevenueSettlement(JsonCommand command);
-
 
 	public CommandProcessingResult updateDocument(
 			MediaSettlementCommand documentCommand, InputStream inputStream,
@@ -27,7 +28,8 @@ public interface MediaSettlementWritePlatformService {
 
 	public CommandProcessingResult deletePartnerAccount(Long entityId);
 
-	public CommandProcessingResult createAgreement(MediaSettlementCommand command);
+	public CommandProcessingResult createAgreement(
+			MediaSettlementCommand command);
 
 	public CommandProcessingResult createOperatorDeduction(JsonCommand command);
 
@@ -44,13 +46,10 @@ public interface MediaSettlementWritePlatformService {
 	public CommandProcessingResult createGameEvent(JsonCommand command,
 			Long entityId);
 
-	/*CommandProcessingResult createInteractiveDetails(Long entityId,
-			JsonCommand command);*/
 
 	public CommandProcessingResult createRevenue(JsonCommand command);
 
-	CommandProcessingResult createInteractiveDetails(Long entityId,
-			JsonCommand command);
+	
 
 	CommandProcessingResult updateRevenue(JsonCommand command);
 
@@ -64,9 +63,8 @@ public interface MediaSettlementWritePlatformService {
 	public CommandProcessingResult deleteCurrencyRateDetail(Long entityId,
 			JsonCommand command);
 
-	public CommandProcessingResult editInteractiveData(Long entityId,
+	public CommandProcessingResult updateInteractiveData(Long entityId,
 			JsonCommand command);
-
-	
-	
+	public CommandProcessingResult updateOperatorDeduction(JsonCommand command,
+			Long entityId);
 }

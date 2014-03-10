@@ -84,7 +84,9 @@ public class BusinessLineData {
 	private Long statusId;
 	private  Long eventId;
 	private Long categoryId;
-	private String mediaTitle; 
+	private String mediaTitle;
+	private String mCodeValue;
+	private String businessLineDescription; 
 	
 	
 	
@@ -136,6 +138,14 @@ public class BusinessLineData {
 			this.categoryId=categoryId;
 			this.mediaTitle=mediaTitle;
 			
+	}
+
+
+	public BusinessLineData(Long id, String codeValue,
+			String businessLineDescription) {
+		this.id = id;
+		this.mCodeValue = codeValue;
+		this.businessLineDescription = businessLineDescription;
 	}
 	
 }

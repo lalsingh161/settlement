@@ -3,7 +3,9 @@ package org.mifosplatform.billing.businessline.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+
 import org.mifosplatform.billing.businessline.data.BusinessLineData;
 import org.mifosplatform.billing.order.data.OrderStatusEnumaration;
 import org.mifosplatform.billing.plan.domain.StatusTypeEnum;
@@ -107,6 +109,24 @@ BusinessLineReadPlatformService {
 			Long categoryId = rs.getLong("categoryId");
 			String mediaTitle = rs.getString("title");
 			return new BusinessLineData(id, eventId, categoryId, mediaTitle);
+		}
+	}
+	
+	@Override
+	public Collection<BusinessLineData> getBusinessLineData() {
+		final String sql = "select id as id, int_event_code as eventCode, int_event_desc as eventDescription from bp_intevent_master where int_event_status>0";
+		BusinessLineCodeMapper mapper = new BusinessLineCodeMapper();
+		return jdbcTemplate.query(sql, mapper);
+	}
+	
+	private final static class BusinessLineCodeMapper implements RowMapper<BusinessLineData>{
+		@Override
+		public BusinessLineData mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+			final Long id = rs.getLong("id");
+			final String codeValue = rs.getString("eventCode");
+			final String businessLineDescription = rs.getString("eventDescription");
+			return new BusinessLineData(id,codeValue,businessLineDescription);
 		}
 	}
 }	
