@@ -26,6 +26,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.mifosplatform.billing.businessline.data.BusinessLineData;
+import org.mifosplatform.billing.businessline.service.BusinessLineReadPlatformService;
 import org.mifosplatform.billing.chargecode.service.ChargeCodeReadPlatformService;
 import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.item.service.ItemReadPlatformService;
@@ -95,6 +97,7 @@ public class MediaSettlementApiResources {
     private final MediaAssetReadPlatformService mediaAssetReadPlatformService;
     private final ItemReadPlatformService itemReadPlatformService;
     private final MediaAssetReadPlatformService assetReadPlatformService;
+    private final BusinessLineReadPlatformService businessLineReadPlatformService;
     
     
     @Autowired
@@ -109,7 +112,8 @@ public class MediaSettlementApiResources {
     		final ChargeCodeReadPlatformService chargeCodeReadPlatformService ,
     		final MediaAssetReadPlatformService mediaAssetReadPlatformService,
     		final ItemReadPlatformService itemReadPlatformService,
-    		final MediaAssetReadPlatformService assetReadPlatformService) {
+    		final MediaAssetReadPlatformService assetReadPlatformService,
+    		final BusinessLineReadPlatformService businessLineReadPlatformService) {
 		this.context = context;
 		this.mCodeReadPlatformService = mCodeReadPlatformService;
 		this.toApiJsonSerializer = toApiJsonSerializer;
@@ -122,6 +126,7 @@ public class MediaSettlementApiResources {
 		this.mediaAssetReadPlatformService = mediaAssetReadPlatformService;
 		this.itemReadPlatformService = itemReadPlatformService;
 		this.assetReadPlatformService = assetReadPlatformService;
+		this.businessLineReadPlatformService = businessLineReadPlatformService;
 	
 	}
     
@@ -135,12 +140,12 @@ public class MediaSettlementApiResources {
     @Produces({MediaType.APPLICATION_JSON})
     public String getPartnerAccountTemplate(@Context final UriInfo uriInfo){
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
-    	/*Collection<MCodeData> partnerType = mCodeReadPlatformService.getCodeValue("Partner Type");
-    	Collection<MCodeData> mediaCategory = mCodeReadPlatformService.getCodeValue("Media Category");*/
+    	Collection<MCodeData> partnerType = mCodeReadPlatformService.getCodeValue("Partner Type");
+    	Collection<MCodeData> mediaCategory = mCodeReadPlatformService.getCodeValue("Media Category");
     	Collection<CurrencyData> currencyCodes = this.mediaSettlementReadPlatformService.retrieveCurrency();
     	
     	/*List<PartnerAccountData> countryData = this.mediaSettlementReadPlatformService.retrieveCountryDetails();*/
-    	PartnerAccountData accountData = new PartnerAccountData(null,null,currencyCodes);
+    	PartnerAccountData accountData = new PartnerAccountData(partnerType,mediaCategory,currencyCodes);
     	return toApiJsonSerializer.serialize(accountData);
     }
     
@@ -390,7 +395,8 @@ public class MediaSettlementApiResources {
     	Collection<MCodeData> mediaCategoryData = mCodeReadPlatformService.getCodeValue("Media Category");
 
     	if(revenueData!=null){
-    		Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
+    		/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");*/
+    		Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
     		Collection<MCodeData> royaltyType = this.mCodeReadPlatformService.getCodeValue("Royalty Type");
         	RevenueSettlementData  datas = new RevenueSettlementData(businessLineData,mediaCategoryData,royaltyType);
         	return toApiJsonSerializer.serialize(datas);
@@ -663,7 +669,7 @@ public class MediaSettlementApiResources {
     }
     
     
-    /*@GET
+    @GET
     @Path("/partnername")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
@@ -675,7 +681,7 @@ public class MediaSettlementApiResources {
     	
     	return toApiJsonSerializer.serialize(partnerNameDate);
     	
-    }*/
+    }
     
     @GET
     @Path("/procedureCall")
@@ -763,14 +769,16 @@ public class MediaSettlementApiResources {
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	
     	/*Collectin<StateDetails> circleData = this.mediaSettlementReadPlatformService.retrieveAllStateDetails();*/
-    	Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
+    	/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");*/
+    	
+    	Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
     	Collection<MCodeData> mediaCategoryData = this.mCodeReadPlatformService.getCodeValue("Media Category");
     	Collection<MCodeData> playSourceData = this.mCodeReadPlatformService.getCodeValue("Play Source");
     	Collection<PartnerAccountData> contentData=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");    	 
       	Collection<PartnerAccountData> channelData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
       	Collection<PartnerAccountData> serviceData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
     	/*List<MediaAssetData> contentNameData = this.mediaAssetReadPlatformService.retrieveAllAssetdata();*/
-    	List<ChargesData> chargeCodesData = this.itemReadPlatformService.retrieveChargeCode();
+    	/*List<ChargesData> chargeCodesData = this.itemReadPlatformService.retrieveChargeCode();*/
     	InteractiveData interactiveData = new InteractiveData();//circleData*/null,businessLineData,mediaCategoryData,playSourceData,contentNameData,chargeCodesData);
     	
     	interactiveData.setBisinessLineData(businessLineData);
@@ -779,7 +787,7 @@ public class MediaSettlementApiResources {
     	interactiveData.setContentData(contentData);
     	interactiveData.setChannelData(channelData);
     	interactiveData.setServiceData(serviceData);
-    	interactiveData.setChargeCodeData(chargeCodesData);
+    	/*interactiveData.setChargeCodeData(chargeCodesData);*/
     	
     	return toApiJsonSerializer.serialize(interactiveData);
     }
@@ -814,7 +822,7 @@ public class MediaSettlementApiResources {
        	 
        	 InteractiveData interactiveData = this.mediaSettlementReadPlatformService.retrieveInteractiveHeaderData(eventId);
        	 
-       	 Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
+       	 Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
       	 Collection<MCodeData> mediaCategoryData = this.mCodeReadPlatformService.getCodeValue("Media Category"); 
       	 List<ChargesData> chargeCodesData = this.itemReadPlatformService.retrieveChargeCode();
       	 
@@ -897,7 +905,11 @@ public class MediaSettlementApiResources {
     	
     	RevenueShareData templateData=mediaSettlementReadPlatformService.retriveEditRevenueRecord(id);
     	Collection<MCodeData> mediaCategoryData = mCodeReadPlatformService.getCodeValue("Media Category");
-    	Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
+    	
+    	/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");*/
+    	
+    	Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
+    	
  		Collection<MCodeData>  	royaltyTypeData = mCodeReadPlatformService.getCodeValue("Royalty Type");
     	List<RevenueShareData> percentageDatas = mediaSettlementReadPlatformService.retriveSingleRevenueRecord(id);
     	templateData.setMediaCategoryData(mediaCategoryData);

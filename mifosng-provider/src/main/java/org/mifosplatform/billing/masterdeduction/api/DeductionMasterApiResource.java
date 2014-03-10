@@ -19,6 +19,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.mifosplatform.billing.address.data.StateDetails;
+import org.mifosplatform.billing.businessline.data.BusinessLineData;
+import org.mifosplatform.billing.businessline.service.BusinessLineReadPlatformService;
+import org.mifosplatform.billing.businessline.service.BusinessLineWritePlatformService;
 import org.mifosplatform.billing.masterdeduction.data.DeductionMasterData;
 import org.mifosplatform.billing.masterdeduction.service.DeductionMasterReadPlatformService;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
@@ -52,7 +55,7 @@ import org.springframework.stereotype.Component;
 	    private final ApiRequestParameterHelper apiRequestParameterHelper;
 	    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 	    private final DeductionMasterReadPlatformService deductionReadPlatformService;
-	    
+	    private final BusinessLineReadPlatformService businessLineReadPlatformService;
 	    
 	    @Autowired
 	    public DeductionMasterApiResource(final PlatformSecurityContext context, 
@@ -60,13 +63,15 @@ import org.springframework.stereotype.Component;
 	    		final DefaultToApiJsonSerializer<org.mifosplatform.billing.masterdeduction.data.DeductionMasterData> toApiJsonSerializer, 
 	    		final ApiRequestParameterHelper apiRequestParameterHelper,
 	    		final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
-	    		final DeductionMasterReadPlatformService deductionReadPlatformService) {
+	    		final DeductionMasterReadPlatformService deductionReadPlatformService,
+	    		final BusinessLineReadPlatformService businessLineReadPlatformService) {
 			this.context = context;
 			this.mCodeReadPlatformService = mCodeReadPlatformService;
 			this.toApiJsonSerializer = toApiJsonSerializer;
 			this.apiRequestParameterHelper = apiRequestParameterHelper;
 			this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
 			this.deductionReadPlatformService = deductionReadPlatformService;
+			this.businessLineReadPlatformService = businessLineReadPlatformService;
 	
 	    }
 	 
@@ -78,9 +83,10 @@ import org.springframework.stereotype.Component;
     	 Collection<MCodeData> deductionTypeData = mCodeReadPlatformService.getCodeValue("type");
     	// Collection<MCodeData>  customerTypes = mCodeReadPlatformService.getCodeValue("Client Category");
     	 Collection<MCodeData> levelApplicables = mCodeReadPlatformService.getCodeValue("Level Applicable");
-    	 Collection<MCodeData> businessCategory = mCodeReadPlatformService.getCodeValue("Business");
+    	 /*Collection<MCodeData> businessCategory = mCodeReadPlatformService.getCodeValue("Business");*/
+    	 Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
     	 Collection<StateDetails> stateDatas=deductionReadPlatformService.retrieveAllStateDetails();
-    	 DeductionMasterData deductionData = new DeductionMasterData(deductionTypeData,levelApplicables,businessCategory,stateDatas);
+    	 DeductionMasterData deductionData = new DeductionMasterData(deductionTypeData,levelApplicables,businessLineData,stateDatas);
     	return toApiJsonSerializer.serialize(deductionData);
     }
     
@@ -115,7 +121,7 @@ import org.springframework.stereotype.Component;
     		masterData = deductionReadPlatformService.retrieveDeductionDetail(id);
     		masterData.setDeductionTypeData(mCodeReadPlatformService.getCodeValue("type"));
     		masterData.setLevelApplicables(mCodeReadPlatformService.getCodeValue("Level Applicable"));
-    		masterData.setBusinessCategory(mCodeReadPlatformService.getCodeValue("Business"));
+    		masterData.setBusinessCategory(this.businessLineReadPlatformService.getBusinessLineData());
     		masterData.setStateDatas(deductionReadPlatformService.retrieveAllStateDetails());
     		
     	

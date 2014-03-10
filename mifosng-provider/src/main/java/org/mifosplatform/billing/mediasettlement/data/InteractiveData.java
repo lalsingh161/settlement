@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.mifosplatform.billing.businessline.data.BusinessLineData;
 import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 import org.mifosplatform.billing.media.data.MediaAssetData;
@@ -27,7 +28,7 @@ public class InteractiveData {
 	private Long mediaCategory;
 	private Long chargeCode;
 	private List<ChargesData> chargeCodeData;
-	private Collection<MCodeData> businessLineData;
+	private Collection<BusinessLineData> businessLineData;
 	private Collection<MCodeData> mediaCategoryData;
 
 	public InteractiveData(
@@ -192,7 +193,7 @@ public class InteractiveData {
 		this.chargeCodeData = chargeCodeData;
 	}
 
-	public void setBisinessLineData(Collection<MCodeData> businessLineData) {
+	public void setBisinessLineData(Collection<BusinessLineData> businessLineData) {
 		this.businessLineData = businessLineData;		
 	}
 

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
+import org.mifosplatform.billing.businessline.data.BusinessLineData;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 
 public class RevenueShareData {
@@ -19,7 +20,7 @@ public class RevenueShareData {
 	private BigDecimal percentage;
 	private BigDecimal flat;
 	Collection<MCodeData> mediaCategoryData;
-	Collection<MCodeData> businessLineData;
+	Collection<BusinessLineData> businessLineData;
 	Collection<MCodeData> royaltyTypeData;
 	public Collection<MCodeData> getMediaCategoryData() {
 		return mediaCategoryData;
@@ -29,11 +30,11 @@ public class RevenueShareData {
 		this.mediaCategoryData = mediaCategoryData;
 	}
 
-	public Collection<MCodeData> getBusinessLineData() {
+	public Collection<BusinessLineData> getBusinessLineData() {
 		return businessLineData;
 	}
 
-	public void setBusinessLineData(Collection<MCodeData> businessLineData) {
+	public void setBusinessLineData(Collection<BusinessLineData> businessLineData) {
 		this.businessLineData = businessLineData;
 	}
 
@@ -88,7 +89,7 @@ public class RevenueShareData {
 	}
 */
 	public RevenueShareData(Collection<MCodeData> mediaCategoryData,
-			Collection<MCodeData> businessLineData,
+			Collection<BusinessLineData> businessLineData,
 			Collection<MCodeData> royaltyTypeData,
 			List<RevenueShareData> percentageDatas, List<RevenueShareData> datas) {
 		

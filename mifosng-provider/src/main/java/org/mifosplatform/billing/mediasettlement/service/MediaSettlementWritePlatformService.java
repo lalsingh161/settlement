@@ -63,7 +63,7 @@ public interface MediaSettlementWritePlatformService {
 	public CommandProcessingResult deleteCurrencyRateDetail(Long entityId,
 			JsonCommand command);
 
-	public CommandProcessingResult editInteractiveData(Long entityId,
+	public CommandProcessingResult updateInteractiveData(Long entityId,
 			JsonCommand command);
 	public CommandProcessingResult updateOperatorDeduction(JsonCommand command,
 			Long entityId);

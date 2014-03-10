@@ -147,9 +147,9 @@ public class BusinessLineApiResource {
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
 	public String createEventMaster( final String jsonRequestBody) {
+		context.authenticatedUser().validateHasReadPermission("BUSINESSLINE");
 		final CommandWrapper commandRequest = new CommandWrapperBuilder().createBusinessLine().withJson(jsonRequestBody).build();
 		final CommandProcessingResult result  = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
-		
 		return this.toApiJsonSerializer.serialize(result);
 	}
 	
@@ -158,10 +158,9 @@ public class BusinessLineApiResource {
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})
 	public String updateEventMaster(@PathParam("eventId")Long eventId,final String jsonRequestBody) {
-		
+		context.authenticatedUser().validateHasReadPermission("BUSINESSLINE");
 		final CommandWrapper commandRequest = new CommandWrapperBuilder().updateBusinessLine(eventId).withJson(jsonRequestBody).build();
-final CommandProcessingResult result  = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
-		
+		final CommandProcessingResult result  = this.commandSourceWritePlatformService.logCommandSource(commandRequest);
 		return this.toApiJsonSerializer.serialize(result);
 	}
 	

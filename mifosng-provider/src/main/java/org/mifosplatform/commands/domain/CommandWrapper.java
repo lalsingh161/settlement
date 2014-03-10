@@ -1194,5 +1194,10 @@ public class CommandWrapper {
 		return this.actionName.equalsIgnoreCase("UPDATE") && this.entityName.equalsIgnoreCase("OPERATORDEDUCTION");
 	}
 
+	 public boolean isCreateInteractiveDetails() {
+			return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
+					&& this.actionName.equalsIgnoreCase("CREATE");
+		}
+
 }
 

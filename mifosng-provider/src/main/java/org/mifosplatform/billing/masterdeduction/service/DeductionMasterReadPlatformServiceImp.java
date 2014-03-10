@@ -35,7 +35,7 @@ public class DeductionMasterReadPlatformServiceImp implements DeductionMasterRea
 	
 		context.authenticatedUser();
 		final String sql = " SELECT id as id ,ded_code as deductionCode,deduction as deductionName,(select code_value from m_code_value  where id = dc.ded_type) as deductionType,(select code_value from m_code_value  where id = dc.ded_source) as levelApplicable," +
-				"(select code_value from m_code_value  where id = dc.ded_category) as business,(select state_name from b_state where id=dc.circle) as circle FROM bp_deduction_codes dc where dc.is_deleted='N' order by dc.id asc";
+				"(select int_event_code from bp_intevent_master where id = dc.ded_category) as business,(select state_name from b_state where id=dc.circle) as circle FROM bp_deduction_codes dc where dc.is_deleted='N' order by dc.id asc";
 		DeductionMapper mapper = new DeductionMapper();
 		return jdbcTemplate.query(sql, mapper,new Object[]{} );
 	

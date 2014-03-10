@@ -1,5 +1,6 @@
 package org.mifosplatform.billing.businessline.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.mifosplatform.billing.businessline.data.BusinessLineData;
@@ -15,5 +16,7 @@ public interface BusinessLineReadPlatformService {
 	BusinessLineData retrieveEventMasterDetails(Integer eventId);
 	
 	List<BusinessLineData> retrieveEventDetailsData(Integer eventId);
+
+	Collection<BusinessLineData> getBusinessLineData();
 	
 }

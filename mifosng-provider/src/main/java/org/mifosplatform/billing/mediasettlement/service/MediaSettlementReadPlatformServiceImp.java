@@ -412,7 +412,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			 * ;
 			 * " g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType, g.start_date as startDate,g.end_date as endDate, a.media_category as mediaCategory,a.partner_type as partnerType,a.partner_name as partnerName, g.partner_account_id as partnerAccountId from bp_account a,bp_agreement g where g.partner_account_id=a.id and a.is_deleted='N'"
 			 */
-			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,d.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id   ";
+			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,d.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND d.partner_account_id = a.id   ";
 		}
 
 		@Override
@@ -656,27 +656,27 @@ public class MediaSettlementReadPlatformServiceImp implements
 		}
 	}
 
-	/*
-	 * @Override public List<DisbursementsData> retrieveAllPartnerName(Long
-	 * partnerType, Long mediaCategory) { // TODO Auto-generated method stub
-	 * context.authenticatedUser(); final String sql =
-	 * " SELECT partner_name as partnerName FROM bp_account WHERE partner_type =? AND media_category =? and is_deleted='N'"
-	 * ; PartnerNameMapper mapper = new PartnerNameMapper(); return
-	 * jdbcTemplate.query(sql, mapper,new Object[]{partnerType,mediaCategory} );
-	 * 
-	 * }
-	 * 
-	 * private static final class PartnerNameMapper implements
-	 * RowMapper<DisbursementsData>{
-	 * 
-	 * @Override public DisbursementsData mapRow(ResultSet rs, int rowNum)
-	 * throws SQLException {
-	 * 
-	 * final String partnerName = rs.getString("partnerName");
-	 * 
-	 * 
-	 * return new DisbursementsData(partnerName); } }
-	 */
+		@Override 
+	  public List<DisbursementsData> retrieveAllPartnerName(Long
+	  partnerType, Long mediaCategory) { // TODO Auto-generated method stub
+	  context.authenticatedUser(); final String sql =
+	  " SELECT DISTINCT a.partner_name as partnerName FROM bp_account a, bp_agreement_dtl g WHERE g.partner_type =? AND g.media_category =? and a.is_deleted='N' AND a.id = g.partner_account_id"
+	  ; PartnerNameMapper mapper = new PartnerNameMapper(); return
+	  jdbcTemplate.query(sql, mapper,new Object[]{partnerType,mediaCategory} );
+	  
+	  }
+	  
+	  private static final class PartnerNameMapper implements
+	  RowMapper<DisbursementsData>{
+	  
+	  @Override public DisbursementsData mapRow(ResultSet rs, int rowNum)
+	  throws SQLException {
+	  
+	  final String partnerName = rs.getString("partnerName");
+	  
+	  
+	  return new DisbursementsData(partnerName); } }
+	 
 
 	@Override
 	public Collection<OperatorDeductionData> getOperatorDeduction(Long clientId) {
@@ -758,7 +758,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			Long categoryId) {
 		// TODO Auto-generated method stub
 		context.authenticatedUser();
-		final String sql = "select DISTINCT a.id as partnerAccountId, a.partner_name as partnerName,g.royalty_sequence as royaltySequence ,"
+		 final String sql = "select DISTINCT a.id as partnerAccountId, a.partner_name as partnerName,d.royalty_sequence as royaltySequence ,"
 
 				+ "(select partner_type from bp_royalty_seq where seq=1 and "
 				+ "oem_id =a.id and active_flag='Y' ) as partnerType4,"
@@ -766,7 +766,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 				+ "oem_id =a.id and active_flag='Y' ) as partnerType5,"
 				+ "(select partner_type from bp_royalty_seq where seq=3 and "
 				+ "oem_id =a.id and active_flag='Y' ) as partnerType6 "
-				+ "  from  bp_account a,bp_agreement g where g.media_category=? and a.id=g.partner_account_id and g.royalty_sequence=1";
+				+ "  from  bp_account a,bp_agreement g, bp_agreement_dtl d where d.media_category=? and a.id=g.partner_account_id and d.royalty_sequence=1 and d.partner_account_id = a.id";
 		RevenueSettlementData mapper = new RevenueSettlementData();
 		return jdbcTemplate.query(sql, mapper, new Object[] { categoryId });
 	}
@@ -894,7 +894,9 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public List<InteractiveHeaderData> retriveAllInteractiveForThisClient(
 			Long clientId) {
-		final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select mc1.code_value from m_code_value mc1 where mc1.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory,(select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";
+		/*final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select mc1.code_value from m_code_value mc1 where mc1.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory,(select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";*/
+		final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select im.int_event_code from bp_intevent_master im where im.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory,(select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";
+		
 		InteractiveHeaderDataMapper mapper = new InteractiveHeaderDataMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { clientId });
 	}
@@ -1093,7 +1095,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public List<RevenueShareData> retriveAllrevenueshareForThisClient(
 			Long clientId) {
-		final String sql = "select sm.id as id,(select code_value from m_code_value where sm.business_line=id) as businessLine,"+
+		final String sql = "select sm.id as id,(select int_event_desc from bp_intevent_master where sm.business_line=id) as businessLine,"+
 				"(select code_value from m_code_value where sm.media_category=id) as mediaCategory,"+
 				"(select code_value from m_code_value where sm.revenue_share_type=id) as revenueShareType "+
 				"from bp_revenue_share_master sm where client_id=?";

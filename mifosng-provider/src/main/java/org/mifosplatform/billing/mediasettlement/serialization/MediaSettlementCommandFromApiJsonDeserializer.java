@@ -378,8 +378,8 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank().notExceedingLengthOf(50);
 	        
 	
-	        final BigDecimal chargeCode = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("chargeCode", element);
-	        baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank().notExceedingLengthOf(50);
+	        /*final BigDecimal chargeCode = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("chargeCode", element);
+	        baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank().notExceedingLengthOf(50);*/
 	        
 	        final LocalDate dataUploadedDate = fromApiJsonHelper.extractLocalDateNamed("dataUploadedDate", element);
 	        baseDataValidator.reset().parameter("dataUploadedDate").value(dataUploadedDate).notBlank();

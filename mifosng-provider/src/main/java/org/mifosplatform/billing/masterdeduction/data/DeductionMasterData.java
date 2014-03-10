@@ -2,10 +2,10 @@ package org.mifosplatform.billing.masterdeduction.data;
 
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.mifosplatform.billing.address.data.StateDetails;
+import org.mifosplatform.billing.businessline.data.BusinessLineData;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 
 	
@@ -22,7 +22,7 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 	    private List<DeductionMasterData> masterDatas;
 		private Collection<MCodeData> levelApplicables;
 		private Collection<MCodeData> deductionTypeData;
-	    private Collection<MCodeData> businessCategory;
+	    private Collection<BusinessLineData> businessCategory;
 	    private  Collection<StateDetails> stateDatas;
 
      	private Long circle;
@@ -32,7 +32,7 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 	   
 		public DeductionMasterData(Collection<MCodeData> deductionTypeData,
 			   Collection<MCodeData> levelApplicables,
-				Collection<MCodeData> businessCategory, Collection<StateDetails> stateDatas) {
+				Collection<BusinessLineData> businessCategory, Collection<StateDetails> stateDatas) {
 			this.deductionTypeData = deductionTypeData;
 			this.levelApplicables = levelApplicables;
 			this.businessCategory= businessCategory;
@@ -144,12 +144,12 @@ import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 		}
 
 
-		public Collection<MCodeData> getBusinessCategory() {
+		public Collection<BusinessLineData> getBusinessCategory() {
 			return businessCategory;
 		}
 
 
-		public void setBusinessCategory(Collection<MCodeData> businessCategory) {
+		public void setBusinessCategory(Collection<BusinessLineData> businessCategory) {
 			this.businessCategory = businessCategory;
 		}
 
