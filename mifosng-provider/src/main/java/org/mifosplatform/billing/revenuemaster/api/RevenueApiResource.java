@@ -59,7 +59,7 @@ public class RevenueApiResource {
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String createRevenue(@PathParam("clientId") final Long clientId,final String apiRequestBodyAsJson) {
-		 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenue(clientId).withJson(apiRequestBodyAsJson).build();
+		 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(clientId).withJson(apiRequestBodyAsJson).build();
 		 final String json = wrapper.getJson();
 			CommandProcessingResult result = null;
 			
@@ -71,7 +71,7 @@ public class RevenueApiResource {
 						wrapper.getLoanId(), wrapper.getSavingsId(),
 						wrapper.getCodeId(), wrapper.getSupportedEntityType(),
 						wrapper.getSupportedEntityId(), wrapper.getTransactionId());
-		this.revenueClient.createRevenue(command); 
+		this.revenueClient.createRevenueInvoice(command); 
 		return this.toApiJsonSerializer.serialize(result);
 	}
 }
