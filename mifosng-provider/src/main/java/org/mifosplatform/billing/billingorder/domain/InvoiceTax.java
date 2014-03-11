@@ -35,8 +35,8 @@ public class InvoiceTax {
 	@Column(name = "tax_code")
 	private String taxCode;
 
-	@Column(name = "tax_value")
-	private BigDecimal taxValue;
+	/*@Column(name = "tax_value")
+	private BigDecimal taxValue;*/
 
 	@Column(name = "tax_percentage")
 	private BigDecimal taxPercentage;
@@ -54,13 +54,12 @@ public class InvoiceTax {
 	}
 
 	public InvoiceTax(final Invoice invoice, final BillingOrder charge,
-			final String taxCode, final BigDecimal taxValue,
-			final BigDecimal taxPercentage, final BigDecimal taxAmount) {
+			final String taxCode, final BigDecimal taxPercentage, final BigDecimal taxAmount) {
 
 		this.charge = charge;
 		this.invoice = invoice;
 		this.taxCode = taxCode;
-		this.taxValue = taxValue;
+		//this.taxValue = taxValue;
 		this.taxPercentage = taxPercentage;
 		this.taxAmount = taxAmount;
 	}
@@ -94,14 +93,14 @@ public class InvoiceTax {
 	public void setTaxCode(String taxCode) {
 		this.taxCode = taxCode;
 	}
-
+/*
 	public BigDecimal getTaxValue() {
 		return taxValue;
 	}
 
 	public void setTaxValue(BigDecimal taxValue) {
 		this.taxValue = taxValue;
-	}
+	}*/
 
 	public BigDecimal getTaxPercentage() {
 		return taxPercentage;
