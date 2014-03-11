@@ -924,7 +924,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String mediaCategoryStr = rs.getString("mediaCategory");
 			final String chargeCodeStr = rs.getString("chargeCode");
 			return new InteractiveHeaderData(id, clientId, externalId,
-					businessLineStr, activityMonth, dataUploadedDate.toDate(),
+					businessLineStr, activityMonth, null==dataUploadedDate?null:dataUploadedDate.toDate(),
 					mediaCategoryStr, chargeCodeStr);
 		}
 	}

@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CreateRevenueCommandHandler implements NewCommandSourceHandler {
+public class CreateRevenueMasterCommandHandler implements NewCommandSourceHandler {
 		
 		private final RevenueClient revenueClient;
 		
 		@Autowired
-	    public CreateRevenueCommandHandler(final RevenueClient revenueClient) {
+	    public CreateRevenueMasterCommandHandler(final RevenueClient revenueClient) {
 	        this.revenueClient = revenueClient;
 	    }
 		

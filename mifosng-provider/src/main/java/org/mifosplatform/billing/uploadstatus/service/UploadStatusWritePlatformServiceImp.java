@@ -1405,6 +1405,12 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					}
 				}
 				
+				/*uploadStatusForGameEvent.setProcessRecords(processRecordCount);
+				uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
+				uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
+				writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
+				processRecordCount=0L;totalRecordCount=0L;
+				uploadStatusForGameEvent=null;*/
 				uploadStatusForGameEvent.setProcessRecords(processRecordCount);
 				uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
 				uploadStatusForGameEvent.setTotalRecords(totalRecordCount);

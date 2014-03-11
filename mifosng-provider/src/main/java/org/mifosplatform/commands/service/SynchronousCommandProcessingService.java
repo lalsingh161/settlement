@@ -863,13 +863,9 @@ public class SynchronousCommandProcessingService implements
 					    }
 				 }else if (wrapper.isbusinessLineResource()) {
 						if (wrapper.isCreate()) {
-							handler = applicationContext.getBean(
-									"createBusinessLineCommandHandler",
-									NewCommandSourceHandler.class);
+							handler = applicationContext.getBean("createBusinessLineCommandHandler",NewCommandSourceHandler.class);
 						} else if (wrapper.isBusinessLineUpdate()) {
-							handler = applicationContext.getBean(
-									"updateBusinessLineCommandHandler",
-									NewCommandSourceHandler.class);
+							handler = applicationContext.getBean("updateBusinessLineCommandHandler",NewCommandSourceHandler.class);
 						} else if (wrapper.isDelete()) {/*
 							handler = applicationContext.getBean(
 									"deleteBusinessLineCommandHandler",
@@ -877,7 +873,7 @@ public class SynchronousCommandProcessingService implements
 						*/} else {
 							throw new UnsupportedCommandException(wrapper.commandName());
 						}
-					}else if(wrapper.isUpdateSettlementSequenceData()){
+				 }else if(wrapper.isUpdateSettlementSequenceData()){
 					 handler = applicationContext.getBean("updatePartnerGameCommandHandler",NewCommandSourceHandler.class);
 				 }else if(wrapper.isGameEvent()){
 					 if(wrapper.isCreateGameEvent()){
