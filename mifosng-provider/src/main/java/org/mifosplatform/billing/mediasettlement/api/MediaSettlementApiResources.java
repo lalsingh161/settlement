@@ -766,10 +766,8 @@ public class MediaSettlementApiResources {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public String createGameEvent(@Context final UriInfo uriInfo){
-    	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	
-    	/*Collectin<StateDetails> circleData = this.mediaSettlementReadPlatformService.retrieveAllStateDetails();*/
-    	/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");*/
+    	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	
     	Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
     	Collection<MCodeData> mediaCategoryData = this.mCodeReadPlatformService.getCodeValue("Media Category");
@@ -777,9 +775,8 @@ public class MediaSettlementApiResources {
     	Collection<PartnerAccountData> contentData=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");    	 
       	Collection<PartnerAccountData> channelData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
       	Collection<PartnerAccountData> serviceData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
-    	/*List<MediaAssetData> contentNameData = this.mediaAssetReadPlatformService.retrieveAllAssetdata();*/
-    	/*List<ChargesData> chargeCodesData = this.itemReadPlatformService.retrieveChargeCode();*/
-    	InteractiveData interactiveData = new InteractiveData();//circleData*/null,businessLineData,mediaCategoryData,playSourceData,contentNameData,chargeCodesData);
+    	
+    	InteractiveData interactiveData = new InteractiveData();
     	
     	interactiveData.setBisinessLineData(businessLineData);
     	interactiveData.setMediaCategoryData(mediaCategoryData);
@@ -787,7 +784,6 @@ public class MediaSettlementApiResources {
     	interactiveData.setContentData(contentData);
     	interactiveData.setChannelData(channelData);
     	interactiveData.setServiceData(serviceData);
-    	/*interactiveData.setChargeCodeData(chargeCodesData);*/
     	
     	return toApiJsonSerializer.serialize(interactiveData);
     }

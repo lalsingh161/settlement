@@ -1081,13 +1081,19 @@ public class MediaSettlementReadPlatformServiceImp implements
 	public List<PartnerAccountData> retrieveAllPartnerType(String codeValue,
 			String codeName) {
 
-		final String sql = "select pa.id as partnerId ,pa.partner_name as partnerName from bp_account pa where pa.partner_type=(select id from m_code_value where code_value = ? and code_id=(select id from m_code where code_name= ?))";
-		contentMapper mapper = new contentMapper();
+		/*final String sql = "select pa.id as partnerId ,pa.partner_name as partnerName from bp_account pa where pa.partner_type=(select id from m_code_value where code_value = ? and code_id=(select id from m_code where code_name= ?))";*/
+		final String sql = "select pa.id as partnerId, pa.partner_name as partnerName from bp_account pa "+
+				"inner join bp_agreement a ON a.partner_account_id = pa.id "+
+				"inner join bp_agreement_dtl ad ON ad.agmt_id = a.id where ad.partner_type = "+
+				"(select id from m_code_value where code_value=? and code_id = "+
+				"(select id from m_code where code_name=?)) and pa.is_deleted='N' "+
+				"and a.is_deleted='N'";
+		ContentMapper mapper = new ContentMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { codeValue,
 				codeName });
 	}
 
-	private final static class contentMapper implements
+	private final static class ContentMapper implements
 			RowMapper<PartnerAccountData> {
 
 		@Override
