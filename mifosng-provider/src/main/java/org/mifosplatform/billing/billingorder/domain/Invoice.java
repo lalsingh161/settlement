@@ -17,6 +17,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.mifosplatform.billing.order.domain.OrderLine;
 import org.mifosplatform.billing.order.domain.OrderPrice;
+import org.mifosplatform.billing.revenuemaster.domain.DeductionTax;
 
 @Entity
 @Table(name = "b_invoice")
@@ -48,8 +49,8 @@ public class Invoice {
 	@Column(name="bill_id")
 	private Long billId;
 	
-	@Column(name="due_amount")
-	private BigDecimal dueAmount;
+/*	@Column(name="due_amount")
+	private BigDecimal dueAmount;*/
 
 
 	@Column(name="createdby_id")
@@ -72,6 +73,11 @@ public class Invoice {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "invoice", orphanRemoval = true)
 	private List<InvoiceTax> chargeTaxs = new ArrayList<InvoiceTax>();
 
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "invoice", orphanRemoval = true)
+	private List<DeductionTax> deductionTaxs = new ArrayList<DeductionTax>();
+	
+	
 	private Invoice(){
 
 	}
@@ -198,9 +204,12 @@ public class Invoice {
 	public List<BillingOrder> getCharges(){
 		return this.charges;
 	}
-	public void updateAmount(BigDecimal amountPaid) {
+
+	
+
+	/*public void updateAmount(BigDecimal amountPaid) {
 		this.dueAmount=this.dueAmount.subtract(amountPaid);
 		
-	}
+	}*/
 
 }

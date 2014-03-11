@@ -129,7 +129,7 @@ public class PaymentWritePlatformServiceImpl implements
 			if(payment.getInvoiceId() != null){
 				
 				Invoice invoice=this.invoiceRepository.findOne(payment.getInvoiceId());
-				invoice.updateAmount(payment.getAmountPaid());
+				//invoice.updateAmount(payment.getAmountPaid());
 				this.invoiceRepository.save(invoice);
 				
 			}

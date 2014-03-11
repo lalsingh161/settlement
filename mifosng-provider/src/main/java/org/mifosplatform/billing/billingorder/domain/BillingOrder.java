@@ -19,6 +19,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.mifosplatform.billing.order.domain.Order;
 import org.mifosplatform.billing.order.domain.OrderDiscount;
+import org.mifosplatform.billing.revenuemaster.domain.DeductionTax;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
@@ -71,6 +72,11 @@ public class BillingOrder  extends AbstractPersistable<Long>{
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "charge", orphanRemoval = true)
 	private List<InvoiceTax> chargeTaxs = new ArrayList<InvoiceTax>();
+	
+	
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "charge", orphanRemoval = true)
+	private List<DeductionTax> deductions = new ArrayList<DeductionTax>();
 	
 	
 
@@ -212,6 +218,12 @@ public class BillingOrder  extends AbstractPersistable<Long>{
 		chargeTaxs.update(this);
 		this.chargeTaxs.add(chargeTaxs);
 
+	}
+
+   public void addDeductionTaxes(DeductionTax deductions) {
+		
+		deductions.update(this);
+		this.deductions.add(deductions);
 	}
 
 }
