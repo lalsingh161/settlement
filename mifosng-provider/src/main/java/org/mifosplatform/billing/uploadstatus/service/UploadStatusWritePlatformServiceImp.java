@@ -48,11 +48,12 @@ import org.joda.time.format.DateTimeFormat;
 import org.mifosplatform.billing.adjustment.api.AdjustmentApiResource;
 import org.mifosplatform.billing.adjustment.data.AdjustmentData;
 import org.mifosplatform.billing.adjustment.service.AdjustmentReadPlatformService;
-import org.mifosplatform.billing.item.data.ChargesData;
+import org.mifosplatform.billing.businessline.data.BusinessLineData;
+import org.mifosplatform.billing.businessline.service.BusinessLineReadPlatformService;
 import org.mifosplatform.billing.importfile.data.MRNErrorData;
 import org.mifosplatform.billing.inventory.api.InventoryItemDetailsApiResource;
 import org.mifosplatform.billing.inventory.exception.OrderQuantityExceedsException;
-import org.mifosplatform.billing.inventory.service.InventoryItemDetailsReadPlatformService;
+import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.item.service.ItemReadPlatformService;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 import org.mifosplatform.billing.mcodevalues.service.MCodeReadPlatformService;
@@ -116,7 +117,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	private ApiRequestJsonSerializationSettings serSettings;
 	private Long orderIdValue;
 	private String resultStatus="";
-	private Collection<MCodeData> businessLineDataList;
+	private Collection<BusinessLineData> businessLineDataList;
 	private Collection<MCodeData> mediaCategoryDataList;
 	private Collection<MCodeData> playSourceDataList;
 	private List<ChargesData> chargeCodesDataList;
@@ -145,6 +146,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	 private final ItemReadPlatformService itemReadPlatformService;
 	 private final MediaAssetReadPlatformService mediaAssetReadPlatformService;
 	 private final MCodeReadPlatformService mCodeReadPlatformService;
+	 private final BusinessLineReadPlatformService businessLineReadPlatformService;
 	
 	@Autowired
 	public UploadStatusWritePlatformServiceImp(
@@ -159,7 +161,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			final MediaSettlementReadPlatformService mediaSettlementReadPlatformService,
 			final ItemReadPlatformService itemReadPlatformService,
 			final MediaAssetReadPlatformService mediaAssetReadPlatformService,
-			final MCodeReadPlatformService mCodeReadPlatformService) {
+			final MCodeReadPlatformService mCodeReadPlatformService,
+			final BusinessLineReadPlatformService businessLineReadPlatformService) {
 		this.context=context;
 		this.uploadStatusRepository=uploadStatusRepository;
 		this.commandsSourceWritePlatformService=commandsSourceWritePlatformService;
@@ -173,6 +176,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 		this.itemReadPlatformService = itemReadPlatformService;
 		this.mediaAssetReadPlatformService = mediaAssetReadPlatformService;
 		this.mCodeReadPlatformService = mCodeReadPlatformService;
+		this.businessLineReadPlatformService = businessLineReadPlatformService;
 	}
 	
 	//@Transactional
@@ -1235,7 +1239,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 			
 		}else if(uploadProcess.equalsIgnoreCase("GameEvent")){
-			Integer cellNumber = 9;
+			Integer cellNumber = 14;
 			UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
 			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
 			Workbook wb = null;
@@ -1244,29 +1248,33 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			try {
 				wb = WorkbookFactory.create(new File(fileLocation));
 				Sheet interactiveHeaderSheet = wb.getSheetAt(0);
-				Sheet interactiveDetailSheet = wb.getSheetAt(1);
+				
 				//Sheet mediaLocationSheet = wb.getSheetAt(2);
 				int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
 				System.out.println("Number of rows : "+msNumberOfRows);
 				
-				for (int i = 1; i < msNumberOfRows; i++) {
+				for (int i = 3; i < msNumberOfRows; i++) {
 
 						Row headerRow = interactiveHeaderSheet.getRow(i);
-						Row  detailRow= interactiveDetailSheet.getRow(i);
 						JSONObject jsonObject = new JSONObject();
 						
 					 try {
 						 if(headerRow.getCell(3).getStringCellValue().equalsIgnoreCase("EOF"))
 							 throw new EOFException();
 						totalRecordCount++;
-						jsonObject.put("clientId",headerRow.getCell(0).getNumericCellValue());//-
-						jsonObject.put("externalId",headerRow.getCell(1).getNumericCellValue());//-
-						jsonObject.put("activityMonth",headerRow.getCell(2).getNumericCellValue());//-
 						
-						businessLineDataList=this.mCodeReadPlatformService.getCodeValue("Business");
+						Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
+						
+						jsonObject.put("clientId",clientId);//-
+						jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
+						/*SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
+						jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getNumericCellValue()));*/
+						jsonObject.put("activityMonth",headerRow.getCell(2).getNumericCellValue());
+						
+						businessLineDataList = this.businessLineReadPlatformService.getBusinessLineData();
 						if(businessLineDataList.size()>0)
 						{
-							for(MCodeData businessData:businessLineDataList)
+							for(BusinessLineData businessData:businessLineDataList)
 							{
 								if(businessData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(3).getStringCellValue()))
 										{
@@ -1287,7 +1295,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 										}
 							}
 						}
-						chargeCodesDataList=this.itemReadPlatformService.retrieveChargeCode();
+						/*chargeCodesDataList=this.itemReadPlatformService.retrieveChargeCode();
 						if(chargeCodesDataList.size()>0)
 						{
 							for(ChargesData chargeData:chargeCodesDataList)
@@ -1297,12 +1305,12 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									jsonObject.put("chargeCode",chargeData.getId());
 										}
 							}
-						}
+						}*/
 				
-						SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
-						jsonObject.put("dataUploadedDate",formatter.format(headerRow.getCell(6).getDateCellValue()));
-						jsonObject.put("dateFormat","dd MMMM yyyy");
-						jsonObject.put("locale","en");
+						
+						/*jsonObject.put("dataUploadedDate",formatter.format(headerRow.getCell(6).getDateCellValue()));*/
+							jsonObject.put("dateFormat","dd MMMM yyyy");
+							jsonObject.put("locale","en");
 							JSONArray a = new JSONArray();
 							Map<String, Object> m = new LinkedHashMap<String, Object>();
 							
@@ -1311,7 +1319,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							{
 								for(MCodeData playSourceData:playSourceDataList)
 								{
-									if(playSourceData.getmCodeValue().equalsIgnoreCase(detailRow.getCell(0).getStringCellValue()))
+									if(playSourceData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
 											{
 												m.put("playSource",playSourceData.getId());
 											}
@@ -1322,7 +1330,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 								{
 									for(MediaAssetData mediaData:mediaDataList)
 									{
-										if(mediaData.getMediaTitle().equalsIgnoreCase(detailRow.getCell(1).getStringCellValue()))
+										if(mediaData.getMediaTitle().equalsIgnoreCase(headerRow.getCell(6).getStringCellValue()))
 												{
 											m.put("contentName",mediaData.getMediaId());
 												}
@@ -1333,7 +1341,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					   if(contentDataList.size()>0)
 					   {
 						   for(PartnerAccountData contentData:contentDataList){
-							   if(contentData.getPartnerName().equalsIgnoreCase(detailRow.getCell(2).getStringCellValue()))
+							   if(contentData.getPartnerName().equalsIgnoreCase(headerRow.getCell(7).getStringCellValue()))
 							   {
 								   m.put("contentProvider", contentData.getId());
 							   }
@@ -1343,7 +1351,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					   if(contentDataList.size()>0)
 					   {
 						   for(PartnerAccountData channelData:channelDataList){
-							   if(channelData.getPartnerName().equalsIgnoreCase(detailRow.getCell(3).getStringCellValue()))
+							   if(channelData.getPartnerName().equalsIgnoreCase(headerRow.getCell(8).getStringCellValue()))
 							   {
 								   m.put("channelName", channelData.getId());
 							   }
@@ -1354,15 +1362,15 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					   if(contentDataList.size()>0)
 					   {
 						   for(PartnerAccountData serviceData:serviceDataList){
-							   if(serviceData.getPartnerName().equalsIgnoreCase(detailRow.getCell(4).getStringCellValue()))
+							   if(serviceData.getPartnerName().equalsIgnoreCase(headerRow.getCell(9).getStringCellValue()))
 							   {
 								   m.put("serviceName", serviceData.getId());
 							   }
 						   }
 					   }
-							m.put("endUserPrice", detailRow.getCell(5).getNumericCellValue());
-							m.put("grossRevenue", detailRow.getCell(6).getNumericCellValue());
-							m.put("downloads", detailRow.getCell(7).getNumericCellValue());
+							m.put("endUserPrice", headerRow.getCell(10).getNumericCellValue());
+							m.put("grossRevenue", headerRow.getCell(12).getNumericCellValue());
+							m.put("downloads", headerRow.getCell(11).getNumericCellValue());
 							m.put("locale","en");
 							
 	

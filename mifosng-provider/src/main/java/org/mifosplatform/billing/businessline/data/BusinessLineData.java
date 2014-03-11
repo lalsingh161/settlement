@@ -147,5 +147,116 @@ public class BusinessLineData {
 		this.mCodeValue = codeValue;
 		this.businessLineDescription = businessLineDescription;
 	}
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	public String getEventName() {
+		return eventName;
+	}
+
+
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+
+
+	public String getEventDescription() {
+		return eventDescription;
+	}
+
+
+	public void setEventDescription(String eventDescription) {
+		this.eventDescription = eventDescription;
+	}
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+
+	public String getChargeCode() {
+		return chargeCode;
+	}
+
+
+	public void setChargeCode(String chargeCode) {
+		this.chargeCode = chargeCode;
+	}
+
+
+	public Long getCategory() {
+		return category;
+	}
+
+
+	public void setCategory(Long category) {
+		this.category = category;
+	}
+
+
+	public Long getStatusId() {
+		return statusId;
+	}
+
+
+	public void setStatusId(Long statusId) {
+		this.statusId = statusId;
+	}
+
+
+	public Long getEventId() {
+		return eventId;
+	}
+
+
+	public void setEventId(Long eventId) {
+		this.eventId = eventId;
+	}
+
+
+	public String getMediaTitle() {
+		return mediaTitle;
+	}
+
+
+	public void setMediaTitle(String mediaTitle) {
+		this.mediaTitle = mediaTitle;
+	}
+
+
+	public String getmCodeValue() {
+		return mCodeValue;
+	}
+
+
+	public void setmCodeValue(String mCodeValue) {
+		this.mCodeValue = mCodeValue;
+	}
+
+
+	public String getBusinessLineDescription() {
+		return businessLineDescription;
+	}
+
+
+	public void setBusinessLineDescription(String businessLineDescription) {
+		this.businessLineDescription = businessLineDescription;
+	}
+	
 	
 }

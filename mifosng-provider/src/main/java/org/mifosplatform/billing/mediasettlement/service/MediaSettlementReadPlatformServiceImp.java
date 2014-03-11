@@ -1317,4 +1317,11 @@ public class MediaSettlementReadPlatformServiceImp implements
 				return new OperatorDeductionData(id, clientId, deductionCode, deductionValue);			
 			};
 		}
+		
+		@Override
+		public Long retriveClientId(String clientName) {
+			
+			final String sql = "select id from m_client where firstname=?";
+			return jdbcTemplate.queryForLong(sql, new Object[]{clientName});
+		}
 }
