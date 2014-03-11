@@ -41,7 +41,7 @@ public class RevenueClient {
 		
 	}
 
-	public CommandProcessingResult createRevenue(JsonCommand command) {
+	public CommandProcessingResult createRevenueInvoice(JsonCommand command) {
 	
 		try
 		{
