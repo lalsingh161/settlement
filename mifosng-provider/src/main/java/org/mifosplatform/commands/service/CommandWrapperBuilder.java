@@ -2103,6 +2103,14 @@ public class CommandWrapperBuilder {
 		return this;
 
 	}
-	
+	public CommandWrapperBuilder createRevenueInvoice(Long clientId) {
+		
+		this.actionName = "CREATE";
+		this.entityName = "REVENUEMASTER";
+		this.entityId = clientId;
+		this.href = "revenuemaster/"+clientId;
+		return this;
+		
+	}
 	
 }
