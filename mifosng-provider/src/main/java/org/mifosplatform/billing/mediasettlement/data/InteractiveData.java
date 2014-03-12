@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.joda.time.LocalDate;
 import org.mifosplatform.billing.businessline.data.BusinessLineData;
 import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
@@ -22,7 +23,7 @@ public class InteractiveData {
 	
 	private Long clientId;
 	private Long externalId;
-	private Long activityMonth;
+	private String activityMonth;
 	private Date dataUploadedDate;
 	private Long businessLine;
 	private Long mediaCategory;
@@ -56,12 +57,12 @@ public class InteractiveData {
 	}
 
 	public InteractiveData(Long clientId, Long externalId,
-			Long activityMonth, Date date, Long businessLine,
+			String activityMonth, LocalDate date, Long businessLine,
 			Long mediaCategory, Long chargeCode) {
 		this.clientId = clientId;
 		this.externalId = externalId;
 		this.activityMonth = activityMonth;
-		this.dataUploadedDate = date;
+		this.dataUploadedDate = (null==date)?null:date.toDate();
 		this.businessLine = businessLine;
 		this.mediaCategory = mediaCategory;
 		this.chargeCode = chargeCode;
@@ -143,13 +144,7 @@ public class InteractiveData {
 		this.externalId = externalId;
 	}
 
-	public Long getActivityMonth() {
-		return activityMonth;
-	}
-
-	public void setActivityMonth(Long activityMonth) {
-		this.activityMonth = activityMonth;
-	}
+	
 
 	public Date getDataUploadedDate() {
 		return dataUploadedDate;

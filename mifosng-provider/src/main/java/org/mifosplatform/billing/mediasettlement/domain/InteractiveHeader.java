@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.mifosplatform.billing.mediadetails.domain.MediaassetAttributes;
+import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
@@ -32,12 +32,12 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	
 	
 	@Column(name="activity_month")
-	private Long activityMonth;
+	private String activityMonth;
 	
 	
 	
 	@Column(name="data_upload_date")
-	private Date dataUploadedDate;
+	private Date dataUploadedDate = new Date();
 	
 	@Column(name="business_line")
 	private Long businessLine;
@@ -63,7 +63,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	
 	
 	public InteractiveHeader(Long clientId, Long externalId,
-			Long activityMonth, Long businessLine, Long mediaCategory, Long chargeCode, Date dataUploadedDate) {
+			String activityMonth, Long businessLine, Long mediaCategory, Long chargeCode, LocalDate dataUploadedDate) {
 
 		
 		this.clientId = clientId;
@@ -74,7 +74,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		this.mediaCategory = mediaCategory;
 		
 		this.chargeCode = chargeCode;
-		this.dataUploadedDate = dataUploadedDate;
+		this.dataUploadedDate = (null==dataUploadedDate)?null:dataUploadedDate.toDate();
 	}
 
 	public String displayProperties(){
@@ -86,11 +86,11 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		
 		Long clientId = command.longValueOfParameterNamed("clientId");
 		Long externalId = command.longValueOfParameterNamed("externalId");
-		Long activityMonth = command.longValueOfParameterNamed("activityMonth");
+		String activityMonth = command.stringValueOfParameterNamed("activityMonth");
 		Long businessLine = command.longValueOfParameterNamed("businessLine");
 		Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");
 		Long chargeCode = command.longValueOfParameterNamed("chargeCode");
-		Date dataUploadedDate = command.DateValueOfParameterNamed("dataUploadedDate");
+		LocalDate dataUploadedDate = command.localDateValueOfParameterNamed("dataUploadedDate");
 		
 		return new InteractiveHeader(clientId,externalId,activityMonth,businessLine,mediaCategory,chargeCode,dataUploadedDate);
 	}
@@ -123,14 +123,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public Long getActivityMonth() {
-		return activityMonth;
-	}
-
-
-	public void setActivityMonth(Long activityMonth) {
-		this.activityMonth = activityMonth;
-	}
+	
 
 
 	public Date getDataUploadedDate() {
@@ -192,4 +185,17 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 			List<InteractiveDetails> interactiveDetailData) {
 		this.interactiveDetailData = interactiveDetailData;
 	}
+
+
+	public String getActivityMonth() {
+		return activityMonth;
+	}
+
+
+	public void setActivityMonth(String activityMonth) {
+		this.activityMonth = activityMonth;
+	}
+
+
+	
 }

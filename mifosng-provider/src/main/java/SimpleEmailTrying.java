@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
@@ -35,7 +38,12 @@ public class SimpleEmailTrying {
     }
     
     public static void main(String[] a){
-    	new SimpleEmailTrying().sendToUserAccount();
+    	/*new SimpleEmailTrying().sendToUserAccount();*/
+    	
+    	
+    	SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
+    	System.out.println(formatter.format(new Date()).toString());
+    	
     	System.out.println("email sent.....!");
     }
 }

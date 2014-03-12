@@ -12,9 +12,10 @@ public class GenerateInteractiveHeaderData {
 	private String chargeCode;
 	private String chargeType;
 	private Integer taxInclusive;
+	private String activityMonth;
 
 	public GenerateInteractiveHeaderData(Long id, Long clientId,
-			Long externalId, String businessLineStr, Long activityMonth,
+			Long externalId, String businessLineStr, String activityMonth,
 			Date date, String mediaCategory, String chargeCode,String chargeType,Integer taxInclusive) {
 		
 		this.id=id;
@@ -25,6 +26,7 @@ public class GenerateInteractiveHeaderData {
 		this.chargeCode = chargeCode;
 		this.chargeType = chargeType;
 		this.taxInclusive = taxInclusive;
+		this.activityMonth = activityMonth;
 		
 	}
 

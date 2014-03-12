@@ -1239,7 +1239,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 			
 		}else if(uploadProcess.equalsIgnoreCase("GameEvent")){
-			Integer cellNumber = 14;
+			Integer cellNumber = 13;
 			UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
 			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
 			Workbook wb = null;
@@ -1253,7 +1253,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
 				System.out.println("Number of rows : "+msNumberOfRows);
 				
-				for (int i = 3; i < msNumberOfRows; i++) {
+				for (int i = 4; i < msNumberOfRows; i++) {
 
 						Row headerRow = interactiveHeaderSheet.getRow(i);
 						JSONObject jsonObject = new JSONObject();
@@ -1269,7 +1269,11 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
 						/*SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
 						jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getNumericCellValue()));*/
-						jsonObject.put("activityMonth",headerRow.getCell(2).getNumericCellValue());
+						
+						SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
+						jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
+						/*jsonObject.put("activityMonth",headerRow.getCell(2).getDateCellValue());*/
+						System.out.println("#####################"+formatter.format(headerRow.getCell(2).getDateCellValue()));
 						
 						businessLineDataList = this.businessLineReadPlatformService.getBusinessLineData();
 						if(businessLineDataList.size()>0)

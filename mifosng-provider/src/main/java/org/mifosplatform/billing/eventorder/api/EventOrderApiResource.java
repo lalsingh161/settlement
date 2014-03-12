@@ -127,8 +127,10 @@ public class EventOrderApiResource {
 			context.authenticatedUser();
 			
 			
-			final List<EventMasterData> events = eventOrderReadplatformServie.getEvents();
+			final List<EventMasterData> events = eventOrderReadplatformServie.getBusinessLine();
+			
 			final Collection<PartnerAccountData> partner = mediaSettlementReadPlatformService.retrievePartnerNames();/*codeReadPlatformService.getCodeValue("MediaGameDescription");*/
+			
 			final Collection<MCodeData> source = codeReadPlatformService.getCodeValue("Deck Type");
 			final EventOrderData data = new EventOrderData(source,events,partner);
 			final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());

@@ -918,13 +918,13 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long clientId = rs.getLong("clientId");
 			final Long externalId = rs.getLong("externalId");
 			final String businessLineStr = rs.getString("businessLine");
-			final Long activityMonth = rs.getLong("activityMonth");
+			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs,
 					"dataUploadedDate");
 			final String mediaCategoryStr = rs.getString("mediaCategory");
 			final String chargeCodeStr = rs.getString("chargeCode");
 			return new InteractiveHeaderData(id, clientId, externalId,
-					businessLineStr, activityMonth, null==dataUploadedDate?null:dataUploadedDate.toDate(),
+					businessLineStr, activityMonth, dataUploadedDate,
 					mediaCategoryStr, chargeCodeStr);
 		}
 	}
@@ -965,12 +965,12 @@ public class MediaSettlementReadPlatformServiceImp implements
 				throws SQLException {
 			final Long clientId = rs.getLong("clientId");
 			final Long externalId = rs.getLong("externalId");
-			final Long activityMonth = rs.getLong("activityMonth");
+			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadDate = JdbcSupport.getLocalDate(rs, "dataUploadDate");
 			final Long businessLine = rs.getLong("businessLine");
 			final Long mediaCategory = rs.getLong("mediaCategory");
 			final Long chargeCode = rs.getLong("chargeCode");
-			return new InteractiveData(clientId,externalId,activityMonth,dataUploadDate!=null?dataUploadDate.toDate():null,businessLine,mediaCategory,chargeCode);
+			return new InteractiveData(clientId,externalId,activityMonth,dataUploadDate,businessLine,mediaCategory,chargeCode);
 		}
 		
 	}

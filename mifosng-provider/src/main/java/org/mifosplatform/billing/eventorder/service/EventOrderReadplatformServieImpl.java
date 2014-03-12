@@ -183,6 +183,13 @@ public class EventOrderReadplatformServieImpl implements EventOrderReadplatformS
 	}
 	
 	@Override
+	public List<EventMasterData> getBusinessLine() {
+		final String sql = "select id as id, int_event_code as eventName, int_event_desc as eventDescription from bp_intevent_master where int_event_status>0";
+		EventMasterDataMapper mapper = new EventMasterDataMapper();
+		return jdbcTemplate.query(sql, mapper);
+	}
+	
+	@Override
 	public List<EventOrderData> getTheClientEventOrders(Long clientId) {
 		
 		try{
@@ -242,4 +249,7 @@ final class CustomValidationProcedure extends StoredProcedure {
     }
 			
 			
+	public CustomValidationProcedure() {
+		// TODO Auto-generated constructor stub
+	}		
 }

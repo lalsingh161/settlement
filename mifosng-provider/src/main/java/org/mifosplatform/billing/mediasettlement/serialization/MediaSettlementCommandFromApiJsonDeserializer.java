@@ -368,8 +368,11 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        final BigDecimal externalId = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("externalId", element);
 	        baseDataValidator.reset().parameter("externalId").value(externalId).notBlank().notExceedingLengthOf(50);
 	        
-	        final BigDecimal activityMonth = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("activityMonth",element);
-	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank().notExceedingLengthOf(50);
+	        /*final BigDecimal activityMonth = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("activityMonth",element);
+	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank().notExceedingLengthOf(50);*/
+	        
+	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth", element);
+	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank();
 	        
 	        final BigDecimal businessLine = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("businessLine", element);
 	        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank().notExceedingLengthOf(50);

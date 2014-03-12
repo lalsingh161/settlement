@@ -50,13 +50,13 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 				final Long clientId = rs.getLong("clientId");
 				final Long externalId = rs.getLong("externalId");
 				final String businessLineStr = rs.getString("businessLine");
-				final Long activityMonth = rs.getLong("activityMonth");
-				final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs, "dataUploadedDate");
+				final String activityMonth = rs.getString("activityMonth");
+				/*final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs, "dataUploadedDate");*/
 				final String mediaCategory = rs.getString("mediaCategory");
-				final String chargeCode = rs.getString("chargeCode");
+				/*final String chargeCode = rs.getString("chargeCode");*/
 				final String chargeType = rs.getString("chargeType");
 				final Integer taxInclusive = rs.getInt("taxInclusive");
-				return new GenerateInteractiveHeaderData(id,clientId,externalId,businessLineStr,activityMonth,dataUploadedDate.toDate(),mediaCategory,chargeCode,chargeType,taxInclusive);
+				return new GenerateInteractiveHeaderData(id,clientId,externalId,businessLineStr,activityMonth,null,/*dataUploadedDate.toDate(),*/mediaCategory,null/*chargeCode*/,chargeType,taxInclusive);
 			}
 		}
 

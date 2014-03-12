@@ -43,17 +43,15 @@ public class RevenueClient {
 
 	public CommandProcessingResult createRevenueInvoice(JsonCommand command) {
 	
-		try
-		{
-		context.authenticatedUser();
-		BigDecimal invoiceAmount=this.RevenueOfClient(command.entityId());      
-	      invoiceAmount.doubleValue();
-	      return new CommandProcessingResult(command.entityId());
-	
-			}
-		catch(DataIntegrityViolationException dve) {
+		try {
+			context.authenticatedUser();
+			BigDecimal invoiceAmount = this.RevenueOfClient(command.entityId());
+			invoiceAmount.doubleValue();
+			return new CommandProcessingResult(command.entityId());
+
+		} catch (DataIntegrityViolationException dve) {
 			return CommandProcessingResult.empty();
-			
+
 		}
 
 	}
