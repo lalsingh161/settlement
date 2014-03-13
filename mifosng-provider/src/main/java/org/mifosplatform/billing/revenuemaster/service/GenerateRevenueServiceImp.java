@@ -55,7 +55,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			for(DeductionTaxesData deductionTax:deductionTaxes)
 			{
 			if(detailData.getId()==deductionTax.getDetailId()){
-				System.out.println(detailChargeTaxAmount);
+				/*System.out.println(detailChargeTaxAmount);*/
 			 detailChargeTaxAmount=detailChargeTaxAmount.add(deductionTax.getTaxAmount());
 			
 			DeductionTax deduction=new DeductionTax(invoice,charge,deductionTax.getDeductionCode(),
@@ -85,7 +85,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		charge.setNetChargeAmount(netChargeAmount);
 		charge.setChargeAmount(netChargeAmount);    
 	    
-	    netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
+	    
 		invoiceAmount=netChargeAmount;
 		
 		invoice.addCharges(charge);
