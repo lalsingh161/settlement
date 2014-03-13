@@ -2,6 +2,7 @@ package org.mifosplatform.billing.revenuemaster.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.mifosplatform.billing.billingorder.domain.Invoice;
@@ -33,11 +34,13 @@ public class RevenueClient {
 	private GenerateRevenueService generateRevenueService;
 	
 @Autowired
-	public RevenueClient(final PlatformSecurityContext context,final RevenueCommandFromApiJsonDeserializer apiJsonDeserializer,final RevenueMasterReadplatformService revenueReadplatformService,final GenerateRevenueService generateRevenueService){
+	public RevenueClient(final PlatformSecurityContext context,final RevenueCommandFromApiJsonDeserializer apiJsonDeserializer,final RevenueMasterReadplatformService revenueReadplatformService,final GenerateRevenueService generateRevenueService,
+			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService){
 		this.context =context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
 		this.revenueReadplatformService = revenueReadplatformService;
 		this.generateRevenueService = generateRevenueService;
+		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		
 	}
 
@@ -78,7 +81,16 @@ public class RevenueClient {
 		      	}else{
 				throw new NoInteractiveHeadersFoundException(headerData.getId());
 			    }
-			}else if(headerData.getMediaCategory().equalsIgnoreCase("Non Game")){
+			}else if(headerData.getMediaCategory().equalsIgnoreCase("Non Gam")){
+				detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
+				if(detailDatas!=null)
+				{
+					invoiceAmount =  this.interactivedetailDeductions(detailDatas,deductionDatas);		
+				}else {
+					throw new NoInteractiveHeadersFoundException(headerData.getId());
+				}
+		
+			}else if(headerData.getMediaCategory().equalsIgnoreCase("Non Gam Wall Paper")){
 				detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
 				if(detailDatas!=null)
 				{
@@ -120,6 +132,11 @@ public class RevenueClient {
 	}
 		Invoice invoice = this.generateRevenueService.generateInvoice(detailDatas,deductionTaxes);
 	
+		
+		 transactionHistoryWritePlatformService.saveTransactionHistory(detailDatas.get(0).getClientId(),"Invoice", new Date(),"Amount:"
+ 				+invoice.getInvoiceAmount(),"Charge Startdate:"+new Date(),
+ 				"Charge Enddate:"+new Date());
+		
 		if(invoice!=null)
 		{
 			invoiceAmount=invoiceAmount.add(invoice.getInvoiceAmount());
