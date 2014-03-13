@@ -29,7 +29,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	
     private final static Set<String> supportedParameters = new HashSet<String>(Arrays.asList("partnerName","partnerType","mediaCategory",
     		"partnerAddress","gamePlaySource","gameMediaPartnerData","game","gDate","royaltySequence",
-    		"royaltyValue","overwriteRoyaltyValue","playSource","price","sequence","locale",
+    		"royaltyValue","overwriteRoyaltyValue","price","sequence","locale",
     		"id","chData","deductionCodes","deductionData","clientId","deductionValue","deductionCode","country",
     		"settlementSequenceData","partnerType1","partnerType2","partnerType3","partnerType4",
     		"partnerType5","partnerType6","royaltyType","currencyId","currencyCode","eventId","playSource","contentName",
@@ -37,7 +37,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     
     private final static Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
     		"clientId","circle","externalId","activityMonth","businessLine","mediaCategory","contentName",
-    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate"));
+    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate","downloads","grossRevenue","endUserPrice","serviceName","channelName","contentProvider"));
 	
     private final static Set<String> supportedParametersforRevenue = new HashSet<String>(
 			Arrays.asList("locale", "businessLine", "mediaCategory",
@@ -600,5 +600,68 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		}
 		
-	}
+	 public void validateForRawData(String json){
+
+
+	        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+
+	        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+	        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParametersforGameEvent);
+
+	        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+	        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("media.settlement.rawdata");
+
+	        final JsonElement element = fromApiJsonHelper.parse(json);
+	        
+	        
+	        final String clientName = fromApiJsonHelper.extractStringNamed("clientId", element);
+	        baseDataValidator.reset().parameter("clientId").value(clientName).notBlank().notExceedingLengthOf(50);
+	        
+	        
+	        final BigDecimal externalId = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("externalId", element);
+	        baseDataValidator.reset().parameter("externalId").value(externalId).notBlank().notExceedingLengthOf(50);
+	        
+	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth", element);
+	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank();
+	        
+	        final String businessLine = fromApiJsonHelper.extractStringNamed("businessLine", element);
+	        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank().notExceedingLengthOf(50);
+	        
+	        final String mediaCategory = fromApiJsonHelper.extractStringNamed("mediaCategory",element);
+	        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank().notExceedingLengthOf(50);
+	    	 
+	    	final String playSource = fromApiJsonHelper.extractStringNamed("playSource", element);
+	        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
+	    	
+	        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
+	        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
+	        
+	        final String contentProvider = fromApiJsonHelper.extractStringNamed("contentProvider", element);
+	        baseDataValidator.reset().parameter("contentProvider").value(contentProvider).notBlank();
+	       
+	        final String channelName = fromApiJsonHelper.extractStringNamed("channelName", element);
+	        baseDataValidator.reset().parameter("channelName").value(channelName).notBlank();
+	        
+	        final String serviceName = fromApiJsonHelper.extractStringNamed("serviceName", element);
+	        baseDataValidator.reset().parameter("serviceName").value(serviceName).notBlank();
+	        
+	        final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
+	        baseDataValidator.reset().parameter("endUserPrice").value(endUserPrice).notBlank();
+	        
+	        final Integer downloads = fromApiJsonHelper.extractIntegerWithLocaleNamed("downloads", element);
+	        baseDataValidator.reset().parameter("downloads").value(downloads).notBlank().integerGreaterThanZero();   
+	        
+	        final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
+	        baseDataValidator.reset().parameter("grossRevenue").value(grossRevenue).notBlank();
+	        
+	        
+		     
+		   throwExceptionIfValidationWarningsExist(dataValidationErrors);
+		   
+		   
+	    
+		
+	 }	
+		
+}
 

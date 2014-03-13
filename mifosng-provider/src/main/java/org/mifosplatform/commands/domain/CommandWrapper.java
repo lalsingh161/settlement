@@ -1202,7 +1202,14 @@ public class CommandWrapper {
 		   return this.entityName.equalsIgnoreCase("REVENUEMASTER"); 
 	}
 	public boolean isCreateRevenueInvoice() {
-		return this.entityName.equalsIgnoreCase("REVENUEMASTER")&&this.actionName.equalsIgnoreCase("CREATE");
+		return this.entityName.equalsIgnoreCase("REVENUEMASTER") && this.actionName.equalsIgnoreCase("CREATE");
+	}
+	
+	public boolean isRawData(){
+		return this.entityName.equalsIgnoreCase("GAMEEVENT");
+	}
+	public boolean isCreateRawData(){
+		return this.entityName.equalsIgnoreCase("GAMEEVENT") && this.actionName.equalsIgnoreCase("CREATE");
 	}
 }
 

@@ -2112,5 +2112,13 @@ public class CommandWrapperBuilder {
 		return this;
 		
 	}
+
+	public CommandWrapperBuilder createRawData() {
+		this.actionName = "CREATE";
+		this.entityName = "GAMEEVENT";
+		this.entityId = null;
+		this.href = "uploadstatus/";
+		return this;
+	}
 	
 }

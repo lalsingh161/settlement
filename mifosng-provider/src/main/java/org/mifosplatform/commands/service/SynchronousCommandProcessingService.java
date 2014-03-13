@@ -889,13 +889,17 @@ public class SynchronousCommandProcessingService implements
 			         if(wrapper.isCreate()) {
 			             handler = applicationContext.getBean("createCreditDistributionCommandHandler",NewCommandSourceHandler.class);
 			         }
-			      }else if(wrapper.isInvoiceRevenue()){
+			    }else if (wrapper.isRawData()) {
+					if(wrapper.isCreateRawData()){
+						handler = applicationContext.getBean("createRawDataCommandHandler", NewCommandSourceHandler.class);
+					}
+			    }else if(wrapper.isInvoiceRevenue()){
 						 if(wrapper.isCreateRevenueInvoice()){
 							 handler = applicationContext.getBean("createRevenueInvoiceCommandHandler",NewCommandSourceHandler.class);	
 						 }
-					 }else {
-			               throw new UnsupportedCommandException(wrapper.commandName());
-		              }
+				}else {
+			            throw new UnsupportedCommandException(wrapper.commandName());
+				}
 			       
 					
 	       return handler;

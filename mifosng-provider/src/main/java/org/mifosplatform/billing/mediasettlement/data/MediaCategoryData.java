@@ -67,6 +67,47 @@ public class MediaCategoryData {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+	public String getPartnerType() {
+		return partnerType;
+	}
+
+	public void setPartnerType(String partnerType) {
+		this.partnerType = partnerType;
+	}
+
+	public MediaCategoryData getMediaCategoryData() {
+		return mediaCategoryData;
+	}
+
+	public void setMediaCategoryData(MediaCategoryData mediaCategoryData) {
+		this.mediaCategoryData = mediaCategoryData;
+	}
+
+	public MediaCategoryData getPartnerTypeData() {
+		return partnerTypeData;
+	}
+
+	public void setPartnerTypeData(MediaCategoryData partnerTypeData) {
+		this.partnerTypeData = partnerTypeData;
+	}
+
+	public Long getPartnerTypeId() {
+		return partnerTypeId;
+	}
+
+	public void setPartnerTypeId(Long partnerTypeId) {
+		this.partnerTypeId = partnerTypeId;
+	}
+
+	public Collection<PartnerGameData> getContentProviderGames() {
+		return contentProviderGames;
+	}
+
+	public void setContentProviderGames(
+			Collection<PartnerGameData> contentProviderGames) {
+		this.contentProviderGames = contentProviderGames;
+	}
 	
 	
 }

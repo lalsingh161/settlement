@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
@@ -31,6 +29,7 @@ import org.mifosplatform.billing.mediasettlement.domain.PartnerGame;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetails;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetailsJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameJpaRepository;
+import org.mifosplatform.billing.mediasettlement.domain.RawInteractiveHeaderDetail;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMaster;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMasterJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueOEMSettlement;
@@ -46,6 +45,7 @@ import org.mifosplatform.billing.mediasettlement.exception.OperatorDeductionCode
 import org.mifosplatform.billing.mediasettlement.exception.PartnerAgreementNotFoundException;
 import org.mifosplatform.billing.mediasettlement.exception.PartnerGameNotFoundException;
 import org.mifosplatform.billing.mediasettlement.serialization.MediaSettlementCommandFromApiJsonDeserializer;
+import org.mifosplatform.billing.transactionhistory.service.TransactionHistoryWritePlatformService;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -90,6 +90,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private InteractiveDetailsJpaRepository interactiveDetailsJpaRepository;	
 	final private RevenueMasterJpaRepository revenueMasterJpaRepository;
 	final private CurrencyRateJpaRepository currencyRateJpaRepository;
+	final private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(MediaSettlementWritePlatformServiceImp.class);
 	
@@ -112,7 +113,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final InteractiveDetailsJpaRepository interactiveDetailsJpaRepository,
 			final RevenueMasterJpaRepository revenueMasterJpaRepository,
 			final PartnerAgreementDetailRepository partnerAgreementDetailRepository,
-			final  CurrencyRateJpaRepository currencyRateJpaRepository) {
+			final  CurrencyRateJpaRepository currencyRateJpaRepository,
+			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService) {
 
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
@@ -131,10 +133,9 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		this.interactiveHeaderJpaRepository = interactiveHeaderJpaRepository;
 		this.interactiveDetailsJpaRepository = interactiveDetailsJpaRepository;
 		this.revenueMasterJpaRepository = revenueMasterJpaRepository;
-
 		this.partnerAgreementDetailRepository=partnerAgreementDetailRepository;
-
 		this.currencyRateJpaRepository = currencyRateJpaRepository;
+		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 
 	}
 	
@@ -149,8 +150,33 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			fromApiJsonDeserializer.validateForCreate(command.json());
 			accountPartner = PartnerAccount.fomrJson(command);
 			
-			 accountPartnerJpaRepository.save(accountPartner);				
+			 accountPartnerJpaRepository.save(accountPartner);		
 			 
+			 //Long mediaCategory;String partnerName;String partnerAddress;Character isDeleted='N';Long currencyId;Long externalId;String contactNum;String emailId;
+			 
+			transactionHistoryWritePlatformService.saveTransactionHistory(
+					0L,
+					"Create Partner",
+					accountPartner.getCreatedDate().toDate(),
+					"Partner Type: "
+							+ mediaSettlementReadPlatformService
+									.retrivePartnerType(
+											accountPartner.getPartnerType())
+									.getPartnerType(),
+					"Media Category: "
+							+ mediaSettlementReadPlatformService
+									.retrieveMediaCategory(
+											accountPartner.getMediaCategory())
+									.getMediaCategory(),
+					"Partner Name: "
+							+accountPartner.getPartnerName(),
+					"Partner Address: "
+							+accountPartner.getPartnerAddress(),
+					"Is Deleted: "
+							+accountPartner.getIsDeleted()					
+					);
+			
+			
 			
 			}catch(DataIntegrityViolationException e){
 				logger.error(e.getMessage(), e);
@@ -158,58 +184,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				return new CommandProcessingResult(Long.valueOf(-1L));
 			}
 			return new CommandProcessingResultBuilder().withEntityId(accountPartner.getId()).build();	
-		/*
-		context.authenticatedUser();
-		PartnerAccount accountPartner = null;
-		try{
-			fromApiJsonDeserializer.validateForCreate(command.json());
-			 accountPartner = PartnerAccount.fomrJson(command);
-			 long partnerId = (long)accountPartner.getPartnerType();
-			 accountPartnerJpaRepository.save(accountPartner);
-			 long matchPartnerTypeId = (long)mediaSettlementReadPlatformService.getPartnerType("Service");
-			 
-			 if(partnerId == matchPartnerTypeId){
-				 ChannelPartnerMapping cpm = ChannelPartnerMapping.newInstance(accountPartner.getId());
-				 channelPartnerJpaRepository.save(cpm);
-			 }
-			 final JsonElement element = fromApiJsonHelper.parse(command.json());			 
-			 final JsonArray chDataArray = fromApiJsonHelper.extractJsonArrayNamed("chData",element);	        	
-	         if(chDataArray != null && chDataArray.size()>=1){
-	        	 
-	        	 String[] chStringArray = new String[chDataArray.size()];
-	        	 int chStringArraySize = chDataArray.size();
-	    	     baseDataValidator.reset().parameter(null).value(chStringArraySize).integerGreaterThanZero();
-	    	     for(int i=0; i<chDataArray.size();i++){
-	    	    	 chStringArray[i] = chDataArray.get(i).toString();
-	     	     }
-	        	for(String s: chStringArray){
-	        		final JsonElement el = fromApiJsonHelper.parse(s);
-	        		final Long channelPartnerId = fromApiJsonHelper.extractLongNamed("channelPartnerName", el);
-	        		final String channelPartnerAddress = fromApiJsonHelper.extractStringNamed("channelPartnerAddress", el);
-	        		long mapId = (long)mediaSettlementReadPlatformService.getMapId(channelPartnerId);
-	        		ChannelPartnerMapping cp = channelPartnerJpaRepository.findOne(mapId);
-	        		if((cp.getPartnerId() != null && cp.getPartnerId() >= 0) && (cp.getIsMapped().charValue() == 'Y')){
-	        			throw new PlatformDataIntegrityException("this.channel.partner.is.already.allocated", "this.channel.partner.is.already.allocated");
-	        		}
-	        		cp.setIsMapped('Y');
-	        		cp.setPartnerId(accountPartner.getId());
-	        		channelPartnerJpaRepository.save(cp);
-	        		
-	        	}
-	        	 
-	        	 
-	        	 ChannelPartnerMapping cpm = ChannelPartnerMapping.newInstance(accountPartner.getId());
-				 channelPartnerJpaRepository.save(cpm);	
-	         } 
-			
-			
-		}catch(DataIntegrityViolationException e){
-			logger.error(e.getMessage(), e);
-			handleDataIntegrityIssue(e);
-			return new CommandProcessingResult(Long.valueOf(-1L));
 		}
-		return new CommandProcessingResultBuilder().withEntityId(accountPartner.getId()).build();
-	*/}
 	
 	
 	@Transactional
@@ -1096,5 +1071,24 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 						}
 		 	
 		 	
-
+		 	@Transactional
+		 	@Override
+		 	public CommandProcessingResult createRawData(JsonCommand command) {
+		 		
+		 		context.authenticatedUser();
+		 		RawInteractiveHeaderDetail rawData = null;
+		 		
+		 		try{
+		 			
+		 			fromApiJsonDeserializer.validateForRawData(command.json());
+		 			rawData = RawInteractiveHeaderDetail.fromJson(command);
+		 			
+		 			
+		 		}catch(DataIntegrityViolationException dve){
+		 			handleCodeDataIntegrityIssues(command, dve);
+		 		}
+		 		
+		 		
+		 		return null;
+		 	}
 }

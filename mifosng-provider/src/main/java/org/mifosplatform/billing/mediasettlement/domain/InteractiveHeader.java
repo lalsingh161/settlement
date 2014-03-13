@@ -74,7 +74,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		this.mediaCategory = mediaCategory;
 		
 		this.chargeCode = chargeCode;
-		this.dataUploadedDate = (null==dataUploadedDate)?null:dataUploadedDate.toDate();
+		this.dataUploadedDate = (null==dataUploadedDate)?new Date():dataUploadedDate.toDate();
 	}
 
 	public String displayProperties(){

@@ -67,4 +67,6 @@ public interface MediaSettlementWritePlatformService {
 			JsonCommand command);
 	public CommandProcessingResult updateOperatorDeduction(JsonCommand command,
 			Long entityId);
+
+	public CommandProcessingResult createRawData(JsonCommand command);
 }

@@ -1263,7 +1263,12 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				
 				//Sheet mediaLocationSheet = wb.getSheetAt(2);
 				int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
+				int lastRowNumber = interactiveHeaderSheet.getLastRowNum();
+				
 				System.out.println("Number of rows : "+msNumberOfRows);
+				System.out.println("Number of rows : "+lastRowNumber);
+				
+				JSONObject parentJsonObject = new JSONObject();
 				
 				for (int i = 4; i < msNumberOfRows; i++) {
 
@@ -1272,132 +1277,36 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						
 					 try {
 						 if(headerRow.getCell(3).getStringCellValue().equalsIgnoreCase("EOF"))
-							 throw new EOFException();
-						totalRecordCount++;
+							throw new EOFException();
+						 
+						 
+						 	totalRecordCount++;
 						
-						Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
-						
-						jsonObject.put("clientId",clientId);//-
-						clientIds.add(clientId);
-						jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
-						/*SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
-						jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getNumericCellValue()));*/
-						
-						SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
-						jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
-						/*jsonObject.put("activityMonth",headerRow.getCell(2).getDateCellValue());*/
-						/*System.out.println("#####################"+formatter.format(headerRow.getCell(2).getDateCellValue()));*/
-						
-						businessLineDataList = this.businessLineReadPlatformService.getBusinessLineData();
-						if(businessLineDataList.size()>0)
-						{
-							for(BusinessLineData businessData:businessLineDataList)
-							{
-								if(businessData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(3).getStringCellValue()))
-										{
-											jsonObject.put("businessLine",businessData.getId());
-										}
-							}
-						}
-						
-						mediaCategoryDataList=this.mCodeReadPlatformService.getCodeValue("Media Category");
-						
-						if(mediaCategoryDataList.size()>0)
-						{
-							for(MCodeData mediaData:mediaCategoryDataList)
-							{
-								if(mediaData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(4).getStringCellValue()))
-										{
-									jsonObject.put("mediaCategory",mediaData.getId());
-										}
-							}
-						}
-						/*chargeCodesDataList=this.itemReadPlatformService.retrieveChargeCode();
-						if(chargeCodesDataList.size()>0)
-						{
-							for(ChargesData chargeData:chargeCodesDataList)
-							{
-								if(chargeData.getChargeDescription().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
-										{
-									jsonObject.put("chargeCode",chargeData.getId());
-										}
-							}
-						}*/
-				
-						
-						/*jsonObject.put("dataUploadedDate",formatter.format(headerRow.getCell(6).getDateCellValue()));*/
+						 	jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
+							jsonObject.put("clientId",headerRow.getCell(1).getStringCellValue());//-
+							/*clientIds.add(clientId);*/
+							SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
+							jsonObject.put("activityMonth",headerRow.getCell(2).getDateCellValue());
+							jsonObject.put("businessLine",headerRow.getCell(3).getStringCellValue());
+							jsonObject.put("mediaCategory",headerRow.getCell(4).getStringCellValue());
 							jsonObject.put("dateFormat","dd MMMM yyyy");
 							jsonObject.put("locale","en");
-							JSONArray a = new JSONArray();
+							
+							/*JSONArray a = new JSONArray();
 							Map<String, Object> m = new LinkedHashMap<String, Object>();
+							*/
 							
-							playSourceDataList = this.mCodeReadPlatformService.getCodeValue("Play Source");
-							if(playSourceDataList.size()>0)
-							{
-								for(MCodeData playSourceData:playSourceDataList)
-								{
-									if(playSourceData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
-											{
-												m.put("playSource",playSourceData.getId());
-											}
-								}
-							}
-							m.put("contentName", headerRow.getCell(6).getStringCellValue());
-							 /*Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
-								if(mediaDataList.size()>0)
-								{
-									for(MediaAssetData mediaData:mediaDataList)
-									{
-										if(mediaData.getMediaTitle().equalsIgnoreCase(headerRow.getCell(6).getStringCellValue()))
-												{
-											m.put("contentName",mediaData.getMediaId());
-												}
-									}
-								}*/
-							
-					   contentDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");
-					   if(contentDataList.size()>0)
-					   {
-						   for(PartnerAccountData contentData:contentDataList){
-							   if(contentData.getPartnerName().equalsIgnoreCase(headerRow.getCell(7).getStringCellValue()))
-							   {
-								   m.put("contentProvider", contentData.getId());
-							   }
-						   }
-					   }
-					   channelDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
-					   if(contentDataList.size()>0)
-					   {
-						   for(PartnerAccountData channelData:channelDataList){
-							   if(channelData.getPartnerName().equalsIgnoreCase(headerRow.getCell(8).getStringCellValue()))
-							   {
-								   m.put("channelName", channelData.getId());
-							   }
-						   }
-					   }
-					   
-					   serviceDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
-					   if(contentDataList.size()>0)
-					   {
-						   for(PartnerAccountData serviceData:serviceDataList){
-							   if(serviceData.getPartnerName().equalsIgnoreCase(headerRow.getCell(9).getStringCellValue()))
-							   {
-								   m.put("serviceName", serviceData.getId());
-							   }
-						   }
-					   }
-							m.put("endUserPrice", headerRow.getCell(10).getNumericCellValue());
-							m.put("grossRevenue", headerRow.getCell(12).getNumericCellValue());
-							m.put("downloads", headerRow.getCell(11).getNumericCellValue());
-							m.put("locale","en");
-							
-	
-							a.put(m);
-							jsonObject.put("activeData",a);
-						
+							jsonObject.put("playSource",headerRow.getCell(5).getStringCellValue());							
+							jsonObject.put("contentName", headerRow.getCell(6).getStringCellValue());						
+							jsonObject.put("contentProvider", headerRow.getCell(7).getStringCellValue());
+							jsonObject.put("channelName", headerRow.getCell(8).getStringCellValue());							   
+							jsonObject.put("serviceName", headerRow.getCell(9).getStringCellValue());
+							jsonObject.put("endUserPrice", headerRow.getCell(10).getNumericCellValue());
+							jsonObject.put("downloads", headerRow.getCell(11).getNumericCellValue());
+							jsonObject.put("grossRevenue", headerRow.getCell(12).getNumericCellValue());
 						
 						context.authenticatedUser().validateHasReadPermission(GAMEEVENT_RESOURCE_TYPE);
-						final CommandWrapper commandRequest = new CommandWrapperBuilder().createGameEvent(0L).withJson(jsonObject.toString()).build();
+						final CommandWrapper commandRequest = new CommandWrapperBuilder().createRawData().withJson(jsonObject.toString()).build();
 						final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 						
 						if(result!=null){
@@ -1422,15 +1331,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						errorData.add(new MRNErrorData((long)i, "Error: "+e.getMessage()));
 					}
 				}
-				
-				
-				
-				/*uploadStatusForGameEvent.setProcessRecords(processRecordCount);
-				uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
-				uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
-				writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
-				processRecordCount=0L;totalRecordCount=0L;
-				uploadStatusForGameEvent=null;*/
+
 				uploadStatusForGameEvent.setProcessRecords(processRecordCount);
 				uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
 				uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
@@ -1438,7 +1339,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				processRecordCount=0L;totalRecordCount=0L;
 				uploadStatusForGameEvent=null;
 				
-				for(Long cId: clientIds){
+				/*for(Long cId: clientIds){
 					
 					 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
 					 final String json = wrapper.getJson();
@@ -1453,8 +1354,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									wrapper.getSupportedEntityId(), wrapper.getTransactionId());
 					this.revenueClient.createRevenueInvoice(command); 
 					
-				}
-				clientIds = null;
+				}*/
+				//clientIds = null;
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -2268,3 +2169,221 @@ private void writeCSVData(String fileLocation,
 	}
 }
 
+
+/*Set<Long> clientIds = new HashSet<Long>();
+Integer cellNumber = 13;
+UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
+ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
+Workbook wb = null;
+Long processRecordCount=0L;
+Long totalRecordCount=0L;
+try {
+	wb = WorkbookFactory.create(new File(fileLocation));
+	Sheet interactiveHeaderSheet = wb.getSheetAt(0);
+	
+	//Sheet mediaLocationSheet = wb.getSheetAt(2);
+	int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
+	int lastRowNumber = interactiveHeaderSheet.getLastRowNum();
+	
+	System.out.println("Number of rows : "+msNumberOfRows);
+	System.out.println("Number of rows : "+lastRowNumber);
+	
+	for (int i = 4; i < msNumberOfRows; i++) {
+
+			Row headerRow = interactiveHeaderSheet.getRow(i);
+			JSONObject jsonObject = new JSONObject();
+			
+		 try {
+			 if(headerRow.getCell(3).getStringCellValue().equalsIgnoreCase("EOF"))
+				 throw new EOFException();
+			totalRecordCount++;
+			
+			Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
+			
+			jsonObject.put("clientId",clientId);//-
+			clientIds.add(clientId);
+			jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
+			SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
+			jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getNumericCellValue()));
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
+			jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
+			jsonObject.put("activityMonth",headerRow.getCell(2).getDateCellValue());
+			System.out.println("#####################"+formatter.format(headerRow.getCell(2).getDateCellValue()));
+			
+			businessLineDataList = this.businessLineReadPlatformService.getBusinessLineData();
+			if(businessLineDataList.size()>0)
+			{
+				for(BusinessLineData businessData:businessLineDataList)
+				{
+					if(businessData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(3).getStringCellValue()))
+							{
+								jsonObject.put("businessLine",businessData.getId());
+							}
+				}
+			}
+			
+			mediaCategoryDataList=this.mCodeReadPlatformService.getCodeValue("Media Category");
+			
+			if(mediaCategoryDataList.size()>0)
+			{
+				for(MCodeData mediaData:mediaCategoryDataList)
+				{
+					if(mediaData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(4).getStringCellValue()))
+							{
+						jsonObject.put("mediaCategory",mediaData.getId());
+							}
+				}
+			}
+			chargeCodesDataList=this.itemReadPlatformService.retrieveChargeCode();
+			if(chargeCodesDataList.size()>0)
+			{
+				for(ChargesData chargeData:chargeCodesDataList)
+				{
+					if(chargeData.getChargeDescription().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
+							{
+						jsonObject.put("chargeCode",chargeData.getId());
+							}
+				}
+			}
+	
+			
+			jsonObject.put("dataUploadedDate",formatter.format(headerRow.getCell(6).getDateCellValue()));
+				jsonObject.put("dateFormat","dd MMMM yyyy");
+				jsonObject.put("locale","en");
+				JSONArray a = new JSONArray();
+				Map<String, Object> m = new LinkedHashMap<String, Object>();
+				
+				playSourceDataList = this.mCodeReadPlatformService.getCodeValue("Play Source");
+				if(playSourceDataList.size()>0)
+				{
+					for(MCodeData playSourceData:playSourceDataList)
+					{
+						if(playSourceData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
+								{
+									m.put("playSource",playSourceData.getId());
+								}
+					}
+				}
+				m.put("contentName", headerRow.getCell(6).getStringCellValue());
+				 Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
+					if(mediaDataList.size()>0)
+					{
+						for(MediaAssetData mediaData:mediaDataList)
+						{
+							if(mediaData.getMediaTitle().equalsIgnoreCase(headerRow.getCell(6).getStringCellValue()))
+									{
+								m.put("contentName",mediaData.getMediaId());
+									}
+						}
+					}
+				
+		   contentDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");
+		   if(contentDataList.size()>0)
+		   {
+			   for(PartnerAccountData contentData:contentDataList){
+				   if(contentData.getPartnerName().equalsIgnoreCase(headerRow.getCell(7).getStringCellValue()))
+				   {
+					   m.put("contentProvider", contentData.getId());
+				   }
+			   }
+		   }
+		   channelDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
+		   if(contentDataList.size()>0)
+		   {
+			   for(PartnerAccountData channelData:channelDataList){
+				   if(channelData.getPartnerName().equalsIgnoreCase(headerRow.getCell(8).getStringCellValue()))
+				   {
+					   m.put("channelName", channelData.getId());
+				   }
+			   }
+		   }
+		   
+		   serviceDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
+		   if(contentDataList.size()>0)
+		   {
+			   for(PartnerAccountData serviceData:serviceDataList){
+				   if(serviceData.getPartnerName().equalsIgnoreCase(headerRow.getCell(9).getStringCellValue()))
+				   {
+					   m.put("serviceName", serviceData.getId());
+				   }
+			   }
+		   }
+				m.put("endUserPrice", headerRow.getCell(10).getNumericCellValue());
+				m.put("grossRevenue", headerRow.getCell(12).getNumericCellValue());
+				m.put("downloads", headerRow.getCell(11).getNumericCellValue());
+				m.put("locale","en");
+				
+
+				a.put(m);
+				jsonObject.put("activeData",a);
+			
+			
+			context.authenticatedUser().validateHasReadPermission(GAMEEVENT_RESOURCE_TYPE);
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().createGameEvent(0L).withJson(jsonObject.toString()).build();
+			final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+			
+			if(result!=null){
+		    	//Long rsId = result.resourceId();
+		    	errorData.add(new MRNErrorData((long)i, "Success"));
+		    	processRecordCount++;
+		    }
+			
+			
+		}catch(PlatformDataIntegrityException e){
+			errorData.add(new MRNErrorData((long)i, e.getParameterName()+" : "+e.getDefaultUserMessage()));
+		}catch (PlatformApiDataValidationException e) {
+			errorData.add(new MRNErrorData((long)i, e.getErrors().get(0).getParameterName()+" : "+e.getDefaultUserMessage()));
+		}catch (NullPointerException e) {
+			errorData.add(new MRNErrorData((long)i, "Error: value cannot be null"));
+		}catch (EOFException e){
+			errorData.add(new MRNErrorData((long)i, "Completed: End Of Record"));
+			break;
+		}catch (IllegalStateException e) {
+			errorData.add(new MRNErrorData((long)i,e.getMessage()));
+		}catch (Exception e) {
+			errorData.add(new MRNErrorData((long)i, "Error: "+e.getMessage()));
+		}
+	}
+	
+	
+	
+	uploadStatusForGameEvent.setProcessRecords(processRecordCount);
+	uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
+	uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
+	writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
+	processRecordCount=0L;totalRecordCount=0L;
+	uploadStatusForGameEvent=null;
+	uploadStatusForGameEvent.setProcessRecords(processRecordCount);
+	uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
+	uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
+	writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
+	processRecordCount=0L;totalRecordCount=0L;
+	uploadStatusForGameEvent=null;
+	
+	for(Long cId: clientIds){
+		
+		 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
+		 final String json = wrapper.getJson();
+			
+			final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
+				final JsonCommand command = JsonCommand.from(json, parsedCommand,
+						this.fromApiJsonHelper, wrapper.getEntityName(),
+						wrapper.getEntityId(), wrapper.getSubentityId(),
+						wrapper.getGroupId(), wrapper.getClientId(),
+						wrapper.getLoanId(), wrapper.getSavingsId(),
+						wrapper.getCodeId(), wrapper.getSupportedEntityType(),
+						wrapper.getSupportedEntityId(), wrapper.getTransactionId());
+		this.revenueClient.createRevenueInvoice(command); 
+		
+	}
+	clientIds = null;
+
+} catch (IOException e) {
+	e.printStackTrace();
+} catch (InvalidFormatException e) {
+	e.getStackTrace();
+}
+
+
+*/
