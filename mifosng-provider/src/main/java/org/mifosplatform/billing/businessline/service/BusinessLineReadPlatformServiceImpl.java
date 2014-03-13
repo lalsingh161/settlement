@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.mifosplatform.billing.businessline.data.BusinessLineData;
 import org.mifosplatform.billing.order.data.OrderStatusEnumaration;
+import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.billing.plan.domain.StatusTypeEnum;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
+import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,10 +24,12 @@ public class BusinessLineReadPlatformServiceImpl implements
 BusinessLineReadPlatformService {
 	
 	private final JdbcTemplate jdbcTemplate;
+	private final PlatformSecurityContext context;
 	
 	@Autowired
-	public BusinessLineReadPlatformServiceImpl (final TenantAwareRoutingDataSource dataSource) {
+	public BusinessLineReadPlatformServiceImpl (final TenantAwareRoutingDataSource dataSource,final PlatformSecurityContext context) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.context=context;
 	}
 
 	@Override
@@ -93,8 +97,8 @@ BusinessLineReadPlatformService {
 	
 	@Override
 	public List<BusinessLineData> retrieveEventDetailsData(Integer eventId) {
-		String sql = "Select bl.id as id, bl.intevent_id as eventId,bl.int_category as categoryId,m.title as title  "
-					  +" from bp_intevent_dtl bl,b_media_asset m where bl.int_category=m.id and intevent_id = ?";
+		String sql = "Select bl.id as id, bl.intevent_id as eventId,bl.int_category as categoryId,m.code_value as mCodeValue  "
+					  +" from bp_intevent_dtl bl,m_code_value m where bl.int_category=m.id and intevent_id= ?";
 		
 		RowMapper<BusinessLineData> rm = new EventDetailsMapper();
 		
@@ -107,8 +111,8 @@ BusinessLineReadPlatformService {
 			Long id = rs.getLong("id");
 			Long eventId = rs.getLong("eventId");
 			Long categoryId = rs.getLong("categoryId");
-			String mediaTitle = rs.getString("title");
-			return new BusinessLineData(id, eventId, categoryId, mediaTitle);
+			String mCodeValue = rs.getString("mCodeValue");
+			return new BusinessLineData(id, eventId, categoryId, mCodeValue);
 		}
 	}
 	
@@ -129,6 +133,51 @@ BusinessLineReadPlatformService {
 			return new BusinessLineData(id,codeValue,businessLineDescription);
 		}
 	}
+
+	public List<McodeData> retrieveCategoryData(String str) {
+
+		context.authenticatedUser();
+		CategoryMapper mapper = new CategoryMapper();
+
+		String sql = "select " + mapper.schema()+" m.code_name=?";
+
+		return this.jdbcTemplate.query(sql, mapper, new Object[] {str});
+
+	}
+
+	private static final class CategoryMapper implements RowMapper<McodeData> {
+
+		public String schema() {
+			return "mc.id as id,mc.code_value as codeValue FROM m_code_value mc,m_code m where mc.code_id=m.id and";
+
+		}
+
+		@Override
+		public McodeData mapRow(final ResultSet rs,
+				@SuppressWarnings("unused") final int rowNum)
+				throws SQLException {
+           
+			String codeValue = rs.getString("codeValue");
+			Long id = rs.getLong("id");
+			return new McodeData(id,codeValue);
+
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }	
 
 	

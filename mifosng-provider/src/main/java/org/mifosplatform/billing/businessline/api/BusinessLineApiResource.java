@@ -23,6 +23,7 @@ import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.item.service.ItemReadPlatformService;
 import org.mifosplatform.billing.media.data.MediaAssetData;
 import org.mifosplatform.billing.media.service.MediaAssetReadPlatformService;
+import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -88,10 +89,11 @@ public class BusinessLineApiResource {
 	public BusinessLineData handleTemplateRelatedData(final Set<String> responseParameters) {
 		
 	
-	    List<MediaAssetData> mediaData   = this.assetReadPlatformService.retrieveAllAssetdata();
+	    //List<MediaAssetData> mediaData   = this.assetReadPlatformService.retrieveAllAssetdata();
+		List<McodeData> catgoryData = this.businessLineReadPlatformService.retrieveCategoryData("Media Category");
 		List<EnumOptionData> statusData = this.businessLineReadPlatformService.retrieveNewStatus();
 		List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
-		BusinessLineData singleEvent  = new BusinessLineData(mediaData,statusData,chargeDatas);
+		BusinessLineData singleEvent  = new BusinessLineData(catgoryData,statusData,chargeDatas);
 		
 		return singleEvent;	
 	}
@@ -105,7 +107,8 @@ public class BusinessLineApiResource {
 		context.authenticatedUser().validateHasReadPermission("CLIENT");
 		Set<String> responseParameters = ApiParameterHelper.extractFieldsForResponseIfProvided(uriInfo.getQueryParameters());
 		responseParameters.addAll(RESPONSE_PARAMETERS);
-		List<MediaAssetData> mediaData   = this.assetReadPlatformService.retrieveAllAssetdata();
+		//List<MediaAssetData> mediaData   = this.assetReadPlatformService.retrieveAllAssetdata();
+		List<McodeData> catgoryData = this.businessLineReadPlatformService.retrieveCategoryData("Media Category");
 		List<EnumOptionData> statusData = this.businessLineReadPlatformService.retrieveNewStatus();
 		List<BusinessLineData> details = this.businessLineReadPlatformService.retrieveEventDetailsData(eventId);
 		List<ChargesData> chargeDatas = this.itemReadPlatformService.retrieveChargeCode();
@@ -124,9 +127,9 @@ public class BusinessLineApiResource {
 			}
 		}*/
 		
-		event.setMediaAsset(mediaData);
+		event.setCategoryData(catgoryData);
 		event.setStatusData(statusData);
-		event.setSelectedMedia(details);
+		event.setSelectedCategoryData(details);
 		event.setChargeDatas(chargeDatas);
 		final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 	

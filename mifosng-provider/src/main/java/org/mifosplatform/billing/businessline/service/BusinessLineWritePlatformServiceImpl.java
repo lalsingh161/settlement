@@ -11,6 +11,8 @@ import org.mifosplatform.billing.media.data.MediaAssetData;
 import org.mifosplatform.billing.media.domain.MediaAsset;
 import org.mifosplatform.billing.media.service.MediaAssetReadPlatformService;
 import org.mifosplatform.billing.mediadetails.domain.MediaAssetRepository;
+import org.mifosplatform.billing.paymode.domain.Paymode;
+import org.mifosplatform.billing.paymode.domain.PaymodeRepository;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResultBuilder;
@@ -28,7 +30,7 @@ BusinessLineWritePlatformService {
 	
 	private PlatformSecurityContext context;
 	private BusinessLineMasterRepository businessLineMasterRepository;
-	private MediaAssetRepository assetRepository;
+	private PaymodeRepository paymodeRepository;
 	private BusinessLineFromApiJsonDeserializer apiJsonDeserializer;
 	private MediaAssetReadPlatformService assetReadPlatformService;
 	
@@ -36,12 +38,12 @@ BusinessLineWritePlatformService {
 	public BusinessLineWritePlatformServiceImpl (final PlatformSecurityContext context,
 											    final BusinessLineMasterRepository businessLineMasterRepository,
 											    final BusinessLineFromApiJsonDeserializer apiJsonDeserializer,
-											    final MediaAssetRepository assetRepository,
+											    final PaymodeRepository paymodeRepository,
 											    final MediaAssetReadPlatformService assetReadPlatformService) {
 		this.context = context;
 		this.businessLineMasterRepository = businessLineMasterRepository;
 		this.apiJsonDeserializer = apiJsonDeserializer;
-		this.assetRepository = assetRepository;
+		this.paymodeRepository = paymodeRepository;
 		this.assetReadPlatformService = assetReadPlatformService;
 	}
 	@Transactional
@@ -61,8 +63,8 @@ BusinessLineWritePlatformService {
 			}
 			for(String mediaId : category) {
 				final Long id = Long.valueOf(mediaId);
-				MediaAsset mediaAsset = this.assetRepository.findOne(id);
-				BusinessLineDetails detail = new BusinessLineDetails(mediaAsset.getId());
+				Paymode paymode = this.paymodeRepository.findOne(id);
+				BusinessLineDetails detail = new BusinessLineDetails(paymode.getId());
 				eventMaster.addMediaDetails(detail);
 			}
 			//eventMaster.setCreatedbyId(createdbyId);
@@ -98,8 +100,9 @@ BusinessLineWritePlatformService {
 				
 				for(String categoryId : category) {
 					final Long id = Long.valueOf(categoryId);
-					MediaAsset mediaAsset = this.assetRepository.findOne(id);
-					BusinessLineDetails detail = new BusinessLineDetails(mediaAsset.getId());
+					//MediaAsset mediaAsset = this.assetRepository.findOne(id);
+					Paymode paymode = this.paymodeRepository.findOne(id);
+					BusinessLineDetails detail = new BusinessLineDetails(paymode.getId());
 					oldEvent.addMediaDetails(detail);
 				}
 			}
