@@ -850,6 +850,8 @@ public class SynchronousCommandProcessingService implements
 				 }else if(wrapper.isOperatorDeduction()){
 					 if(wrapper.isCreateOperatorDeduction()){
 						 handler = applicationContext.getBean("createOperatorDeductionCommandHandler", NewCommandSourceHandler.class);
+					 }else if(wrapper.isUpdateOperatorDeduction()){
+						   handler = applicationContext.getBean("updateOperatorDeductionCommandHandler",NewCommandSourceHandler.class);
 					 }
 				 }else if(wrapper.isPartnerGame()){
 					 	if(wrapper.isCreatePartnerGame()){

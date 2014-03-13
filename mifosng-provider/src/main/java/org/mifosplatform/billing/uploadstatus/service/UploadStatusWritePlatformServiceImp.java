@@ -70,6 +70,7 @@ import org.mifosplatform.billing.order.exceptions.NoGrnIdFoundException;
 import org.mifosplatform.billing.payments.api.PaymentsApiResource;
 import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
+import org.mifosplatform.billing.revenuemaster.service.RevenueClient;
 import org.mifosplatform.billing.uploadstatus.command.UploadStatusCommand;
 import org.mifosplatform.billing.uploadstatus.domain.UploadStatus;
 import org.mifosplatform.billing.uploadstatus.domain.UploadStatusCommandValidator;
@@ -78,6 +79,7 @@ import org.mifosplatform.billing.uploadstatus.domain.UploadStatusRepository;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.InvalidJsonException;
@@ -85,6 +87,7 @@ import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidation
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.exception.UnsupportedParameterException;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
+import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
@@ -95,6 +98,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -125,7 +129,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	private Collection<PartnerAccountData> serviceDataList;
 	private Collection<PartnerAccountData> channelDataList;;
 	private List<AdjustmentData> adjustmentDataList;
-	 public Collection<McodeData> paymodeDataList;
+	public Collection<McodeData> paymodeDataList;
+	
 	
 	 private static final String MEDIAASSETS_RESOURCE_TYPE = "ASSESTS";
 	 private static final String EPG_RESOURCE_TYPE = "EPGPROGRAMGUIDE";
@@ -147,6 +152,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	 private final MediaAssetReadPlatformService mediaAssetReadPlatformService;
 	 private final MCodeReadPlatformService mCodeReadPlatformService;
 	 private final BusinessLineReadPlatformService businessLineReadPlatformService;
+	 private final FromJsonHelper fromApiJsonHelper;
+	 private final RevenueClient revenueClient;
 	
 	@Autowired
 	public UploadStatusWritePlatformServiceImp(
@@ -162,7 +169,9 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			final ItemReadPlatformService itemReadPlatformService,
 			final MediaAssetReadPlatformService mediaAssetReadPlatformService,
 			final MCodeReadPlatformService mCodeReadPlatformService,
-			final BusinessLineReadPlatformService businessLineReadPlatformService) {
+			final BusinessLineReadPlatformService businessLineReadPlatformService,
+			final FromJsonHelper fromApiJsonHelper,
+			final RevenueClient revenueClient) {
 		this.context=context;
 		this.uploadStatusRepository=uploadStatusRepository;
 		this.commandsSourceWritePlatformService=commandsSourceWritePlatformService;
@@ -177,6 +186,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 		this.mediaAssetReadPlatformService = mediaAssetReadPlatformService;
 		this.mCodeReadPlatformService = mCodeReadPlatformService;
 		this.businessLineReadPlatformService = businessLineReadPlatformService;
+		this.fromApiJsonHelper = fromApiJsonHelper;
+		this.revenueClient = revenueClient;
 	}
 	
 	//@Transactional
@@ -1239,6 +1250,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 			
 		}else if(uploadProcess.equalsIgnoreCase("GameEvent")){
+			Set<Long> clientIds = new HashSet<Long>();
 			Integer cellNumber = 13;
 			UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
 			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
@@ -1266,6 +1278,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
 						
 						jsonObject.put("clientId",clientId);//-
+						clientIds.add(clientId);
 						jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
 						/*SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
 						jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getNumericCellValue()));*/
@@ -1273,7 +1286,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
 						jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
 						/*jsonObject.put("activityMonth",headerRow.getCell(2).getDateCellValue());*/
-						System.out.println("#####################"+formatter.format(headerRow.getCell(2).getDateCellValue()));
+						/*System.out.println("#####################"+formatter.format(headerRow.getCell(2).getDateCellValue()));*/
 						
 						businessLineDataList = this.businessLineReadPlatformService.getBusinessLineData();
 						if(businessLineDataList.size()>0)
@@ -1329,7 +1342,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 											}
 								}
 							}
-							 Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
+							m.put("contentName", headerRow.getCell(6).getStringCellValue());
+							 /*Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
 								if(mediaDataList.size()>0)
 								{
 									for(MediaAssetData mediaData:mediaDataList)
@@ -1339,7 +1353,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 											m.put("contentName",mediaData.getMediaId());
 												}
 									}
-								}
+								}*/
 							
 					   contentDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");
 					   if(contentDataList.size()>0)
@@ -1409,6 +1423,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					}
 				}
 				
+				
+				
 				/*uploadStatusForGameEvent.setProcessRecords(processRecordCount);
 				uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
 				uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
@@ -1421,6 +1437,24 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
 				processRecordCount=0L;totalRecordCount=0L;
 				uploadStatusForGameEvent=null;
+				
+				for(Long cId: clientIds){
+					
+					 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
+					 final String json = wrapper.getJson();
+						
+						final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
+							final JsonCommand command = JsonCommand.from(json, parsedCommand,
+									this.fromApiJsonHelper, wrapper.getEntityName(),
+									wrapper.getEntityId(), wrapper.getSubentityId(),
+									wrapper.getGroupId(), wrapper.getClientId(),
+									wrapper.getLoanId(), wrapper.getSavingsId(),
+									wrapper.getCodeId(), wrapper.getSupportedEntityType(),
+									wrapper.getSupportedEntityId(), wrapper.getTransactionId());
+					this.revenueClient.createRevenueInvoice(command); 
+					
+				}
+				clientIds = null;
 
 			} catch (IOException e) {
 				e.printStackTrace();

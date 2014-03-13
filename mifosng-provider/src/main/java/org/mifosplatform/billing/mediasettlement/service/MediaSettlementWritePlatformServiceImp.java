@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
@@ -783,6 +785,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	@Override
 	public CommandProcessingResult createGameEvent(JsonCommand command,
 			Long entityId) {
+		
+		
 		
 		InteractiveHeader header = null; 
 		/*final Long eventId=entityId;*/
