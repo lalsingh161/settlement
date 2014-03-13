@@ -18,13 +18,13 @@ public class BusinessLineData {
 	}
 
 
-	public List<MediaAssetData> getMediaAsset() {
-		return mediaAsset;
+	public List<McodeData> getCategoryData() {
+		return categoryData;
 	}
 
 
-	public void setMediaAsset(List<MediaAssetData> mediaAsset) {
-		this.mediaAsset = mediaAsset;
+	public void setCategoryData(List<McodeData> categoryData) {
+		this.categoryData = categoryData;
 	}
 
 
@@ -55,24 +55,24 @@ public class BusinessLineData {
 	private String chargeCode;
 	private Long category;
 	private List<EnumOptionData> statusData;
-	private List<MediaAssetData> mediaAsset;
+	//private List<MediaAssetData> mediaAsset;
+	private List<McodeData> categoryData;
 	private List<ChargesData> chargeDatas;
 	
 
 	private List<McodeData> mediaCategeorydata;
-	private List<BusinessLineData> selectedMedia;
+	private List<BusinessLineData> selectedCategoryData;
 	public Long getCategoryId() {
 		return categoryId;
 	}
 
-
-	public List<BusinessLineData> getSelectedMedia() {
-		return selectedMedia;
+	public List<BusinessLineData> getSelectedCategoryData() {
+		return selectedCategoryData;
 	}
 
 
-	public void setSelectedMedia(List<BusinessLineData> selectedMedia) {
-		this.selectedMedia = selectedMedia;
+	public void setSelectedCategoryData(List<BusinessLineData> selectedCategoryData) {
+		this.selectedCategoryData = selectedCategoryData;
 	}
 
 
@@ -106,10 +106,10 @@ public class BusinessLineData {
 	}
 
 
-	public BusinessLineData(List<MediaAssetData> mediaData,
+	public BusinessLineData(List<McodeData> categoryData,
 			List<EnumOptionData> statusData, List<ChargesData> chargeDatas) {
 		
-		this.mediaAsset=mediaData;
+		this.categoryData=categoryData;
 		this.statusData=statusData;
 		this.chargeDatas=chargeDatas;
 		
@@ -131,12 +131,12 @@ public class BusinessLineData {
 
 
 	public BusinessLineData(Long id, Long eventId, Long categoryId,
-			String mediaTitle) {
+			String mCodeValue) {
 		
 			this.id=id;
 			this.eventId=eventId;
 			this.categoryId=categoryId;
-			this.mediaTitle=mediaTitle;
+			this.mCodeValue=mCodeValue;
 			
 	}
 
