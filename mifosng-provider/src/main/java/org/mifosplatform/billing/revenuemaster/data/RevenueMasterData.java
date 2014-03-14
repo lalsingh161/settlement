@@ -6,7 +6,6 @@ public class RevenueMasterData {
 	
 	private Long id;
 	private String playSource;
-	private String contentName;
 	private String contentProvider;
 	private String channelName;
 	private String serviceName;
@@ -21,13 +20,13 @@ public class RevenueMasterData {
 	private BigDecimal netRevenueAmount=BigDecimal.ZERO;
 	private BigDecimal detailChargeTaxAmount=BigDecimal.ZERO;
 
-	public RevenueMasterData(Long id,Long headerId,String playSource, String contentName,
+	public RevenueMasterData(Long id,Long headerId,String playSource,
 			String contentProvider, String channelName, String serviceName,
 			BigDecimal endUserPrice, BigDecimal downloads,
 			BigDecimal grossRevenue,String chargeCode,String chargeType,Integer taxInclusive,Long clientId) {
 		this.id=id;
 		this.headerId=headerId;
-		this.contentName=contentName;
+	/*	this.contentName=contentName;*/
 		this.endUserPrice=endUserPrice;
 		this.downloads= downloads;
 		this.grossRevenue = grossRevenue;
@@ -40,9 +39,7 @@ public class RevenueMasterData {
 	public Long getId() {
 		return id;
 	}
-	public String getContentName() {
-		return contentName;
-	}
+	
 	public String getChannelName() {
 		return channelName;
 	}

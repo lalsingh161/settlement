@@ -60,7 +60,6 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 		@Override
 		public List<RevenueMasterData> retriveAllinteractiveDetails(Long id) {
 			final String sql="select itd.id as id ,itd.interactive_header_id as headerId,(select code_value from m_code_value where id = itd.play_source) as playSource,"+
-											"(select title from b_media_asset where id = itd.content_name) as contentName,"+
 											"(select partner_name from bp_account where id = itd.content_provider) as contentProvider,"+
 											"(select partner_name from bp_account where id = itd.channel_name) as channelName,"+
 											"(select partner_name from bp_account where id = itd.service_name) as serviceName,"+
@@ -80,7 +79,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 						 final Long id=rs.getLong("id");  
 						 final Long headerId=rs.getLong("headerId");
 					     final String playSource = rs.getString("playSource");
-					     final String contentName = rs.getString("contentName");
+					    /* final String contentName = rs.getString("contentName");*/
 					     final String contentProvider = rs.getString("contentProvider");
 					     final String channelName = rs.getString("channelName");
 					     final String serviceName = rs.getString("serviceName");
@@ -91,7 +90,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 						 final String chargeType = rs.getString("chargeType");
 						 final Integer taxInclusive = rs.getInt("taxInclusive");
 						 final Long clientId = rs.getLong("clientId");
-						return new RevenueMasterData(id,headerId,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,chargeCode,chargeType,taxInclusive,clientId);
+						return new RevenueMasterData(id,headerId,playSource,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,chargeCode,chargeType,taxInclusive,clientId);
 					   }
 					
 					}
