@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.mifosplatform.billing.billingorder.domain.Invoice;
+import org.mifosplatform.billing.billingorder.service.BillingOrderWritePlatformService;
+import org.mifosplatform.billing.clientbalance.data.ClientBalanceData;
 import org.mifosplatform.billing.clientbalance.service.ClientBalanceReadPlatformService;
 import org.mifosplatform.billing.revenuemaster.data.DeductionData;
 import org.mifosplatform.billing.revenuemaster.data.DeductionTaxesData;
@@ -26,21 +28,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class RevenueClient {
 	
-	private ClientBalanceReadPlatformService clientBalanceReadPlatformService;
 	private RevenueMasterReadplatformService revenueReadplatformService;
 	private PlatformSecurityContext context;
 	private RevenueCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService; 
 	private GenerateRevenueService generateRevenueService;
+	private BillingOrderWritePlatformService billingOrderWritePlatformService;
+	private ClientBalanceReadPlatformService clientBalanceReadPlatformService;
 	
 @Autowired
 	public RevenueClient(final PlatformSecurityContext context,final RevenueCommandFromApiJsonDeserializer apiJsonDeserializer,final RevenueMasterReadplatformService revenueReadplatformService,final GenerateRevenueService generateRevenueService,
-			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService){
+			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
+			final BillingOrderWritePlatformService billingOrderWritePlatformService,
+			final ClientBalanceReadPlatformService clientBalanceReadPlatformService){
 		this.context =context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
 		this.revenueReadplatformService = revenueReadplatformService;
 		this.generateRevenueService = generateRevenueService;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
+		this.billingOrderWritePlatformService = billingOrderWritePlatformService;
+		this.clientBalanceReadPlatformService = clientBalanceReadPlatformService;
 		
 	}
 
@@ -132,6 +139,9 @@ public class RevenueClient {
 	}
 		Invoice invoice = this.generateRevenueService.generateInvoice(detailDatas,deductionTaxes);
 	
+		List<ClientBalanceData> clientBalancesDatas = clientBalanceReadPlatformService.retrieveAllClientBalances(detailDatas.get(0).getClientId());
+		
+		this.billingOrderWritePlatformService.updateClientBalance(invoice,clientBalancesDatas);
 		
 		 transactionHistoryWritePlatformService.saveTransactionHistory(detailDatas.get(0).getClientId(),"Invoice", new Date(),"Amount:"
  				+invoice.getInvoiceAmount(),"Charge Startdate:"+new Date(),

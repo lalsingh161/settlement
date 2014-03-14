@@ -42,8 +42,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	    BigDecimal netRevenueAmount = BigDecimal.ZERO;
 	    BigDecimal detailChargeTaxAmount = BigDecimal.ZERO;
 	    
-	    Invoice invoice = new Invoice(detailDatas.get(0).getClientId(),new LocalDate().toDate(), invoiceAmount, invoiceAmount, netTaxAmount, "active",
-				null, null, null, null);
+	    Invoice invoice = new Invoice(detailDatas.get(0).getClientId(),new LocalDate().toDate(), invoiceAmount, invoiceAmount, netTaxAmount, "active");
 	    
 	   // System.out.println("chargecode" +detailDatas.get(0).getChargeCode());
 	    BillingOrder charge = new BillingOrder(detailDatas.get(0).getClientId(), detailDatas.get(0).getHeaderId(),new Long(0), detailDatas.get(0).getChargeCode(),detailDatas.get(0).getChargeType(), "None" ,invoiceAmount,
@@ -71,7 +70,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		    detailData.updateNetRevenueAmount(netRevenueAmount);
 		    detailChargeTaxAmount=BigDecimal.ZERO;
 			System.out.println(detailData.getNetRevenueAmount());
-			System.out.println(detailData.getDetailChargeTaxAmount());
+			
 		}
 	    
 	    
@@ -95,6 +94,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		invoice.setTaxAmount(netTaxAmount);
 		
 		invoice.setInvoiceAmount(invoiceAmount);
+		invoice.setDueAmount(invoiceAmount);
 		
 		return this.invoiceRepository.save(invoice);
 	}

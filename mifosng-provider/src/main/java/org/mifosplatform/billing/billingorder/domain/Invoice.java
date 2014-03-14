@@ -8,25 +8,23 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.mifosplatform.billing.order.domain.OrderLine;
-import org.mifosplatform.billing.order.domain.OrderPrice;
 import org.mifosplatform.billing.revenuemaster.domain.DeductionTax;
+import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
+import org.mifosplatform.useradministration.domain.AppUser;
 
 @Entity
 @Table(name = "b_invoice")
-public class Invoice {
+public class Invoice extends AbstractAuditableCustom<AppUser, Long>{
 
-	@Id
+/*	@Id
 	@GeneratedValue
 	@Column(name = "id")
-	private Long id;
+	private Long id;*/
 
 	@Column(name="client_id")
 	private Long clientId;
@@ -49,21 +47,8 @@ public class Invoice {
 	@Column(name="bill_id")
 	private Long billId;
 	
-/*	@Column(name="due_amount")
-	private BigDecimal dueAmount;*/
-
-
-	@Column(name="createdby_id")
-	private Long createdBy;
-
-	@Column(name="created_date")
-	private Date createdDate;
-
-	@Column(name="lastmodified_date")
-	private Date lastModifiedDate;
-
-	@Column(name="lastmodifiedby_id")
-	private Long lastModifedById;
+	@Column(name="due_amount")
+	private BigDecimal dueAmount;
 	
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "invoice", orphanRemoval = true)
@@ -84,8 +69,7 @@ public class Invoice {
 
 	public Invoice(final Long clientId,final Date invoiceDate,
 			final BigDecimal invoiceAmount,final BigDecimal netChargeAmount,
-			final BigDecimal taxAmount,final String invoiceStatus,final Long createdBy,
-			final Date createdDate,final Date lastModifiedDate,final Long lastModifedById) {
+			final BigDecimal taxAmount,final String invoiceStatus) {
 
 		this.clientId = clientId;
 		this.invoiceDate = invoiceDate;
@@ -93,21 +77,7 @@ public class Invoice {
 		this.netChargeAmount = netChargeAmount;
 		this.taxAmount = taxAmount;
 		this.invoiceStatus = invoiceStatus;
-		this.createdBy = createdBy;
-		this.createdDate = createdDate;
-		this.lastModifiedDate = lastModifiedDate;
-		this.lastModifedById = lastModifedById;
-	}
 
-
-
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public Long getClientId() {
@@ -158,38 +128,6 @@ public class Invoice {
 		this.invoiceStatus = invoiceStatus;
 	}
 
-	public Long getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(Long createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public Date getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
-
-	public Date getLastModifiedDate() {
-		return lastModifiedDate;
-	}
-
-	public void setLastModifiedDate(Date lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}
-
-	public Long getLastModifedById() {
-		return lastModifedById;
-	}
-
-	public void setLastModifedById(Long lastModifedById) {
-		this.lastModifedById = lastModifedById;
-	}
-
 	public void updateBillId(Long billId) {
 		this.billId=billId;
 		
@@ -207,9 +145,19 @@ public class Invoice {
 
 	
 
-	/*public void updateAmount(BigDecimal amountPaid) {
+	public void updateAmount(BigDecimal amountPaid) {
 		this.dueAmount=this.dueAmount.subtract(amountPaid);
 		
-	}*/
+	}
 
+	public BigDecimal getDueAmount() {
+		return dueAmount;
+	}
+
+	public void setDueAmount(BigDecimal invoiceAmount) {
+		this.dueAmount = invoiceAmount;
+	}
+
+	
+	
 }
