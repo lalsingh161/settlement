@@ -66,6 +66,7 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.organisation.monetary.data.CurrencyData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -318,10 +319,27 @@ public class MediaSettlementApiResources {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public String updateOperatorDeductionCode(final String jsonRequestBody, @PathParam("codeId") final Long codeId){
+    	CommandWrapper commandRequest = null;
+    	CommandProcessingResult result = null;
+    	try{
     	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-    	final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOperatorDeductionCode(codeId).withJson(jsonRequestBody).build();
-    	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    	commandRequest = new CommandWrapperBuilder().updateOperatorDeductionCode(codeId).withJson(jsonRequestBody).build();
+    	result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    	/*
+    	 * in update functionality writeplatformservice class is not handling unique key exception,
+    	 * that is the reason why here aditionally we are handling this exception 
+    	 * */
+    	
+    	}catch(DataIntegrityViolationException e){
+    		final Throwable realCause = e.getMostSpecificCause();
+    		if(realCause.getMessage().contains("operatordeductionuniquekey")) {
+                final String externalId = "partnerName";
+                throw new PlatformDataIntegrityException("error.msg.settlement.duplicate.operatordeduction.code.assignment", "Operator Deduction code with combination `" + externalId
+                        + "` already exists", "Operator Deduction Code", externalId);
+            }
+    	}
     	return toApiJsonSerializer.serialize(result);
+    	
     }
     
     @POST

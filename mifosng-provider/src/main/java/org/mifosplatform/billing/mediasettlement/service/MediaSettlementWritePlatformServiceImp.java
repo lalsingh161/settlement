@@ -183,7 +183,6 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			
 			
 			}catch(DataIntegrityViolationException e){
-				logger.error(e.getMessage(), e);
 				handleDataIntegrityIssue(e);
 				return new CommandProcessingResult(Long.valueOf(-1L));
 			}
@@ -245,6 +244,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	private void handleDataIntegrityIssue(DataIntegrityViolationException e) {
 		
 		Throwable realCause = e.getMostSpecificCause();
+		logger.error(e.getMessage(), e);
         if (realCause.getMessage().contains("partner_name_UNIQUE")) {
 
             final String externalId = "partnerName";
@@ -344,8 +344,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		}catch(NullPointerException e){
 			throw new PlatformDataIntegrityException("Game Price Is not Defined for This Game","Game Price Is not Defined for This Game", "Game Price Is not Defined for This Game");
 		}catch(DataIntegrityViolationException dve){
-			logger.error(dve.getMessage(), dve);
-	         throw new PlatformDataIntegrityException(""+dve.toString(),""+dve.getMessage());
+			//logger.error(dve.getMessage(), dve);
+			handleDataIntegrityIssue(dve);
 		}
 		return new CommandProcessingResultBuilder().withEntityId(revenueSettlement==null?revenueOEMSettlement.getId():revenueSettlement.getId()).build();
 	}
@@ -367,7 +367,6 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
                 this.accountPartnerJpaRepository.save(account);
             }
 		}catch(DataIntegrityViolationException e){
-			logger.error(e.getMessage(), e);
 			handleCodeDataIntegrityIssues(command, e);
 			return new CommandProcessingResult(Long.valueOf(-1L));
 		}
@@ -414,7 +413,6 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	         
 	         
 	} catch (DataIntegrityViolationException dve) {
-		logger.error(dve.getMessage(), dve);
          throw new PlatformDataIntegrityException("error.msg.document.unknown.data.integrity.issue",
                  ""+dve.getMostSpecificCause().getMessage());
          
@@ -556,8 +554,10 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
    	}
 		return new CommandProcessingResultBuilder().withEntityId(clientId).build();
 		
-		}catch(PlatformDataIntegrityException e){
-			throw new PlatformApiDataValidationException(e.getDefaultUserMessage(), e.getGlobalisationMessageCode(),null);
+		}catch(DataIntegrityViolationException dve){
+			handleCodeDataIntegrityIssues(command, dve);
+			logger.error(dve.getMessage(),dve);
+			return new CommandProcessingResultBuilder().withEntityId(-1L).build();
 		}
 	}
 	
@@ -579,16 +579,15 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			
 			Map<String, Object> actualChanges = operatorDeduction.update(command);
 			if(!actualChanges.isEmpty()){
-				operatorDeductionJpaRepository.save(operatorDeduction);
+				OperatorDeduction d = operatorDeductionJpaRepository.save(operatorDeduction);
 			}
 			
-			
+			return new CommandProcessingResultBuilder().withEntityId(operatorDeduction.getId()).build();
 		}catch(DataIntegrityViolationException dve){
 			handleCodeDataIntegrityIssues(command, dve);
+			logger.error(dve.getMessage(),dve);
+			return new CommandProcessingResultBuilder().withEntityId(-1L).build();
 		}
-		
-	
-		return new CommandProcessingResultBuilder().withEntityId(operatorDeduction.getId()).build();
 	}
 	
 	@Transactional
@@ -754,7 +753,14 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	private void handleCodeDataIntegrityIssues(JsonCommand command,
 			DataIntegrityViolationException dve) {
 		final Throwable realCause = dve.getMostSpecificCause();
-		 logger.error(dve.getMessage(), dve);
+		logger.error(dve.getMessage(), dve);
+		if(realCause.getMessage().contains("operatordeductionuniquekey")) {
+            final String externalId = "partnerName";
+            throw new PlatformDataIntegrityException("error.msg.settlement.duplicate.operatordeduction.code.assignment", "Operator Deduction code with combination `" + externalId
+                    + "` already exists", "Operator Deduction Code", externalId);
+        }
+		 
+		 
 	        throw new PlatformDataIntegrityException("error.msg.settlement.create.unknown.data.integrity.issue",
 	                "Unknown data integrity issue with resource Settlement: " + realCause.getMessage());
 	   

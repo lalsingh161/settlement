@@ -1286,7 +1286,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							jsonObject.put("clientId",headerRow.getCell(1).getStringCellValue());//-
 							/*clientIds.add(clientId);*/
 							SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
-							jsonObject.put("activityMonth",headerRow.getCell(2).getDateCellValue());
+							jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
 							jsonObject.put("businessLine",headerRow.getCell(3).getStringCellValue());
 							jsonObject.put("mediaCategory",headerRow.getCell(4).getStringCellValue());
 							jsonObject.put("dateFormat","dd MMMM yyyy");
