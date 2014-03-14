@@ -1305,7 +1305,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							jsonObject.put("downloads", headerRow.getCell(11).getNumericCellValue());
 							jsonObject.put("grossRevenue", headerRow.getCell(12).getNumericCellValue());
 						
-						context.authenticatedUser().validateHasReadPermission(GAMEEVENT_RESOURCE_TYPE);
+						context.authenticatedUser().validateHasReadPermission("RAWDATA");
 						final CommandWrapper commandRequest = new CommandWrapperBuilder().createRawData().withJson(jsonObject.toString()).build();
 						final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 						

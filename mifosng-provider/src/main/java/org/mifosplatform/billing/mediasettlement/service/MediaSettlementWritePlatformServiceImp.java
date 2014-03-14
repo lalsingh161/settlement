@@ -30,6 +30,7 @@ import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetails;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetailsJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RawInteractiveHeaderDetail;
+import org.mifosplatform.billing.mediasettlement.domain.RawInteractiveHeaderDetailJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMaster;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMasterJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueOEMSettlement;
@@ -91,6 +92,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private RevenueMasterJpaRepository revenueMasterJpaRepository;
 	final private CurrencyRateJpaRepository currencyRateJpaRepository;
 	final private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
+	final private RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository;
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(MediaSettlementWritePlatformServiceImp.class);
 	
@@ -114,7 +116,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final RevenueMasterJpaRepository revenueMasterJpaRepository,
 			final PartnerAgreementDetailRepository partnerAgreementDetailRepository,
 			final  CurrencyRateJpaRepository currencyRateJpaRepository,
-			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService) {
+			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
+			final RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository) {
 
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
@@ -136,6 +139,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		this.partnerAgreementDetailRepository=partnerAgreementDetailRepository;
 		this.currencyRateJpaRepository = currencyRateJpaRepository;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
+		this.rawInteractiveHeaderDetailJpaRepository = rawInteractiveHeaderDetailJpaRepository;
 
 	}
 	
@@ -1082,13 +1086,12 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 			
 		 			fromApiJsonDeserializer.validateForRawData(command.json());
 		 			rawData = RawInteractiveHeaderDetail.fromJson(command);
-		 			
+		 			rawInteractiveHeaderDetailJpaRepository.saveAndFlush(rawData);
 		 			
 		 		}catch(DataIntegrityViolationException dve){
 		 			handleCodeDataIntegrityIssues(command, dve);
-		 		}
-		 		
-		 		
-		 		return null;
+		 			return new CommandProcessingResultBuilder().withEntityId(-1L).build();
+		 		}		 		
+		 		return new CommandProcessingResultBuilder().withEntityId(rawData.getId()).build();
 		 	}
 }

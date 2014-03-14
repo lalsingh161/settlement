@@ -2115,7 +2115,7 @@ public class CommandWrapperBuilder {
 
 	public CommandWrapperBuilder createRawData() {
 		this.actionName = "CREATE";
-		this.entityName = "GAMEEVENT";
+		this.entityName = "RAWDATA";
 		this.entityId = null;
 		this.href = "uploadstatus/";
 		return this;

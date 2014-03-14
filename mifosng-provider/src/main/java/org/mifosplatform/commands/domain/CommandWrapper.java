@@ -1206,10 +1206,10 @@ public class CommandWrapper {
 	}
 	
 	public boolean isRawData(){
-		return this.entityName.equalsIgnoreCase("GAMEEVENT");
+		return this.entityName.equalsIgnoreCase("RAWDATA");
 	}
 	public boolean isCreateRawData(){
-		return this.entityName.equalsIgnoreCase("GAMEEVENT") && this.actionName.equalsIgnoreCase("CREATE");
+		return this.entityName.equalsIgnoreCase("RAWDATA") && this.actionName.equalsIgnoreCase("CREATE");
 	}
 }
 
