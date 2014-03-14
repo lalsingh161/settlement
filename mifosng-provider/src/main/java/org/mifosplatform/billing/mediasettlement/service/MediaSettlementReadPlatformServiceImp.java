@@ -709,7 +709,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 	@Override
 	public Collection<OperatorDeductionData> getDeductionCodes() {
-		final String sql = "select dc.id as id, dc.ded_code as deductionCode, dc.deduction as deduction, dc.ded_type as deductionType, dc.ded_source as deductionSource, dc.ded_category as deductionCategory from bp_deduction_codes dc";
+		final String sql = "select dc.id as id, dc.ded_code as deductionCode, dc.deduction as deduction, dc.ded_type as deductionType, dc.ded_source as deductionSource, dc.ded_category as deductionCategory from bp_deduction_codes dc where dc.is_deleted='N'";
 		DeductionCodeMapper mapper = new DeductionCodeMapper();
 		return jdbcTemplate.query(sql, mapper);
 	}
