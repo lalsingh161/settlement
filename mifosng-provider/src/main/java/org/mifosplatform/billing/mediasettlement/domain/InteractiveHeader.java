@@ -42,8 +42,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	@Column(name="business_line")
 	private Long businessLine;
 	
-	@Column(name="media_category")
-	private Long mediaCategory;
+	
 	
 	@Column(name="charge_code")
 	private Long chargeCode;
@@ -63,7 +62,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	
 	
 	public InteractiveHeader(Long clientId, Long externalId,
-			String activityMonth, Long businessLine, Long mediaCategory, Long chargeCode, LocalDate dataUploadedDate) {
+			String activityMonth, Long businessLine, Long chargeCode, LocalDate dataUploadedDate) {
 
 		
 		this.clientId = clientId;
@@ -71,7 +70,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		this.externalId = externalId;
 		this.activityMonth = activityMonth;
 		this.businessLine = businessLine;
-		this.mediaCategory = mediaCategory;
+		
 		
 		this.chargeCode = chargeCode;
 		this.dataUploadedDate = (null==dataUploadedDate)?new Date():dataUploadedDate.toDate();
@@ -79,7 +78,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 
 	public String displayProperties(){
 		return "_clientId:"+clientId+" _externalId:"+externalId+" _activityMonth:"+activityMonth+"" +
-				"_dataUploadedDate:"+dataUploadedDate+" _businessLine:"+businessLine+" _mediaCategory:"+mediaCategory+" _chargeCode:"+chargeCode+" _isDeleted:"+isDeleted;
+				"_dataUploadedDate:"+dataUploadedDate+" _businessLine:"+businessLine+" _chargeCode:"+chargeCode+" _isDeleted:"+isDeleted;
 	}
 
 	public static InteractiveHeader fromJson(JsonCommand command){
@@ -88,11 +87,10 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		Long externalId = command.longValueOfParameterNamed("externalId");
 		String activityMonth = command.stringValueOfParameterNamed("activityMonth");
 		Long businessLine = command.longValueOfParameterNamed("businessLine");
-		Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");
 		Long chargeCode = command.longValueOfParameterNamed("chargeCode");
 		LocalDate dataUploadedDate = command.localDateValueOfParameterNamed("dataUploadedDate");
 		
-		return new InteractiveHeader(clientId,externalId,activityMonth,businessLine,mediaCategory,chargeCode,dataUploadedDate);
+		return new InteractiveHeader(clientId,externalId,activityMonth,businessLine,chargeCode,dataUploadedDate);
 	}
 
 
@@ -143,16 +141,6 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 
 	public void setBusinessLine(Long businessLine) {
 		this.businessLine = businessLine;
-	}
-
-
-	public Long getMediaCategory() {
-		return mediaCategory;
-	}
-
-
-	public void setMediaCategory(Long mediaCategory) {
-		this.mediaCategory = mediaCategory;
 	}
 
 

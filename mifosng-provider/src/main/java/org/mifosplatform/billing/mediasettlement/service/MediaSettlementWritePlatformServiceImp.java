@@ -796,13 +796,14 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 			     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
 			     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
+			     final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory", element);
 			     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
 			     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
 			     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
 			     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
 			     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
 			     
-			     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads);
+			     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads,mediaCategory);
 			     header.add(interactiveDetailData);
 		    }
 			
@@ -982,7 +983,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	 			headerOld.setExternalId(headerNew.getExternalId());
 	 			headerOld.setActivityMonth(headerNew.getActivityMonth());
 	 			headerOld.setBusinessLine(headerNew.getBusinessLine());
-	 			headerOld.setMediaCategory(headerNew.getMediaCategory());
+	 			/*headerOld.setMediaCategory(headerNew.getMediaCategory());*/
 	 			headerOld.setChargeCode(headerNew.getChargeCode());
 	 			headerOld.setDataUploadedDate(headerNew.getDataUploadedDate());
 	 			
@@ -997,13 +998,14 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 				     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
 				     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
+				     final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory", element);
 				     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
 				     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
 				     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
 				     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
 				     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
 				     
-				     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads);
+				     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads,mediaCategory);
 				     headerOld.add(interactiveDetailData);
 			    }
 				

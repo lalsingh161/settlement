@@ -24,12 +24,12 @@ public class InteractiveHeaderData {
 	private String businessLine;
 	private String activityMonth;
 	private Date dataUploadedDate;
-	private String mediaCategory;
+	/*private String mediaCategory;*/
 	private String chargeCode;
 	private Long id;
 	private Long externalId;
 	private Long businessLineL;
-	private Long mediaCategoryL;
+	/*private Long mediaCategoryL;*/
 	private Long chargeCodeL;
 
 	public InteractiveHeaderData() {
@@ -53,27 +53,27 @@ public class InteractiveHeaderData {
 	}
 
 	public InteractiveHeaderData(Long id,Long clientId, Long externalId,
-			String businessLineStr, String activityMonth, LocalDate date,
-			String mediaCategoryStr, String chargeCodeStr) {
+			String businessLineStr, String activityMonth, LocalDate dataUploadedDate,
+			/*String mediaCategoryStr,*/ String chargeCodeStr) {
 		this.id = id;
 		this.clientId = clientId;
 		this.externalId = externalId;
 		this.businessLine = businessLineStr;
 		this.activityMonth = activityMonth;
-		this.dataUploadedDate = (null==dataUploadedDate)?null:date.toDate();
-		this.mediaCategory = mediaCategoryStr;
+		this.dataUploadedDate = (null==dataUploadedDate)?null:dataUploadedDate.toDate();
+		/*this.mediaCategory = mediaCategoryStr;*/
 		this.chargeCode = chargeCodeStr;
 	}
 
 	public InteractiveHeaderData(Long clientId, Long externalId,
 			String activityMonth, Date date, Long businessLine,
-			Long mediaCategory, Long chargeCode) {
+			/*Long mediaCategory,*/ Long chargeCode) {
 		this.clientId = clientId;
 		this.externalId = externalId;
 		this.activityMonth = activityMonth;
 		this.dataUploadedDate = date;
 		this.businessLineL = businessLine;
-		this.mediaCategoryL = mediaCategory;
+		/*this.mediaCategoryL = mediaCategory;*/
 		this.chargeCodeL = chargeCode;
 	}
 }
