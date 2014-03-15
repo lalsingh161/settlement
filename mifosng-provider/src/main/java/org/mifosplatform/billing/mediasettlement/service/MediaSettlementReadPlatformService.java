@@ -54,6 +54,8 @@ public interface MediaSettlementReadPlatformService {
 	RevenueSettlementSequenceData getGamePrice(Long gameId);
 
 	PartnerAccountData retrieveContentProviderPartnerId(String mediaCategory);
+	
+	List<PartnerAgreementData> retriveViewPA(Long partnerId);
 
 	
 
@@ -138,6 +140,12 @@ public interface MediaSettlementReadPlatformService {
 	Long checkPAgreementId(Long partnerAccountId, Long agreementType, Long agreementCategory,
 			 Long royaltyType, Long settlementSource);
 
+
+	Long checkPartnerAgreementId(Long partnerAccountId);
+	
+	void  retrieveDeleteMediaCategoryData(Long entityId);
+
 	Long retriveClientId(String stringCellValue);
+
 
 }

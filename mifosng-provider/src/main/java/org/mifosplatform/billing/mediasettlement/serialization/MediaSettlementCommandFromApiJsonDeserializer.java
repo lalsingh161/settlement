@@ -33,7 +33,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     		"id","chData","deductionCodes","deductionData","clientId","deductionValue","deductionCode","country",
     		"settlementSequenceData","partnerType1","partnerType2","partnerType3","partnerType4",
     		"partnerType5","partnerType6","royaltyType","currencyId","currencyCode","eventId","playSource","contentName",
-    		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId"));
+    		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId","royaltyShare","status","agreementType","agreementCategory","settlementSource"));
     
     private final static Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
     		"clientId","circle","externalId","activityMonth","businessLine","mediaCategory","contentName",
@@ -66,10 +66,10 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
         final JsonElement element = fromApiJsonHelper.parse(json);
         
         
-        /*final String partnerType = fromApiJsonHelper.extractStringNamed("partnerType", element);
+        final String partnerType = fromApiJsonHelper.extractStringNamed("partnerType", element);
         baseDataValidator.reset().parameter("partnerType").value(partnerType).notBlank().notExceedingLengthOf(50);
         
-        final String mediaCategory = fromApiJsonHelper.extractStringNamed("mediaCategory", element);
+       /* final String mediaCategory = fromApiJsonHelper.extractStringNamed("mediaCategory", element);
         baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank().notExceedingLengthOf(50);*/
         
         final String partnerName = fromApiJsonHelper.extractStringNamed("partnerName", element);
@@ -545,6 +545,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		}
 		
+
 	 public void validateForRawData(String json){
 
 
@@ -609,4 +610,5 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	 }	
 		
 }
+
 

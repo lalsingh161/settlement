@@ -108,9 +108,10 @@ public class PartnerAccountData {
 	}
 
 	
-	public PartnerAccountData(Long id,	String partnerName, String partnerAddress,Long currencyId,String currencyCode,Long externalId,String contactNum,String emailId) {
+	public PartnerAccountData(Long id,Long partnerType,	String partnerName, String partnerAddress,Long currencyId,String currencyCode,Long externalId,String contactNum,String emailId) {
 		
 		this.id = id;
+		this.partnerType=partnerType;
 		this.partnerName = partnerName;
 		this.partnerAddress = partnerAddress;
 		this.currencyId=currencyId;

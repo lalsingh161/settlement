@@ -7,6 +7,9 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
@@ -19,7 +22,9 @@ import org.mifosplatform.useradministration.domain.AppUser;
 @Table(name="bp_agreement_dtl")
 public class PartnerAgreementDetail extends AbstractAuditableCustom<AppUser, Long>{
 
-	
+	@ManyToOne
+    @JoinColumn(name="agmt_id")
+	private PartnerAgreement paObject;
 	
 	@Column(name="play_source")
 	private Long playSource;
@@ -34,10 +39,10 @@ public class PartnerAgreementDetail extends AbstractAuditableCustom<AppUser, Lon
 	private Long mediaCategory;
 	
 	@Column(name="partner_type")
-	private Long partnerType;
+	private Long partnerType=0L;
 	
-	@Column(name="agmt_id")
-	private Long agmtId;
+/*	@Column(name="agmt_id")
+	private Long agmtId;*/
 	
 	@Column(name="status")
 	private Long status;
@@ -50,24 +55,56 @@ public class PartnerAgreementDetail extends AbstractAuditableCustom<AppUser, Lon
 	}
 	
 	
-	public static PartnerAgreementDetail createNew( Long agmtId,Long playSource,BigDecimal royaltyShare, Long royaltySequence,Long mediaCategory, Long partnerType,Long status,Long partnerAccountId) {
+	public static PartnerAgreementDetail createNew(Long playSource,BigDecimal royaltyShare, Long royaltySequence,Long mediaCategory, Long status,Long partnerAccountId) {
 	
-		return new PartnerAgreementDetail(agmtId,playSource,royaltyShare,royaltySequence,mediaCategory,partnerType,status,partnerAccountId);
+		return new PartnerAgreementDetail(playSource,royaltyShare,royaltySequence,mediaCategory,status,partnerAccountId);
 	}
 	
-	
-	public PartnerAgreementDetail ( Long agmtId,Long playSource, BigDecimal royaltyShare,
-				Long royaltySequence, Long mediaCategory,Long partnerType,Long status,Long partnerAccountId) {
+	public void update(PartnerAgreement partnerAgreement) {
+		this.paObject = partnerAgreement;
 		
-		this.agmtId=agmtId;
+	}
+	
+	public PartnerAgreementDetail ( Long playSource, BigDecimal royaltyShare,
+				Long royaltySequence, Long mediaCategory,Long status,Long partnerAccountId) {
+		
+		
 		this.playSource=playSource;
 		this.royaltyShare=royaltyShare;
 		this.royaltySequence=royaltySequence;
 		this.mediaCategory = mediaCategory;
-		this.partnerType = partnerType;
+//		this.partnerType = partnerType;
 		this.status=status;
 		this.partnerAccountId=partnerAccountId;
 		
+	}
+
+	/*
+	public static PartnerAgreementDetail createNews(Long agmtId,Long playSource,BigDecimal royaltyShare, Long royaltySequence,Long mediaCategory, Long status,Long partnerAccountId) {
+		
+		return new PartnerAgreementDetail(playSource,royaltyShare,royaltySequence,mediaCategory,status,partnerAccountId);
+	}
+	public PartnerAgreementDetail (Long agmtId, Long playSource, BigDecimal royaltyShare,
+			Long royaltySequence, Long mediaCategory,Long status,Long partnerAccountId) {
+	
+	this.agmtId=agmtId;
+	this.playSource=playSource;
+	this.royaltyShare=royaltyShare;
+	this.royaltySequence=royaltySequence;
+	this.mediaCategory = mediaCategory;
+//	this.partnerType = partnerType;
+	this.status=status;
+	this.partnerAccountId=partnerAccountId;
+	
+}*/
+
+	public PartnerAgreement getPaObject() {
+		return paObject;
+	}
+
+
+	public void setPaObject(PartnerAgreement paObject) {
+		this.paObject = paObject;
 	}
 
 
@@ -121,14 +158,14 @@ public class PartnerAgreementDetail extends AbstractAuditableCustom<AppUser, Lon
 	}
 
 
-	public Long getAgmtId() {
+	/*public Long getAgmtId() {
 		return agmtId;
 	}
 
 
 	public void setAgmtId(Long agmtId) {
 		this.agmtId = agmtId;
-	}
+	}*/
 
 
 	public Long getStatus() {
@@ -207,11 +244,11 @@ public class PartnerAgreementDetail extends AbstractAuditableCustom<AppUser, Lon
             actualChanges.put(mediaCategory, newValue);
             this.mediaCategory = newValue;
         }
-        if (command.isChangeInLongParameterNamed(partnerType, this.partnerType)) {
+        /*if (command.isChangeInLongParameterNamed(partnerType, this.partnerType)) {
             final Long newValue = command.longValueOfParameterNamed(partnerType);
             actualChanges.put(partnerType, newValue);
             this.partnerType = newValue;
-        }
+        }*/
         
         if (command.isChangeInLongParameterNamed(status, this.status)) {
             final Long newValue = command.longValueOfParameterNamed(status);

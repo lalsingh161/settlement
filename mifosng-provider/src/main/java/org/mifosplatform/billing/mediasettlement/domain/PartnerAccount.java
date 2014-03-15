@@ -23,7 +23,7 @@ public class PartnerAccount extends AbstractAuditableCustom<AppUser, Long>{
 	
 	
 	@Column(name="partner_type", nullable=false)
-	private Long partnerType=0L;
+	private Long partnerType;
 	
 	@Column(name="media_category", nullable=false)
 	private Long mediaCategory=0L;
@@ -106,22 +106,21 @@ public class PartnerAccount extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public PartnerAccount(String partnerName, String partnerAddress,
+	public PartnerAccount(Long partnerType,String partnerName, String partnerAddress,
 			Long currencyId, Long externalId, String contactNum,
 			String emailId) {
+		this.partnerType=partnerType;
 		this.partnerName = partnerName;
 		this.partnerAddress = partnerAddress;
 		this.currencyId=currencyId;
 		this.externalId=externalId;
 		this.contactNum=contactNum;
 		this.emailId=emailId;
-
-		
 	}
 
 	public static PartnerAccount fomrJson(final JsonCommand command){
 		
-		/*final Long partnerType = command.longValueOfParameterNamed("partnerType");*/
+		final Long partnerType = command.longValueOfParameterNamed("partnerType");
 		final String partnerName = command.stringValueOfParameterNamed("partnerName");
 		/*final Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");*/
 		final String partnerAddress = command.stringValueOfParameterNamed("partnerAddress");
@@ -130,7 +129,7 @@ public class PartnerAccount extends AbstractAuditableCustom<AppUser, Long>{
 		final Integer externalId= command.integerValueOfParameterNamed("externalId");
 		final String contactNum = command.stringValueOfParameterNamed("contactNum");
 		final String emailId = command.stringValueOfParameterNamed("emailId");
-		return new PartnerAccount(partnerName,partnerAddress,currencyId,externalId!=null?externalId.longValue():externalId,contactNum,emailId);
+		return new PartnerAccount(partnerType,partnerName,partnerAddress,currencyId,externalId!=null?externalId.longValue():externalId,contactNum,emailId);
 	}
 
 	public void delete() {
@@ -162,12 +161,12 @@ public class PartnerAccount extends AbstractAuditableCustom<AppUser, Long>{
 	        final String currencyCode = "currencyCode";
 	        
 	        
-	       /* if (command.isChangeInLongParameterNamed(partnerType, this.partnerType)) {
+	        if (command.isChangeInLongParameterNamed(partnerType, this.partnerType)) {
 	            final Long newValue = command.longValueOfParameterNamed(partnerType);
 	            actualChanges.put(partnerType, newValue);
 	            this.partnerType = newValue;
 	        }
-	        if (command.isChangeInLongParameterNamed(mediaCategory, this.mediaCategory)) {
+	        /* if (command.isChangeInLongParameterNamed(mediaCategory, this.mediaCategory)) {
 	            final Long newValue = command.longValueOfParameterNamed(mediaCategory);
 	            actualChanges.put(mediaCategory, newValue);
 	            this.mediaCategory = newValue;

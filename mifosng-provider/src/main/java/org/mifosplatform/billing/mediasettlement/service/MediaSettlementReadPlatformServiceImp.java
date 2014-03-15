@@ -78,7 +78,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		 * "select pt.id as id,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt order by pt.id asc"
 		 * ;
 		 */
-		final String sql = "select pt.id as id,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,(select code from m_currency where id=pt.currency_id) as currencyCode, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt order by pt.id asc";
+		final String sql = "select pt.id as id,pt.partner_type as partnerType,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,(select code from m_currency where id=pt.currency_id) as currencyCode, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt order by pt.id asc";
 		PartnerAccountMapper mapper = new PartnerAccountMapper();
 		return jdbcTemplate.query(sql, mapper);
 	}
@@ -89,13 +89,14 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public PartnerAccountData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long id = rs.getLong("id");
+			final Long partnerType = rs.getLong("partnerType");
 			final String partnerName = rs.getString("partnerName");
 			final String currencyCode = rs.getString("currencyCode");
 			final String partnerAddress = rs.getString("partnerAddress");
 			final Long externalId = rs.getLong("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
-			return new PartnerAccountData(id, partnerName, partnerAddress,
+			return new PartnerAccountData(id, partnerType,partnerName, partnerAddress,
 					null, currencyCode, externalId, contactNum, emailId);
 		}
 	}
@@ -106,13 +107,14 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public PartnerAccountData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long id = rs.getLong("id");
+			final Long partnerType = rs.getLong("partnerType");
 			final String partnerName = rs.getString("partnerName");
 			final Long currencyId = rs.getLong("currencyId");
 			final String partnerAddress = rs.getString("partnerAddress");
 			final Long externalId = rs.getLong("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
-			return new PartnerAccountData(id, partnerName, partnerAddress,
+			return new PartnerAccountData(id,partnerType, partnerName, partnerAddress,
 					currencyId, null, externalId, contactNum, emailId);
 		}
 	}
@@ -125,7 +127,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		 * "select pt.id as id, pt.partner_type as partnerType, pt.currency_id as currencyCode, pt.media_category as mediaCategory, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ? and pt.is_deleted='N'"
 		 * ;
 		 */
-		final String sql = "select pt.id as id,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ?";
+		final String sql = "select pt.id as id,pt.partner_type as partnerType,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ?";
 		EditPartnerAccountMapper mapper = new EditPartnerAccountMapper();
 		return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
 	}
@@ -133,7 +135,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public List<PartnerAgreementData> retrievePartnerAgreementDetails() {
 		
-	final String sql = "select a.id as id,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";
+	final String sql = "select a.id as id,(select v.code_value from m_code_value v,bp_account f where v.id=f.partner_type and f.id = a.partner_account_id and is_deleted='N' ) as partnerType,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";
 		PartnerAgreementMapper mapper = new PartnerAgreementMapper();
 		return jdbcTemplate.query(sql, mapper);
 	}
@@ -145,6 +147,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 				throws SQLException {
 			final Long id = rs.getLong("id");
 			final String partnerName = rs.getString("partnerName");
+			final String partnerType = rs.getString("partnerType");
 			final String agreementType = rs.getString("agreementType");
 			final String agreementCategory = rs.getString("agreementCategory");
 			final String royaltyType = rs.getString("royaltyType");
@@ -153,7 +156,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String agmtLocation = rs.getString("agmtLocation");
 			final String settlementSource = rs.getString("settlementSource");
 			final String fileName = rs.getString("fileName");
-			return new PartnerAgreementData(id, partnerName, agreementType,
+			return new PartnerAgreementData(id,partnerType, partnerName, agreementType,
 					agreementCategory, royaltyType, startDate, endDate,
 					agmtLocation, settlementSource, fileName);
 		}
@@ -413,7 +416,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			 * " g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType, g.start_date as startDate,g.end_date as endDate, a.media_category as mediaCategory,a.partner_type as partnerType,a.partner_name as partnerName, g.partner_account_id as partnerAccountId from bp_account a,bp_agreement g where g.partner_account_id=a.id and a.is_deleted='N'"
 			 */
 
-			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,d.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND d.partner_account_id = a.id  ";
+			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,a.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND d.partner_account_id = a.id and g.is_deleted='N'   ";
 
 
 		}
@@ -455,9 +458,11 @@ public class MediaSettlementReadPlatformServiceImp implements
 			//		.getBigDecimalDefaultToNullIfZero(rs, "royaltyShare");
 			//final Long royaltySequence = JdbcSupport.getLong(rs,
 			//		"royaltySequence");
-
+/*
 			final BigDecimal mgAmount = JdbcSupport
-					.getBigDecimalDefaultToZeroIfNull(rs, "mgAmount");
+					.getBigDecimalDefaultToZeroIfNull(rs, "mgAmount");*/
+			
+			final BigDecimal mgAmount= rs.getBigDecimal("mgAmount");
 			
 			//final Long status = JdbcSupport	.getLong(rs, "status");
 
@@ -1201,7 +1206,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 				Long mediaCategory, Long partnerType) {
 			// TODO Auto-generated method stub
 		context.authenticatedUser();
-		final String sql = "SELECT id as id, media_category as mediaCategory,royalty_sequence as royaltySequence ,play_source as playSource ,royalty_share as royaltyShare, status as status from bp_agreement_dtl where  agmt_id =? and media_category =? and partner_type=? ";
+//		SELECT  b.id as id, b.media_category as mediaCategory,b.royalty_sequence as royaltySequence ,b.play_source as playSource ,b.royalty_share as royaltyShare, b.status as status from bp_agreement_dtl b , bp_account a where  b.agmt_id =? and b.media_category =? and a.id=b.partner_account_id and a.partner_type=?
+		final String sql = "SELECT  b.id as id, b.media_category as mediaCategory,b.royalty_sequence as royaltySequence ,b.play_source as playSource ,b.royalty_share as royaltyShare, b.status as status from bp_agreement_dtl b , bp_account a where  b.agmt_id =? and b.media_category =? and a.id=b.partner_account_id and a.partner_type=? ";
 		PAmediaCategoryData mapper = new PAmediaCategoryData();
 		return jdbcTemplate.query(sql, mapper, new Object[] { agmtId ,mediaCategory,partnerType });
 		}	
@@ -1320,11 +1326,63 @@ public class MediaSettlementReadPlatformServiceImp implements
 				return new OperatorDeductionData(id, clientId, deductionCode, deductionValue);			
 			};
 		}
+
+		@Override
+		public Long checkPartnerAgreementId(Long partnerAccountId) {
+			// TODO Auto-generated method stub
+			try {
+				context.authenticatedUser();
+				final String sql = "select id from `bp_agreement` where partner_account_id=? ";
+				return jdbcTemplate.queryForLong(sql, new Object[] { partnerAccountId});
+			} catch (final EmptyResultDataAccessException e) {
+				return null;
+			}
+
+		}
+		
+	
+		@Override
+		public List<PartnerAgreementData> retriveViewPA(Long partnerId) {
+			final String sql = "SELECT  b.id as id, b.media_category as mediaCategory,b.royalty_sequence as royaltySequence ,b.play_source as playSource ,b.royalty_share as royaltyShare, b.status as status from bp_agreement_dtl b where  b.agmt_id =?";
+			ViewPAMapper mapper = new ViewPAMapper();
+			return jdbcTemplate.query(sql, mapper,
+					new Object[] { partnerId });
+		}
+
+		private static final class ViewPAMapper implements
+				RowMapper<PartnerAgreementData> {
+
+			@Override
+			public PartnerAgreementData mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+
+				final Long id = rs.getLong("id");
+				final Long mediaCategory=rs.getLong("mediaCategory");
+				final Long royaltySequence = rs.getLong("royaltySequence");
+				final Long playSource = rs.getLong("playSource");
+				final Long royaltyShare = rs.getLong("royaltyShare");
+				final Long status = rs.getLong("status");
+				
+				return new PartnerAgreementData(id,mediaCategory,royaltySequence, playSource, royaltyShare, status);
+			
+			}
+		}
+		
+		
+		@Override
+		public void retrieveDeleteMediaCategoryData( Long entityId) {
+			// TODO Auto-generated method stub
+
+			jdbcTemplate.update("delete from bp_agreement_dtl where id=? ", new Object[] { entityId });
+		}
+
 		
 		@Override
 		public Long retriveClientId(String clientName) {
 			
 			final String sql = "select id from m_client where firstname=?";
 			return jdbcTemplate.queryForLong(sql, new Object[]{clientName});
+
 		}
+		
 }

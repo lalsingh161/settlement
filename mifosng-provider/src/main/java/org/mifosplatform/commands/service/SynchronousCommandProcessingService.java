@@ -838,6 +838,12 @@ public class SynchronousCommandProcessingService implements
 					   }else if(wrapper.isUpdatePAdetail()) {
 				             handler = applicationContext.getBean("updatePartnerAgreementDetailCommandHandler",NewCommandSourceHandler.class);
 				       }
+					   else if(wrapper.iscreatePartnerAgreementData()) {
+				             handler = applicationContext.getBean("createPartnerAgreementDetailCommandHandler",NewCommandSourceHandler.class);
+				       }
+					   else if(wrapper.isdeleteMediaCategoryDetails()) {
+				             handler = applicationContext.getBean("deleteMediaCategoryDetailsCommandHandler",NewCommandSourceHandler.class);
+				       }
 				 }else if(wrapper.isMasterDeduction()){
 					 	if(wrapper.isCreateDeductionCodes()){
 							   handler = applicationContext.getBean("createMasterDeductionCodesCommandHandler",NewCommandSourceHandler.class);

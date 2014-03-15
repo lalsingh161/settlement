@@ -1,13 +1,22 @@
 package org.mifosplatform.billing.mediasettlement.domain;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.joda.time.LocalDate;
 import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
+import org.mifosplatform.billing.plan.domain.Plan;
+import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
@@ -50,27 +59,60 @@ public class PartnerAgreement extends AbstractAuditableCustom<AppUser, Long>{
 	@Column(name="mg_amount")
 	private BigDecimal mgAmount;
 
+	
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "paObject", orphanRemoval = true)
+	private List<PartnerAgreementDetail> partnerAgreementDetailData = new ArrayList<PartnerAgreementDetail>();
 		
 	public PartnerAgreement(){}
 
-	public static PartnerAgreement createNew( Long partnerAccountId, Long agreementType, Long agreementCategory,
-			 Long royaltyType, Date startDate, Date endDate, String agmtLocation,String fileName,Long settlementSource,BigDecimal mgAmount) {
-		return new PartnerAgreement(partnerAccountId,agreementType,agreementCategory,royaltyType,startDate,endDate,agmtLocation,fileName,settlementSource,mgAmount);
-   }
-		
+	
 	public PartnerAgreement ( Long partnerAccountId, Long agreementType, Long agreementCategory,
-			 Long royaltyType, Date startDate, Date endDate, String agmtLocation,String fileName,Long settlementSource,BigDecimal mgAmount) {
+			 Long royaltyType, LocalDate startDate, LocalDate endDate, String agmtLocation,String fileName,Long settlementSource,BigDecimal mgAmount) {
 		this.partnerAccountId=partnerAccountId;
 		this.agreementType=agreementType;
 		this.agreementCategory=agreementCategory;
 		this.royaltyType=royaltyType;
-		this.startDate=startDate;
-		this.endDate=endDate;
+		this.startDate=startDate.toDate();
+		this.endDate=endDate.toDate();
 		this.agmtLocation=agmtLocation;
 		this.fileName=fileName;
 		this.settlementSource=settlementSource;
 		this.mgAmount=mgAmount;
 
+	}
+	
+	
+	public PartnerAgreement ( Long partnerAccountId, Long agreementType, Long agreementCategory,
+			 Long royaltyType, LocalDate startDate, LocalDate endDate, Long settlementSource,BigDecimal mgAmount) {
+		this.partnerAccountId=partnerAccountId;
+		this.agreementType=agreementType;
+		this.agreementCategory=agreementCategory;
+		this.royaltyType=royaltyType;
+		this.startDate=startDate.toDate();
+		this.endDate=endDate.toDate();
+		this.settlementSource=settlementSource;
+		this.mgAmount=mgAmount;
+
+	}
+	
+	
+	public PartnerAgreement ( Long partnerAccountId,  String agmtLocation,String fileName) {
+		
+		this.partnerAccountId=partnerAccountId;
+		this.agmtLocation=agmtLocation;
+		this.fileName=fileName;
+	}
+	
+	public static PartnerAgreement createFileLocation( Long partnerAccountId, String agmtLocation,String fileName) {
+		return new PartnerAgreement(partnerAccountId,agmtLocation,fileName);
+  }
+	
+	
+	public void add(PartnerAgreementDetail partnerAgreementDetailData) {
+		partnerAgreementDetailData.update(this);
+		this.partnerAgreementDetailData.add(partnerAgreementDetailData);
+		
 	}
 
 
@@ -157,6 +199,23 @@ public class PartnerAgreement extends AbstractAuditableCustom<AppUser, Long>{
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}	
+
+	public BigDecimal getMgAmount() {
+		return mgAmount;
+	}
+
+	public void setMgAmount(BigDecimal mgAmount) {
+		this.mgAmount = mgAmount;
+	}
+
+	public List<PartnerAgreementDetail> getPartnerAgreementDetailData() {
+		return partnerAgreementDetailData;
+	}
+
+	public void setPartnerAgreementDetailData(
+			List<PartnerAgreementDetail> partnerAgreementDetailData) {
+		this.partnerAgreementDetailData = partnerAgreementDetailData;
 	}
 
 	public void update(MediaSettlementCommand command) {
@@ -195,6 +254,22 @@ public class PartnerAgreement extends AbstractAuditableCustom<AppUser, Long>{
             this.mgAmount = command.getMgAmount();
         }
        
+	}
+	
+
+	public static PartnerAgreement fromJson(JsonCommand command) {
+		
+		 Long partnerAccountId=command.longValueOfParameterNamed("partnerAccountId");
+	     Long agreementType=command.longValueOfParameterNamed("agreementType");
+		 Long agreementCategory=command.longValueOfParameterNamed("agreementCategory");
+		 Long royaltyType=command.longValueOfParameterNamed("royaltyType");
+		 LocalDate startDate=command.localDateValueOfParameterNamed("startDate");
+		 LocalDate endDate=command.localDateValueOfParameterNamed("endDate");
+		 Long settlementSource=command.longValueOfParameterNamed("settlementSource");
+		 BigDecimal mgAmount=command.bigDecimalValueOfParameterNamed("mgAmount");
+		   
+		    
+		    return new PartnerAgreement(partnerAccountId,agreementType,agreementCategory,royaltyType,startDate,endDate,settlementSource,mgAmount);
 	}
 
 	

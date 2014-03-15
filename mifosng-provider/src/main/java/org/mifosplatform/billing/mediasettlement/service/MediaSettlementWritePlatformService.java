@@ -52,8 +52,12 @@ public interface MediaSettlementWritePlatformService {
 	
 
 	CommandProcessingResult updateRevenue(JsonCommand command);
+	
+	CommandProcessingResult createPAmediaCatregory(JsonCommand command);
 
 	CommandProcessingResult updatePAmediaCatregory(JsonCommand command);
+	
+	public CommandProcessingResult deleteMediaCategoryDetails(Long detailId);
 
 	public CommandProcessingResult createCurrencyRate(JsonCommand command);
 

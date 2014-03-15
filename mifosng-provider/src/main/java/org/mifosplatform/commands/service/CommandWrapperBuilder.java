@@ -2103,6 +2103,25 @@ public class CommandWrapperBuilder {
 		return this;
 
 	}
+	
+	public CommandWrapperBuilder createPartnerAgreementData() {
+		this.actionName = "CREATEPADETAIL";
+		this.entityName = "MEDIASETTLEMENT";
+		this.entityId = clientId;
+		this.href = "documentData";
+		return this;
+
+	}
+	
+	public CommandWrapperBuilder deleteMediaCategoryDetails(Long detailId) {
+		this.actionName = "DELETEPADETAIL";
+		this.entityName = "MEDIASETTLEMENT";
+		this.entityId = detailId;
+		this.href = "mediasettlements/deleteMediaCategory/" + detailId;
+		return this;
+
+	}
+
 	public CommandWrapperBuilder createRevenueInvoice(Long clientId) {
 		
 		this.actionName = "CREATE";
@@ -2120,5 +2139,6 @@ public class CommandWrapperBuilder {
 		this.href = "uploadstatus/";
 		return this;
 	}
+
 	
 }
