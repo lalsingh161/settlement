@@ -37,6 +37,7 @@ public class PartnerAgreementData {
 	
 	public PartnerAgreementData(Long id,
 	
+	String partnerType,
 	String partnerName,
 	String  agreementType,
 	String  agreementCategory,
@@ -58,6 +59,7 @@ public class PartnerAgreementData {
 		this.agmtLocation = agmtLocation;
 		this.settlementSource=settlementSource;
 		this.fileName  = fileName;
+		this.partnerType=partnerType;
 	}
 	
 

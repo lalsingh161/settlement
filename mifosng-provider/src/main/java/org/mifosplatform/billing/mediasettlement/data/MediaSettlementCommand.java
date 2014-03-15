@@ -34,14 +34,27 @@ public class MediaSettlementCommand {
 	private Long royaltySequence;
 	private Long status;
 	private List<PartnerAgreementData> partnerAgreementDatas;
+	
+	private List<String> partnerAgreementData;
 
 	/*mgAmount is minimum guarented amoun*/
 	private BigDecimal mgAmount;
 
 	
+	public MediaSettlementCommand (Long partnerAccountId,String agmtLocation,InputStream inputStream, 
+			String fileName	){
+		
+		this.partnerAccountId=partnerAccountId;
+		
+		this.agmtLocation=agmtLocation;
+		this.inputStream=inputStream;
+		this.fileName=fileName;
+	 
+	}
+	
 	public MediaSettlementCommand (Set<String> modifiedParameters, Long id, Long partnerAccountId,	Long agreementType,Long agreementCategory,Long royaltyType,Date startDate,
 			Date endDate,String agmtLocation,InputStream inputStream, String fileName, Long settlementSource,Long playSource,
-			BigDecimal royaltyShare, Long royaltySequence,BigDecimal mgAmount, Long mediaCategory, Long partnerType,Long status){
+			BigDecimal royaltyShare, Long royaltySequence,BigDecimal mgAmount, Long mediaCategory, /*Long partnerType,*/Long status,List<String> partnerAgreementData){
 		
 		this.modifiedParameters = modifiedParameters;
 		this.id = id;
@@ -60,8 +73,9 @@ public class MediaSettlementCommand {
 	 	this.royaltySequence=royaltySequence;
 	 	this.mgAmount = mgAmount;
 	 	this.mediaCategory = mediaCategory;
-	 	this.partnerType = partnerType;
+//	 	this.partnerType = partnerType;
 	 	this.status=status;
+	 	this.partnerAgreementData=partnerAgreementData;
 	}
 
 	
@@ -383,7 +397,19 @@ public class MediaSettlementCommand {
 	public void setModifiedParameters(Set<String> modifiedParameters) {
 		this.modifiedParameters = modifiedParameters;
 	}
+	
+	
  
+	public List<String> getPartnerAgreementData() {
+		return partnerAgreementData;
+	}
+
+
+	public void setPartnerAgreementData(List<String> partnerAgreementData) {
+		this.partnerAgreementData = partnerAgreementData;
+	}
+
+
 	public boolean isPlaySourceChanged() {
         return this.modifiedParameters.contains("playSource");
     }

@@ -8,18 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CreatePartnerAgreementDetailCommandHandler  implements
-NewCommandSourceHandler{
-
+public class DeleteMediaCategoryDetailsCommandHandler implements
+NewCommandSourceHandler {
+	
+	
 	final private MediaSettlementWritePlatformService mediaSettlementWritePlatformService;
 	
 	@Autowired
-	public CreatePartnerAgreementDetailCommandHandler(final MediaSettlementWritePlatformService mediaSettlementWritePlatformService ) {
+	public DeleteMediaCategoryDetailsCommandHandler(final MediaSettlementWritePlatformService mediaSettlementWritePlatformService) {
 		this.mediaSettlementWritePlatformService = mediaSettlementWritePlatformService;
 	}
 	
 	@Override
 	public CommandProcessingResult processCommand(JsonCommand command) {
-		return mediaSettlementWritePlatformService.createPAmediaCatregory(command);
+		return this.mediaSettlementWritePlatformService.deleteMediaCategoryDetails(command.entityId());
 	}
+
+
 }

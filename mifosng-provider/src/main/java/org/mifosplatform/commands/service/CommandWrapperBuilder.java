@@ -2104,5 +2104,23 @@ public class CommandWrapperBuilder {
 
 	}
 	
+	public CommandWrapperBuilder createPartnerAgreementData() {
+		this.actionName = "CREATEPADETAIL";
+		this.entityName = "MEDIASETTLEMENT";
+		this.entityId = clientId;
+		this.href = "documentData";
+		return this;
+
+	}
+	
+	public CommandWrapperBuilder deleteMediaCategoryDetails(Long detailId) {
+		this.actionName = "DELETEPADETAIL";
+		this.entityName = "MEDIASETTLEMENT";
+		this.entityId = detailId;
+		this.href = "mediasettlements/deleteMediaCategory/" + detailId;
+		return this;
+
+	}
+	
 	
 }

@@ -1155,7 +1155,16 @@ public class CommandWrapper {
 		return this.entityName.equalsIgnoreCase("MEDIASETTLEMENT")
 		&&	 this.actionName.equalsIgnoreCase("UPDATEPADETAIL");
 	}
-
+	
+	public boolean iscreatePartnerAgreementData() {
+		return this.entityName.equalsIgnoreCase("MEDIASETTLEMENT")
+        &&  this.actionName.equalsIgnoreCase("CREATEPADETAIL");
+    }
+	
+	public boolean isdeleteMediaCategoryDetails() {
+		return this.entityName.equalsIgnoreCase("MEDIASETTLEMENT")
+        &&  this.actionName.equalsIgnoreCase("DELETEPADETAIL");
+    }
 
 
 	public boolean isEditInteractiveData() {
@@ -1189,6 +1198,7 @@ public class CommandWrapper {
 	public boolean isBusinessLineUpdate() {
         return this.actionName.equalsIgnoreCase("UPDATE");
     }
+	
 	
 	public boolean isOperatorDeductionUpdate(){
 		return this.actionName.equalsIgnoreCase("UPDATE") && this.entityName.equalsIgnoreCase("OPERATORDEDUCTION");
