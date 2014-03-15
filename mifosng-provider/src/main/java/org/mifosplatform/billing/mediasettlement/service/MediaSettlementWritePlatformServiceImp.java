@@ -157,7 +157,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			 
 			 //Long mediaCategory;String partnerName;String partnerAddress;Character isDeleted='N';Long currencyId;Long externalId;String contactNum;String emailId;
 			 
-			transactionHistoryWritePlatformService.saveTransactionHistory(
+			/*transactionHistoryWritePlatformService.saveTransactionHistory(
 					0L,
 					"Create Partner",
 					accountPartner.getCreatedDate().toDate(),
@@ -177,7 +177,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 							+accountPartner.getPartnerAddress(),
 					"Is Deleted: "
 							+accountPartner.getIsDeleted()					
-					);
+					);*/
 			
 			
 			
