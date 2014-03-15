@@ -897,9 +897,18 @@ public class SynchronousCommandProcessingService implements
 						 if(wrapper.isCreateRevenueInvoice()){
 							 handler = applicationContext.getBean("createRevenueInvoiceCommandHandler",NewCommandSourceHandler.class);	
 						 }
+				 }else if(wrapper.isCurrencyRateResource()){
+						 if(wrapper.isCretaeCurrencyRate()){
+							 handler = applicationContext.getBean("createCurrencyRateCommandHandler",NewCommandSourceHandler.class); 
+						 }else if(wrapper.isUpdateCurrencyRate()){
+							 handler = applicationContext.getBean("updateCurrencyRateCommandHandler",NewCommandSourceHandler.class); 
+						 }else if(wrapper.isDeleteCurrencyRate()){
+							 handler = applicationContext.getBean("deleteCurrencyRateCommandHandler",NewCommandSourceHandler.class); 
+						 } 
 				}else {
-			            throw new UnsupportedCommandException(wrapper.commandName());
-				}
+			               throw new UnsupportedCommandException(wrapper.commandName());
+		              }
+>>>>>>> b1e9629bdcfb9d679f04e53d2fc9b9dfdd8c80ed
 			       
 					
 	       return handler;
