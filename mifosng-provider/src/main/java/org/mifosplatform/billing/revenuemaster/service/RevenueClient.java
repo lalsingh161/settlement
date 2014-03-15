@@ -1,6 +1,7 @@
 package org.mifosplatform.billing.revenuemaster.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -80,7 +81,7 @@ public class RevenueClient {
 		{
 		   for(GenerateInteractiveHeaderData headerData:headerDatas)
 			{
-			if(headerData.getMediaCategory().equalsIgnoreCase("Game")){
+			if(headerData.getBusinessLine().equalsIgnoreCase("Mobile")){
 				 detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
 				 if(detailDatas!=null)
 				 {
@@ -88,7 +89,7 @@ public class RevenueClient {
 		      	}else{
 				throw new NoInteractiveHeadersFoundException(headerData.getId());
 			    }
-			}else if(headerData.getMediaCategory().equalsIgnoreCase("Non Gam")){
+			}else if(headerData.getBusinessLine().equalsIgnoreCase("Advertisement")){
 				detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
 				if(detailDatas!=null)
 				{
@@ -97,7 +98,7 @@ public class RevenueClient {
 					throw new NoInteractiveHeadersFoundException(headerData.getId());
 				}
 		
-			}else if(headerData.getMediaCategory().equalsIgnoreCase("Non Gam Wall Paper")){
+			}/*else if(headerData.getMediaCategory().equalsIgnoreCase("Non Gam Wall Paper")){
 				detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
 				if(detailDatas!=null)
 				{
@@ -105,7 +106,7 @@ public class RevenueClient {
 				}else {
 					throw new NoInteractiveHeadersFoundException(headerData.getId());
 				}
-				}
+				}*/
 			
 			}
 	
@@ -131,7 +132,7 @@ public class RevenueClient {
 			if(grossRevenueAmount==null){
 				grossRevenueAmount=detailData.getEndUserPrice().multiply(detailData.getDownloads());
 			}
-		    long  detailId=detailData.getId();
+		    final  Long  detailId=detailData.getId();
 			deductionTax=this.calculatedeductiontaxes(deductionDatas,grossRevenueAmount,detailId);	
 			 deductionTaxes.addAll(deductionTax);
 			// System.out.println(deductionTaxes);
@@ -162,6 +163,7 @@ public class RevenueClient {
 		String deductionType=null;
 		BigDecimal deductionValue=null;
 		BigDecimal taxAmount=BigDecimal.ZERO;
+		BigDecimal WpcTaxAmount=BigDecimal.ZERO;
 		List<DeductionTaxesData> taxes=new ArrayList<DeductionTaxesData>();
 		DeductionTaxesData tax=null;
 		
@@ -178,16 +180,18 @@ public class RevenueClient {
 			{   
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();
-				deductionValue=deductionData.getDeductionValue();
-			taxAmount=grossRevenueAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100)));
+			    deductionValue=deductionData.getDeductionValue();
+			    taxAmount=grossRevenueAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2,RoundingMode.HALF_UP);
+			    deductionData.setWpcTaxAmount(taxAmount);
+			    WpcTaxAmount=deductionData.getWpcTaxAmount();
 			
 			} if(deductionData.getDeductionCode().equalsIgnoreCase("ED")){
 				
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();
 				deductionValue=deductionData.getDeductionValue();
-				BigDecimal temAmount=grossRevenueAmount.subtract(taxAmount);
-				taxAmount=temAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100)));
+				BigDecimal temAmount=grossRevenueAmount.subtract(WpcTaxAmount);
+				taxAmount=temAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2,RoundingMode.HALF_UP);
 			
 			} if(deductionData.getDeductionCode().equalsIgnoreCase("ET")){
 				
@@ -195,7 +199,7 @@ public class RevenueClient {
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();
 				deductionValue=deductionData.getDeductionValue();
-				taxAmount=grossRevenueAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100)));
+				taxAmount=grossRevenueAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
 				}
 			}
 			
