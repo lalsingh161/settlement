@@ -66,6 +66,7 @@ import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext
 import org.mifosplatform.organisation.monetary.data.CurrencyData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -318,10 +319,27 @@ public class MediaSettlementApiResources {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public String updateOperatorDeductionCode(final String jsonRequestBody, @PathParam("codeId") final Long codeId){
+    	CommandWrapper commandRequest = null;
+    	CommandProcessingResult result = null;
+    	try{
     	context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
-    	final CommandWrapper commandRequest = new CommandWrapperBuilder().updateOperatorDeductionCode(codeId).withJson(jsonRequestBody).build();
-    	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    	commandRequest = new CommandWrapperBuilder().updateOperatorDeductionCode(codeId).withJson(jsonRequestBody).build();
+    	result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+    	/*
+    	 * in update functionality writeplatformservice class is not handling unique key exception,
+    	 * that is the reason why here aditionally we are handling this exception 
+    	 * */
+    	
+    	}catch(DataIntegrityViolationException e){
+    		final Throwable realCause = e.getMostSpecificCause();
+    		if(realCause.getMessage().contains("operatordeductionuniquekey")) {
+                final String externalId = "partnerName";
+                throw new PlatformDataIntegrityException("error.msg.settlement.duplicate.operatordeduction.code.assignment", "Operator Deduction code with combination `" + externalId
+                        + "` already exists", "Operator Deduction Code", externalId);
+            }
+    	}
     	return toApiJsonSerializer.serialize(result);
+    	
     }
     
     @POST
@@ -771,10 +789,8 @@ public class MediaSettlementApiResources {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public String createGameEvent(@Context final UriInfo uriInfo){
-    	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	
-    	/*Collectin<StateDetails> circleData = this.mediaSettlementReadPlatformService.retrieveAllStateDetails();*/
-    	/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");*/
+    	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	
     	Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
     	Collection<MCodeData> mediaCategoryData = this.mCodeReadPlatformService.getCodeValue("Media Category");
@@ -782,9 +798,8 @@ public class MediaSettlementApiResources {
     	Collection<PartnerAccountData> contentData=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");    	 
       	Collection<PartnerAccountData> channelData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
       	Collection<PartnerAccountData> serviceData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
-    	/*List<MediaAssetData> contentNameData = this.mediaAssetReadPlatformService.retrieveAllAssetdata();*/
-    	/*List<ChargesData> chargeCodesData = this.itemReadPlatformService.retrieveChargeCode();*/
-    	InteractiveData interactiveData = new InteractiveData();//circleData*/null,businessLineData,mediaCategoryData,playSourceData,contentNameData,chargeCodesData);
+    	
+    	InteractiveData interactiveData = new InteractiveData();
     	
     	interactiveData.setBisinessLineData(businessLineData);
     	interactiveData.setMediaCategoryData(mediaCategoryData);
@@ -792,7 +807,6 @@ public class MediaSettlementApiResources {
     	interactiveData.setContentData(contentData);
     	interactiveData.setChannelData(channelData);
     	interactiveData.setServiceData(serviceData);
-    	/*interactiveData.setChargeCodeData(chargeCodesData);*/
     	
     	return toApiJsonSerializer.serialize(interactiveData);
     }

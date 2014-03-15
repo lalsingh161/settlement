@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.joda.time.LocalDate;
 import org.mifosplatform.billing.address.data.StateDetails;
-import org.mifosplatform.billing.chargecode.data.ChargeCodeData;
 import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 import org.mifosplatform.billing.media.data.MediaAssetData;
@@ -22,7 +22,7 @@ public class InteractiveHeaderData {
 	private Long clientId;
 	private String circle;
 	private String businessLine;
-	private Long activityMonth;
+	private String activityMonth;
 	private Date dataUploadedDate;
 	private String mediaCategory;
 	private String chargeCode;
@@ -53,20 +53,20 @@ public class InteractiveHeaderData {
 	}
 
 	public InteractiveHeaderData(Long id,Long clientId, Long externalId,
-			String businessLineStr, Long activityMonth, Date date,
+			String businessLineStr, String activityMonth, LocalDate date,
 			String mediaCategoryStr, String chargeCodeStr) {
 		this.id = id;
 		this.clientId = clientId;
 		this.externalId = externalId;
 		this.businessLine = businessLineStr;
 		this.activityMonth = activityMonth;
-		this.dataUploadedDate = date;
+		this.dataUploadedDate = (null==dataUploadedDate)?null:date.toDate();
 		this.mediaCategory = mediaCategoryStr;
 		this.chargeCode = chargeCodeStr;
 	}
 
 	public InteractiveHeaderData(Long clientId, Long externalId,
-			Long activityMonth, Date date, Long businessLine,
+			String activityMonth, Date date, Long businessLine,
 			Long mediaCategory, Long chargeCode) {
 		this.clientId = clientId;
 		this.externalId = externalId;

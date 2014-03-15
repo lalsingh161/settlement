@@ -494,7 +494,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public PartnerAccountData retrieveContentProviderPartnerId(
 			String mediaCategory) {
-		final String sql = "select pa.id as partnerId ,mcv.code_value as partnerType from bp_account pa inner join m_code_value mcv on mcv.id = pa.partner_type where pa.id = ? and pa.is_deleted='N'";
+		/*final String sql = "select pa.id as partnerId ,mcv.code_value as partnerType from bp_account pa inner join m_code_value mcv on mcv.id = pa.partner_type where pa.id = ? and pa.is_deleted='N'";*/
+		final String sql = "select pa.partner_account_id as partnerId, mcv.code_value as partnerType, pad.partner_type as pType from bp_agreement pa inner join bp_agreement_dtl pad on pa.id=pad.agmt_id inner join m_code_value mcv on mcv.id=pad.partner_type inner join bp_account a on a.id=pa.partner_account_id where pa.partner_account_id=? and a.is_deleted='N' and pa.is_deleted='N'";
 		RetrivePartnerTypeMapper mapper = new RetrivePartnerTypeMapper();
 		return jdbcTemplate.queryForObject(sql, mapper,
 				new Object[] { mediaCategory });
@@ -922,13 +923,13 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long clientId = rs.getLong("clientId");
 			final Long externalId = rs.getLong("externalId");
 			final String businessLineStr = rs.getString("businessLine");
-			final Long activityMonth = rs.getLong("activityMonth");
+			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs,
 					"dataUploadedDate");
 			final String mediaCategoryStr = rs.getString("mediaCategory");
 			final String chargeCodeStr = rs.getString("chargeCode");
 			return new InteractiveHeaderData(id, clientId, externalId,
-					businessLineStr, activityMonth, dataUploadedDate.toDate(),
+					businessLineStr, activityMonth, dataUploadedDate,
 					mediaCategoryStr, chargeCodeStr);
 		}
 	}
@@ -969,12 +970,12 @@ public class MediaSettlementReadPlatformServiceImp implements
 				throws SQLException {
 			final Long clientId = rs.getLong("clientId");
 			final Long externalId = rs.getLong("externalId");
-			final Long activityMonth = rs.getLong("activityMonth");
+			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadDate = JdbcSupport.getLocalDate(rs, "dataUploadDate");
 			final Long businessLine = rs.getLong("businessLine");
 			final Long mediaCategory = rs.getLong("mediaCategory");
 			final Long chargeCode = rs.getLong("chargeCode");
-			return new InteractiveData(clientId,externalId,activityMonth,dataUploadDate!=null?dataUploadDate.toDate():null,businessLine,mediaCategory,chargeCode);
+			return new InteractiveData(clientId,externalId,activityMonth,dataUploadDate,businessLine,mediaCategory,chargeCode);
 		}
 		
 	}
@@ -1085,13 +1086,19 @@ public class MediaSettlementReadPlatformServiceImp implements
 	public List<PartnerAccountData> retrieveAllPartnerType(String codeValue,
 			String codeName) {
 
-		final String sql = "select pa.id as partnerId ,pa.partner_name as partnerName from bp_account pa where pa.partner_type=(select id from m_code_value where code_value = ? and code_id=(select id from m_code where code_name= ?))";
-		contentMapper mapper = new contentMapper();
+		/*final String sql = "select pa.id as partnerId ,pa.partner_name as partnerName from bp_account pa where pa.partner_type=(select id from m_code_value where code_value = ? and code_id=(select id from m_code where code_name= ?))";*/
+		final String sql = "select pa.id as partnerId, pa.partner_name as partnerName from bp_account pa "+
+				"inner join bp_agreement a ON a.partner_account_id = pa.id "+
+				"inner join bp_agreement_dtl ad ON ad.agmt_id = a.id where ad.partner_type = "+
+				"(select id from m_code_value where code_value=? and code_id = "+
+				"(select id from m_code where code_name=?)) and pa.is_deleted='N' "+
+				"and a.is_deleted='N'";
+		ContentMapper mapper = new ContentMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { codeValue,
 				codeName });
 	}
 
-	private final static class contentMapper implements
+	private final static class ContentMapper implements
 			RowMapper<PartnerAccountData> {
 
 		@Override
@@ -1316,8 +1323,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 				return new OperatorDeductionData(id, clientId, deductionCode, deductionValue);			
 			};
 		}
-		
-		
+
 		@Override
 		public Long checkPartnerAgreementId(Long partnerAccountId) {
 			// TODO Auto-generated method stub
@@ -1365,6 +1371,15 @@ public class MediaSettlementReadPlatformServiceImp implements
 			// TODO Auto-generated method stub
 
 			jdbcTemplate.update("delete from bp_agreement_dtl where id=? ", new Object[] { entityId });
+		}
+
+		
+		@Override
+		public Long retriveClientId(String clientName) {
+			
+			final String sql = "select id from m_client where firstname=?";
+			return jdbcTemplate.queryForLong(sql, new Object[]{clientName});
 
 		}
+		
 }

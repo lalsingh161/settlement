@@ -33,5 +33,8 @@ public interface EventOrderReadplatformServie {
 
 	Long getEventId(String eventName);
 
+	List<EventMasterData> getBusinessLine();
+
+
 	
 }

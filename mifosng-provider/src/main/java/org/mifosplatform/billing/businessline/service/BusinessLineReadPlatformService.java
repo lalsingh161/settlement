@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.mifosplatform.billing.businessline.data.BusinessLineData;
+import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
 
 
@@ -18,5 +19,7 @@ public interface BusinessLineReadPlatformService {
 	List<BusinessLineData> retrieveEventDetailsData(Integer eventId);
 
 	Collection<BusinessLineData> getBusinessLineData();
+
+	List<McodeData> retrieveCategoryData(String string);
 	
 }

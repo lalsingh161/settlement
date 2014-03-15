@@ -68,7 +68,7 @@ public class CreditDistributionWritePlatformServiceImpl implements CreditDistrib
 		        	CreditDistribution creditDistribution= CreditDistribution.fromJson(j,fromJsonHelper);
 		        	this.creditDistributionRepository.save(creditDistribution);
 		        	Invoice invoice=this.invoiceRepository.findOne(creditDistribution.getInvoiceId());
-		        	invoice.updateAmount(creditDistribution.getAmount());
+		        	//invoice.updateAmount(creditDistribution.getAmount());
 		        	this.invoiceRepository.save(invoice);
 		        	
 		        }

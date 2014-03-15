@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.infrastructure.codes.exception.SystemDefinedCodeCannotBeChangedException;
@@ -16,7 +17,7 @@ import org.mifosplatform.useradministration.domain.AppUser;
 
 
 @Entity
-@Table(name="bp_operator_deduction")
+@Table(name="bp_operator_deduction" ,uniqueConstraints = {@UniqueConstraint(columnNames = {"client_id","ded_code","ded_value"}, name="operatordeductionuniquekey")})
 public class OperatorDeduction extends AbstractAuditableCustom<AppUser,Long>{
 
 	

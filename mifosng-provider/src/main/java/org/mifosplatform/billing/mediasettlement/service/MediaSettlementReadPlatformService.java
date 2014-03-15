@@ -140,8 +140,12 @@ public interface MediaSettlementReadPlatformService {
 	Long checkPAgreementId(Long partnerAccountId, Long agreementType, Long agreementCategory,
 			 Long royaltyType, Long settlementSource);
 
+
 	Long checkPartnerAgreementId(Long partnerAccountId);
 	
 	void  retrieveDeleteMediaCategoryData(Long entityId);
+
+	Long retriveClientId(String stringCellValue);
+
 
 }

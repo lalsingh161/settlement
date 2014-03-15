@@ -179,8 +179,7 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 		LocalDate invoiceDate = new LocalDate();
 		List<BillingOrder> charges = new ArrayList<BillingOrder>();
 		
-		Invoice invoice = new Invoice(billingOrderCommands.get(0).getClientId(), new LocalDate().toDate(), invoiceAmount, invoiceAmount, netTaxAmount, "active",
-				null, null, null, null);
+		Invoice invoice = new Invoice(billingOrderCommands.get(0).getClientId(), new LocalDate().toDate(), invoiceAmount, invoiceAmount, netTaxAmount, "active");
 		
 		for (BillingOrderCommand billingOrderCommand : billingOrderCommands) {
 			BigDecimal netChargeTaxAmount = BigDecimal.ZERO;
@@ -204,7 +203,7 @@ public class GenerateBillingOrderServiceImplementation implements	GenerateBillin
 				netChargeTaxAmount = netChargeTaxAmount.add(invoiceTaxCommand.getTaxAmount());
 				
 				InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),
-						invoiceTaxCommand.getTaxValue(), invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
+						 invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
 				charge.addChargeTaxes(invoiceTax);
 				
 			}

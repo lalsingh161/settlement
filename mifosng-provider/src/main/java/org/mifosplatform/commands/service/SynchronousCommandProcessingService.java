@@ -856,6 +856,8 @@ public class SynchronousCommandProcessingService implements
 				 }else if(wrapper.isOperatorDeduction()){
 					 if(wrapper.isCreateOperatorDeduction()){
 						 handler = applicationContext.getBean("createOperatorDeductionCommandHandler", NewCommandSourceHandler.class);
+					 }else if(wrapper.isUpdateOperatorDeduction()){
+						   handler = applicationContext.getBean("updateOperatorDeductionCommandHandler",NewCommandSourceHandler.class);
 					 }
 				 }else if(wrapper.isPartnerGame()){
 					 	if(wrapper.isCreatePartnerGame()){
@@ -869,13 +871,9 @@ public class SynchronousCommandProcessingService implements
 					    }
 				 }else if (wrapper.isbusinessLineResource()) {
 						if (wrapper.isCreate()) {
-							handler = applicationContext.getBean(
-									"createBusinessLineCommandHandler",
-									NewCommandSourceHandler.class);
+							handler = applicationContext.getBean("createBusinessLineCommandHandler",NewCommandSourceHandler.class);
 						} else if (wrapper.isBusinessLineUpdate()) {
-							handler = applicationContext.getBean(
-									"updateBusinessLineCommandHandler",
-									NewCommandSourceHandler.class);
+							handler = applicationContext.getBean("updateBusinessLineCommandHandler",NewCommandSourceHandler.class);
 						} else if (wrapper.isDelete()) {/*
 							handler = applicationContext.getBean(
 									"deleteBusinessLineCommandHandler",
@@ -883,7 +881,7 @@ public class SynchronousCommandProcessingService implements
 						*/} else {
 							throw new UnsupportedCommandException(wrapper.commandName());
 						}
-					}else if(wrapper.isUpdateSettlementSequenceData()){
+				 }else if(wrapper.isUpdateSettlementSequenceData()){
 					 handler = applicationContext.getBean("updatePartnerGameCommandHandler",NewCommandSourceHandler.class);
 				 }else if(wrapper.isGameEvent()){
 					 if(wrapper.isCreateGameEvent()){
@@ -897,10 +895,17 @@ public class SynchronousCommandProcessingService implements
 			         if(wrapper.isCreate()) {
 			             handler = applicationContext.getBean("createCreditDistributionCommandHandler",NewCommandSourceHandler.class);
 			         }
-
-			 }else {
-			               throw new UnsupportedCommandException(wrapper.commandName());
-		              }
+			    }else if (wrapper.isRawData()) {
+					if(wrapper.isCreateRawData()){
+						handler = applicationContext.getBean("createRawDataCommandHandler", NewCommandSourceHandler.class);
+					}
+			    }else if(wrapper.isInvoiceRevenue()){
+						 if(wrapper.isCreateRevenueInvoice()){
+							 handler = applicationContext.getBean("createRevenueInvoiceCommandHandler",NewCommandSourceHandler.class);	
+						 }
+				}else {
+			            throw new UnsupportedCommandException(wrapper.commandName());
+				}
 			       
 					
 	       return handler;

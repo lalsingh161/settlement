@@ -48,11 +48,12 @@ import org.joda.time.format.DateTimeFormat;
 import org.mifosplatform.billing.adjustment.api.AdjustmentApiResource;
 import org.mifosplatform.billing.adjustment.data.AdjustmentData;
 import org.mifosplatform.billing.adjustment.service.AdjustmentReadPlatformService;
-import org.mifosplatform.billing.item.data.ChargesData;
+import org.mifosplatform.billing.businessline.data.BusinessLineData;
+import org.mifosplatform.billing.businessline.service.BusinessLineReadPlatformService;
 import org.mifosplatform.billing.importfile.data.MRNErrorData;
 import org.mifosplatform.billing.inventory.api.InventoryItemDetailsApiResource;
 import org.mifosplatform.billing.inventory.exception.OrderQuantityExceedsException;
-import org.mifosplatform.billing.inventory.service.InventoryItemDetailsReadPlatformService;
+import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.item.service.ItemReadPlatformService;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 import org.mifosplatform.billing.mcodevalues.service.MCodeReadPlatformService;
@@ -69,6 +70,7 @@ import org.mifosplatform.billing.order.exceptions.NoGrnIdFoundException;
 import org.mifosplatform.billing.payments.api.PaymentsApiResource;
 import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
+import org.mifosplatform.billing.revenuemaster.service.RevenueClient;
 import org.mifosplatform.billing.uploadstatus.command.UploadStatusCommand;
 import org.mifosplatform.billing.uploadstatus.domain.UploadStatus;
 import org.mifosplatform.billing.uploadstatus.domain.UploadStatusCommandValidator;
@@ -77,6 +79,7 @@ import org.mifosplatform.billing.uploadstatus.domain.UploadStatusRepository;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
+import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.data.ApiParameterError;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.InvalidJsonException;
@@ -84,6 +87,7 @@ import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidation
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.mifosplatform.infrastructure.core.exception.UnsupportedParameterException;
 import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
+import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.portfolio.client.exception.ClientNotFoundException;
@@ -94,6 +98,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -116,7 +121,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	private ApiRequestJsonSerializationSettings serSettings;
 	private Long orderIdValue;
 	private String resultStatus="";
-	private Collection<MCodeData> businessLineDataList;
+	private Collection<BusinessLineData> businessLineDataList;
 	private Collection<MCodeData> mediaCategoryDataList;
 	private Collection<MCodeData> playSourceDataList;
 	private List<ChargesData> chargeCodesDataList;
@@ -124,7 +129,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	private Collection<PartnerAccountData> serviceDataList;
 	private Collection<PartnerAccountData> channelDataList;;
 	private List<AdjustmentData> adjustmentDataList;
-	 public Collection<McodeData> paymodeDataList;
+	public Collection<McodeData> paymodeDataList;
+	
 	
 	 private static final String MEDIAASSETS_RESOURCE_TYPE = "ASSESTS";
 	 private static final String EPG_RESOURCE_TYPE = "EPGPROGRAMGUIDE";
@@ -145,6 +151,9 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	 private final ItemReadPlatformService itemReadPlatformService;
 	 private final MediaAssetReadPlatformService mediaAssetReadPlatformService;
 	 private final MCodeReadPlatformService mCodeReadPlatformService;
+	 private final BusinessLineReadPlatformService businessLineReadPlatformService;
+	 private final FromJsonHelper fromApiJsonHelper;
+	 private final RevenueClient revenueClient;
 	
 	@Autowired
 	public UploadStatusWritePlatformServiceImp(
@@ -159,7 +168,10 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			final MediaSettlementReadPlatformService mediaSettlementReadPlatformService,
 			final ItemReadPlatformService itemReadPlatformService,
 			final MediaAssetReadPlatformService mediaAssetReadPlatformService,
-			final MCodeReadPlatformService mCodeReadPlatformService) {
+			final MCodeReadPlatformService mCodeReadPlatformService,
+			final BusinessLineReadPlatformService businessLineReadPlatformService,
+			final FromJsonHelper fromApiJsonHelper,
+			final RevenueClient revenueClient) {
 		this.context=context;
 		this.uploadStatusRepository=uploadStatusRepository;
 		this.commandsSourceWritePlatformService=commandsSourceWritePlatformService;
@@ -173,6 +185,9 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 		this.itemReadPlatformService = itemReadPlatformService;
 		this.mediaAssetReadPlatformService = mediaAssetReadPlatformService;
 		this.mCodeReadPlatformService = mCodeReadPlatformService;
+		this.businessLineReadPlatformService = businessLineReadPlatformService;
+		this.fromApiJsonHelper = fromApiJsonHelper;
+		this.revenueClient = revenueClient;
 	}
 	
 	//@Transactional
@@ -1235,7 +1250,8 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 			
 		}else if(uploadProcess.equalsIgnoreCase("GameEvent")){
-			Integer cellNumber = 9;
+			Set<Long> clientIds = new HashSet<Long>();
+			Integer cellNumber = 13;
 			UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
 			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
 			Workbook wb = null;
@@ -1244,134 +1260,53 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			try {
 				wb = WorkbookFactory.create(new File(fileLocation));
 				Sheet interactiveHeaderSheet = wb.getSheetAt(0);
-				Sheet interactiveDetailSheet = wb.getSheetAt(1);
+				
 				//Sheet mediaLocationSheet = wb.getSheetAt(2);
 				int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
-				System.out.println("Number of rows : "+msNumberOfRows);
+				int lastRowNumber = interactiveHeaderSheet.getLastRowNum();
 				
-				for (int i = 1; i < msNumberOfRows; i++) {
+				System.out.println("Number of rows : "+msNumberOfRows);
+				System.out.println("Number of rows : "+lastRowNumber);
+				
+				JSONObject parentJsonObject = new JSONObject();
+				
+				for (int i = 4; i < msNumberOfRows; i++) {
 
 						Row headerRow = interactiveHeaderSheet.getRow(i);
-						Row  detailRow= interactiveDetailSheet.getRow(i);
 						JSONObject jsonObject = new JSONObject();
 						
 					 try {
 						 if(headerRow.getCell(3).getStringCellValue().equalsIgnoreCase("EOF"))
-							 throw new EOFException();
-						totalRecordCount++;
-						jsonObject.put("clientId",headerRow.getCell(0).getNumericCellValue());//-
-						jsonObject.put("externalId",headerRow.getCell(1).getNumericCellValue());//-
-						jsonObject.put("activityMonth",headerRow.getCell(2).getNumericCellValue());//-
+							throw new EOFException();
+						 
+						 
+						 	totalRecordCount++;
 						
-						businessLineDataList=this.mCodeReadPlatformService.getCodeValue("Business");
-						if(businessLineDataList.size()>0)
-						{
-							for(MCodeData businessData:businessLineDataList)
-							{
-								if(businessData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(3).getStringCellValue()))
-										{
-									jsonObject.put("businessLine",businessData.getId());
-										}
-							}
-						}
-						
-						mediaCategoryDataList=this.mCodeReadPlatformService.getCodeValue("Media Category");
-						
-						if(mediaCategoryDataList.size()>0)
-						{
-							for(MCodeData mediaData:mediaCategoryDataList)
-							{
-								if(mediaData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(4).getStringCellValue()))
-										{
-									jsonObject.put("mediaCategory",mediaData.getId());
-										}
-							}
-						}
-						chargeCodesDataList=this.itemReadPlatformService.retrieveChargeCode();
-						if(chargeCodesDataList.size()>0)
-						{
-							for(ChargesData chargeData:chargeCodesDataList)
-							{
-								if(chargeData.getChargeDescription().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
-										{
-									jsonObject.put("chargeCode",chargeData.getId());
-										}
-							}
-						}
-				
-						SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
-						jsonObject.put("dataUploadedDate",formatter.format(headerRow.getCell(6).getDateCellValue()));
-						jsonObject.put("dateFormat","dd MMMM yyyy");
-						jsonObject.put("locale","en");
-							JSONArray a = new JSONArray();
+						 	jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
+							jsonObject.put("clientId",headerRow.getCell(1).getStringCellValue());//-
+							/*clientIds.add(clientId);*/
+							SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
+							jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
+							jsonObject.put("businessLine",headerRow.getCell(3).getStringCellValue());
+							jsonObject.put("mediaCategory",headerRow.getCell(4).getStringCellValue());
+							jsonObject.put("dateFormat","dd MMMM yyyy");
+							jsonObject.put("locale","en");
+							
+							/*JSONArray a = new JSONArray();
 							Map<String, Object> m = new LinkedHashMap<String, Object>();
+							*/
 							
-							playSourceDataList = this.mCodeReadPlatformService.getCodeValue("Play Source");
-							if(playSourceDataList.size()>0)
-							{
-								for(MCodeData playSourceData:playSourceDataList)
-								{
-									if(playSourceData.getmCodeValue().equalsIgnoreCase(detailRow.getCell(0).getStringCellValue()))
-											{
-										m.put("playSource",playSourceData.getId());
-											}
-								}
-							}
-							 Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
-								if(mediaDataList.size()>0)
-								{
-									for(MediaAssetData mediaData:mediaDataList)
-									{
-										if(mediaData.getMediaTitle().equalsIgnoreCase(detailRow.getCell(1).getStringCellValue()))
-												{
-											m.put("contentName",mediaData.getMediaId());
-												}
-									}
-								}
-							
-					   contentDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");
-					   if(contentDataList.size()>0)
-					   {
-						   for(PartnerAccountData contentData:contentDataList){
-							   if(contentData.getPartnerName().equalsIgnoreCase(detailRow.getCell(2).getStringCellValue()))
-							   {
-								   m.put("contentProvider", contentData.getId());
-							   }
-						   }
-					   }
-					   channelDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
-					   if(contentDataList.size()>0)
-					   {
-						   for(PartnerAccountData channelData:channelDataList){
-							   if(channelData.getPartnerName().equalsIgnoreCase(detailRow.getCell(3).getStringCellValue()))
-							   {
-								   m.put("channelName", channelData.getId());
-							   }
-						   }
-					   }
-					   
-					   serviceDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
-					   if(contentDataList.size()>0)
-					   {
-						   for(PartnerAccountData serviceData:serviceDataList){
-							   if(serviceData.getPartnerName().equalsIgnoreCase(detailRow.getCell(4).getStringCellValue()))
-							   {
-								   m.put("serviceName", serviceData.getId());
-							   }
-						   }
-					   }
-							m.put("endUserPrice", detailRow.getCell(5).getNumericCellValue());
-							m.put("grossRevenue", detailRow.getCell(6).getNumericCellValue());
-							m.put("downloads", detailRow.getCell(7).getNumericCellValue());
-							m.put("locale","en");
-							
-	
-							a.put(m);
-							jsonObject.put("activeData",a);
+							jsonObject.put("playSource",headerRow.getCell(5).getStringCellValue());							
+							jsonObject.put("contentName", headerRow.getCell(6).getStringCellValue());						
+							jsonObject.put("contentProvider", headerRow.getCell(7).getStringCellValue());
+							jsonObject.put("channelName", headerRow.getCell(8).getStringCellValue());							   
+							jsonObject.put("serviceName", headerRow.getCell(9).getStringCellValue());
+							jsonObject.put("endUserPrice", headerRow.getCell(10).getNumericCellValue());
+							jsonObject.put("downloads", headerRow.getCell(11).getNumericCellValue());
+							jsonObject.put("grossRevenue", headerRow.getCell(12).getNumericCellValue());
 						
-						
-						context.authenticatedUser().validateHasReadPermission(GAMEEVENT_RESOURCE_TYPE);
-						final CommandWrapper commandRequest = new CommandWrapperBuilder().createGameEvent(0L).withJson(jsonObject.toString()).build();
+						context.authenticatedUser().validateHasReadPermission("RAWDATA");
+						final CommandWrapper commandRequest = new CommandWrapperBuilder().createRawData().withJson(jsonObject.toString()).build();
 						final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 						
 						if(result!=null){
@@ -1396,13 +1331,31 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						errorData.add(new MRNErrorData((long)i, "Error: "+e.getMessage()));
 					}
 				}
-				
+
 				uploadStatusForGameEvent.setProcessRecords(processRecordCount);
 				uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
 				uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
 				writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
 				processRecordCount=0L;totalRecordCount=0L;
 				uploadStatusForGameEvent=null;
+				
+				/*for(Long cId: clientIds){
+					
+					 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
+					 final String json = wrapper.getJson();
+						
+						final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
+							final JsonCommand command = JsonCommand.from(json, parsedCommand,
+									this.fromApiJsonHelper, wrapper.getEntityName(),
+									wrapper.getEntityId(), wrapper.getSubentityId(),
+									wrapper.getGroupId(), wrapper.getClientId(),
+									wrapper.getLoanId(), wrapper.getSavingsId(),
+									wrapper.getCodeId(), wrapper.getSupportedEntityType(),
+									wrapper.getSupportedEntityId(), wrapper.getTransactionId());
+					this.revenueClient.createRevenueInvoice(command); 
+					
+				}*/
+				//clientIds = null;
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -2216,3 +2169,221 @@ private void writeCSVData(String fileLocation,
 	}
 }
 
+
+/*Set<Long> clientIds = new HashSet<Long>();
+Integer cellNumber = 13;
+UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
+ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
+Workbook wb = null;
+Long processRecordCount=0L;
+Long totalRecordCount=0L;
+try {
+	wb = WorkbookFactory.create(new File(fileLocation));
+	Sheet interactiveHeaderSheet = wb.getSheetAt(0);
+	
+	//Sheet mediaLocationSheet = wb.getSheetAt(2);
+	int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
+	int lastRowNumber = interactiveHeaderSheet.getLastRowNum();
+	
+	System.out.println("Number of rows : "+msNumberOfRows);
+	System.out.println("Number of rows : "+lastRowNumber);
+	
+	for (int i = 4; i < msNumberOfRows; i++) {
+
+			Row headerRow = interactiveHeaderSheet.getRow(i);
+			JSONObject jsonObject = new JSONObject();
+			
+		 try {
+			 if(headerRow.getCell(3).getStringCellValue().equalsIgnoreCase("EOF"))
+				 throw new EOFException();
+			totalRecordCount++;
+			
+			Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
+			
+			jsonObject.put("clientId",clientId);//-
+			clientIds.add(clientId);
+			jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
+			SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
+			jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getNumericCellValue()));
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
+			jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
+			jsonObject.put("activityMonth",headerRow.getCell(2).getDateCellValue());
+			System.out.println("#####################"+formatter.format(headerRow.getCell(2).getDateCellValue()));
+			
+			businessLineDataList = this.businessLineReadPlatformService.getBusinessLineData();
+			if(businessLineDataList.size()>0)
+			{
+				for(BusinessLineData businessData:businessLineDataList)
+				{
+					if(businessData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(3).getStringCellValue()))
+							{
+								jsonObject.put("businessLine",businessData.getId());
+							}
+				}
+			}
+			
+			mediaCategoryDataList=this.mCodeReadPlatformService.getCodeValue("Media Category");
+			
+			if(mediaCategoryDataList.size()>0)
+			{
+				for(MCodeData mediaData:mediaCategoryDataList)
+				{
+					if(mediaData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(4).getStringCellValue()))
+							{
+						jsonObject.put("mediaCategory",mediaData.getId());
+							}
+				}
+			}
+			chargeCodesDataList=this.itemReadPlatformService.retrieveChargeCode();
+			if(chargeCodesDataList.size()>0)
+			{
+				for(ChargesData chargeData:chargeCodesDataList)
+				{
+					if(chargeData.getChargeDescription().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
+							{
+						jsonObject.put("chargeCode",chargeData.getId());
+							}
+				}
+			}
+	
+			
+			jsonObject.put("dataUploadedDate",formatter.format(headerRow.getCell(6).getDateCellValue()));
+				jsonObject.put("dateFormat","dd MMMM yyyy");
+				jsonObject.put("locale","en");
+				JSONArray a = new JSONArray();
+				Map<String, Object> m = new LinkedHashMap<String, Object>();
+				
+				playSourceDataList = this.mCodeReadPlatformService.getCodeValue("Play Source");
+				if(playSourceDataList.size()>0)
+				{
+					for(MCodeData playSourceData:playSourceDataList)
+					{
+						if(playSourceData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
+								{
+									m.put("playSource",playSourceData.getId());
+								}
+					}
+				}
+				m.put("contentName", headerRow.getCell(6).getStringCellValue());
+				 Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
+					if(mediaDataList.size()>0)
+					{
+						for(MediaAssetData mediaData:mediaDataList)
+						{
+							if(mediaData.getMediaTitle().equalsIgnoreCase(headerRow.getCell(6).getStringCellValue()))
+									{
+								m.put("contentName",mediaData.getMediaId());
+									}
+						}
+					}
+				
+		   contentDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");
+		   if(contentDataList.size()>0)
+		   {
+			   for(PartnerAccountData contentData:contentDataList){
+				   if(contentData.getPartnerName().equalsIgnoreCase(headerRow.getCell(7).getStringCellValue()))
+				   {
+					   m.put("contentProvider", contentData.getId());
+				   }
+			   }
+		   }
+		   channelDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
+		   if(contentDataList.size()>0)
+		   {
+			   for(PartnerAccountData channelData:channelDataList){
+				   if(channelData.getPartnerName().equalsIgnoreCase(headerRow.getCell(8).getStringCellValue()))
+				   {
+					   m.put("channelName", channelData.getId());
+				   }
+			   }
+		   }
+		   
+		   serviceDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
+		   if(contentDataList.size()>0)
+		   {
+			   for(PartnerAccountData serviceData:serviceDataList){
+				   if(serviceData.getPartnerName().equalsIgnoreCase(headerRow.getCell(9).getStringCellValue()))
+				   {
+					   m.put("serviceName", serviceData.getId());
+				   }
+			   }
+		   }
+				m.put("endUserPrice", headerRow.getCell(10).getNumericCellValue());
+				m.put("grossRevenue", headerRow.getCell(12).getNumericCellValue());
+				m.put("downloads", headerRow.getCell(11).getNumericCellValue());
+				m.put("locale","en");
+				
+
+				a.put(m);
+				jsonObject.put("activeData",a);
+			
+			
+			context.authenticatedUser().validateHasReadPermission(GAMEEVENT_RESOURCE_TYPE);
+			final CommandWrapper commandRequest = new CommandWrapperBuilder().createGameEvent(0L).withJson(jsonObject.toString()).build();
+			final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+			
+			if(result!=null){
+		    	//Long rsId = result.resourceId();
+		    	errorData.add(new MRNErrorData((long)i, "Success"));
+		    	processRecordCount++;
+		    }
+			
+			
+		}catch(PlatformDataIntegrityException e){
+			errorData.add(new MRNErrorData((long)i, e.getParameterName()+" : "+e.getDefaultUserMessage()));
+		}catch (PlatformApiDataValidationException e) {
+			errorData.add(new MRNErrorData((long)i, e.getErrors().get(0).getParameterName()+" : "+e.getDefaultUserMessage()));
+		}catch (NullPointerException e) {
+			errorData.add(new MRNErrorData((long)i, "Error: value cannot be null"));
+		}catch (EOFException e){
+			errorData.add(new MRNErrorData((long)i, "Completed: End Of Record"));
+			break;
+		}catch (IllegalStateException e) {
+			errorData.add(new MRNErrorData((long)i,e.getMessage()));
+		}catch (Exception e) {
+			errorData.add(new MRNErrorData((long)i, "Error: "+e.getMessage()));
+		}
+	}
+	
+	
+	
+	uploadStatusForGameEvent.setProcessRecords(processRecordCount);
+	uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
+	uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
+	writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
+	processRecordCount=0L;totalRecordCount=0L;
+	uploadStatusForGameEvent=null;
+	uploadStatusForGameEvent.setProcessRecords(processRecordCount);
+	uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
+	uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
+	writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
+	processRecordCount=0L;totalRecordCount=0L;
+	uploadStatusForGameEvent=null;
+	
+	for(Long cId: clientIds){
+		
+		 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
+		 final String json = wrapper.getJson();
+			
+			final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
+				final JsonCommand command = JsonCommand.from(json, parsedCommand,
+						this.fromApiJsonHelper, wrapper.getEntityName(),
+						wrapper.getEntityId(), wrapper.getSubentityId(),
+						wrapper.getGroupId(), wrapper.getClientId(),
+						wrapper.getLoanId(), wrapper.getSavingsId(),
+						wrapper.getCodeId(), wrapper.getSupportedEntityType(),
+						wrapper.getSupportedEntityId(), wrapper.getTransactionId());
+		this.revenueClient.createRevenueInvoice(command); 
+		
+	}
+	clientIds = null;
+
+} catch (IOException e) {
+	e.printStackTrace();
+} catch (InvalidFormatException e) {
+	e.getStackTrace();
+}
+
+
+*/
