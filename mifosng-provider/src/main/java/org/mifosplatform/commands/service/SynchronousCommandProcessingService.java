@@ -872,9 +872,7 @@ public class SynchronousCommandProcessingService implements
 							handler = applicationContext.getBean(
 									"deleteBusinessLineCommandHandler",
 									NewCommandSourceHandler.class);
-						*/} else {
-							throw new UnsupportedCommandException(wrapper.commandName());
-						}
+						*/}
 				 }else if(wrapper.isUpdateSettlementSequenceData()){
 					 handler = applicationContext.getBean("updatePartnerGameCommandHandler",NewCommandSourceHandler.class);
 				 }else if(wrapper.isGameEvent()){
@@ -908,7 +906,6 @@ public class SynchronousCommandProcessingService implements
 				}else {
 			               throw new UnsupportedCommandException(wrapper.commandName());
 		              }
->>>>>>> b1e9629bdcfb9d679f04e53d2fc9b9dfdd8c80ed
 			       
 					
 	       return handler;
