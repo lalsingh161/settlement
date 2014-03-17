@@ -12,11 +12,12 @@ public class InteractiveDetailsData {
 	private BigDecimal endUserPrice;
 	private BigDecimal downloads;
 	private BigDecimal grossRevenue;
+	private Object mediaCategory;
 
 	public InteractiveDetailsData(Long playSource, String contentName,
 			Long contentProvider, Long channelName, Long serviceName,
 			BigDecimal endUserPrice, BigDecimal downloads,
-			BigDecimal grossRevenue) {
+			BigDecimal grossRevenue, Long mediaCategory) {
 		this.playSource = playSource;
 		this.contentName = contentName;
 		this.contentProvider = contentProvider;
@@ -25,6 +26,7 @@ public class InteractiveDetailsData {
 		this.endUserPrice = endUserPrice;
 		this.downloads = downloads;
 		this.grossRevenue = grossRevenue;
+		this.mediaCategory = mediaCategory;
 	}
 
 }

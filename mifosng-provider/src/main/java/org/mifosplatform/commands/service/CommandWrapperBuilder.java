@@ -2037,7 +2037,7 @@ public class CommandWrapperBuilder {
 		this.actionName = "CREATE";
 		this.entityName = "CURRENCYRATE";
 		this.entityId = null;
-		this.href = "mediasettlements/currencyrate";
+		this.href = "mediasettlements/currency";
 		return this;
 	}
 
@@ -2045,7 +2045,7 @@ public class CommandWrapperBuilder {
 		this.actionName = "UPDATE";
 		this.entityName = "CURRENCYRATE";
 		this.entityId = id;
-		this.href = "mediasettlements/currencyrate"+id;
+		this.href = "mediasettlements/currency"+id;
 		return this;	
 	}
 
@@ -2053,7 +2053,7 @@ public class CommandWrapperBuilder {
 		this.actionName = "DELETE";
 		this.entityName = "CURRENCYRATE";
 		this.entityId = id;
-		this.href = "mediasettlements/currencyrate"+id;
+		this.href = "mediasettlements/currency"+id;
 		return this;
 		
 	}

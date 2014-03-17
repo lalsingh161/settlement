@@ -376,10 +376,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        
 	        final BigDecimal businessLine = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("businessLine", element);
 	        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank().notExceedingLengthOf(50);
-	        
-	        final BigDecimal mediaCategory = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("mediaCategory",element);
-	        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank().notExceedingLengthOf(50);
-	        
+	        	        
 	
 	        /*final BigDecimal chargeCode = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("chargeCode", element);
 	        baseDataValidator.reset().parameter("chargeCode").value(chargeCode).notBlank().notExceedingLengthOf(50);*/
@@ -414,6 +411,9 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 		        final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", elements);
 		        baseDataValidator.reset().parameter("channelName").value(channelName).notBlank();
 		        
+		        final BigDecimal mediaCategory = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("mediaCategory",elements);
+		        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank().notExceedingLengthOf(50);
+		        
 		        final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", elements);
 		        baseDataValidator.reset().parameter("serviceName").value(serviceName).notBlank();
 		        
@@ -437,62 +437,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	    
 		}
 
-		public void validateForCreateInteractive(String json) {
 		
-		
-		   final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
-	        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
-
-	        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
-	        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("interactivedetail");
-
-	        final JsonElement element = fromApiJsonHelper.parse(json);
-	        
-
-	          final JsonArray interactiveDataArray = fromApiJsonHelper.extractJsonArrayNamed("activeData",element);
-	          String[] interactiveDataArrayAttributes =null;
-	          interactiveDataArrayAttributes = new String[interactiveDataArray.size()];
-	 	      int interactiveDataSize = interactiveDataArray.size();
-	 	      baseDataValidator.reset().parameter(null).value(interactiveDataSize).integerGreaterThanZero();
-	 	    
-	 	      for(int i=0; i<interactiveDataArray.size();i++){
-	 	    	 interactiveDataArrayAttributes[i] = interactiveDataArray.get(i).toString();
-	 	       }
-	        
-	 	      for(String singleinteractiveData: interactiveDataArrayAttributes){
-	 	    	 
-	 	    	 final JsonElement elements = fromApiJsonHelper.parse(singleinteractiveData);
-	 	    	 
-	 	    	final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", elements);
-		        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
-	 	    	
-		        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", elements);
-		        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
-		        
-		        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", elements);
-		        baseDataValidator.reset().parameter("contentProvider").value(contentProvider).notBlank();
-		       
-		        final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", elements);
-		        baseDataValidator.reset().parameter("channelName").value(channelName).notBlank();
-		        
-		        final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", elements);
-		        baseDataValidator.reset().parameter("serviceName").value(serviceName).notBlank();
-		        
-		        final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", elements);
-		        baseDataValidator.reset().parameter("endUserPrice").value(endUserPrice).notBlank();
-		        
-		        final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", elements);
-		        baseDataValidator.reset().parameter("grossRevenue").value(grossRevenue).notBlank();
-		        
-		        final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", elements);
-		        baseDataValidator.reset().parameter("downloads").value(downloads).notBlank();   
-		      		     
-			    // final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", elements);
-			     //baseDataValidator.reset().parameter("sequence").value(sequence).notBlank();
-			     
-			     throwExceptionIfValidationWarningsExist(dataValidationErrors);
-	 	      }
-	}
 
 		public void validateForCreateRevenue(String json) {
 			

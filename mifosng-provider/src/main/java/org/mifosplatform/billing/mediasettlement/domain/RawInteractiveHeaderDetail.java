@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.joda.time.LocalDate;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
@@ -66,7 +67,7 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 	@Column(name="gross_revenue", nullable=false)
 	private BigDecimal grossRevenue;
 	
-	@Column(name="isProcessed")
+	@Column(name="is_processed")
 	private Character isProcessed = 'N';
 	
 
@@ -99,6 +100,8 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 		
 
 	}
+	
+	
 
 
 

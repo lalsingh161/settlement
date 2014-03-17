@@ -7,19 +7,17 @@ public class GenerateInteractiveHeaderData {
 	private Long id;
 	private Long clientId;
 	private Long externalId;
-	private String businessLineStr;
+	private String businessLine;
 	private String mediaCategory;
 	private String activityMonth;
 
 	public GenerateInteractiveHeaderData(Long id, Long clientId,
-			Long externalId, String businessLineStr, String activityMonth,
-			String mediaCategory) {
+			Long externalId, String businessLine, String activityMonth) {
 		
 		this.id=id;
 		this.clientId= clientId;
 		this.externalId= externalId;
-		this.businessLineStr = businessLineStr;
-		this.mediaCategory = mediaCategory;
+		this.businessLine = businessLine;
 		this.activityMonth = activityMonth;
 		
 	}
@@ -48,12 +46,8 @@ public class GenerateInteractiveHeaderData {
 		this.externalId = externalId;
 	}
 
-	public String getBusinessLineStr() {
-		return businessLineStr;
-	}
-
-	public String getMediaCategory() {
-		return mediaCategory;
+	public String getBusinessLine() {
+		return businessLine;
 	}
 
 	public String getActivityMonth() {

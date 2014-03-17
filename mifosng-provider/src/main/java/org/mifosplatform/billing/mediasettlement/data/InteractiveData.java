@@ -58,13 +58,13 @@ public class InteractiveData {
 
 	public InteractiveData(Long clientId, Long externalId,
 			String activityMonth, LocalDate date, Long businessLine,
-			Long mediaCategory, Long chargeCode) {
+			Long chargeCode) {
 		this.clientId = clientId;
 		this.externalId = externalId;
 		this.activityMonth = activityMonth;
 		this.dataUploadedDate = (null==date)?null:date.toDate();
 		this.businessLine = businessLine;
-		this.mediaCategory = mediaCategory;
+
 		this.chargeCode = chargeCode;
 	}
 

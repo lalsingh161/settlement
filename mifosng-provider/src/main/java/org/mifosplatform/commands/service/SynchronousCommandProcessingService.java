@@ -878,9 +878,7 @@ public class SynchronousCommandProcessingService implements
 							handler = applicationContext.getBean(
 									"deleteBusinessLineCommandHandler",
 									NewCommandSourceHandler.class);
-						*/} else {
-							throw new UnsupportedCommandException(wrapper.commandName());
-						}
+						*/}
 				 }else if(wrapper.isUpdateSettlementSequenceData()){
 					 handler = applicationContext.getBean("updatePartnerGameCommandHandler",NewCommandSourceHandler.class);
 				 }else if(wrapper.isGameEvent()){
@@ -903,9 +901,17 @@ public class SynchronousCommandProcessingService implements
 						 if(wrapper.isCreateRevenueInvoice()){
 							 handler = applicationContext.getBean("createRevenueInvoiceCommandHandler",NewCommandSourceHandler.class);	
 						 }
+				 }else if(wrapper.isCurrencyRateResource()){
+						 if(wrapper.isCretaeCurrencyRate()){
+							 handler = applicationContext.getBean("createCurrencyRateCommandHandler",NewCommandSourceHandler.class); 
+						 }else if(wrapper.isUpdateCurrencyRate()){
+							 handler = applicationContext.getBean("updateCurrencyRateCommandHandler",NewCommandSourceHandler.class); 
+						 }else if(wrapper.isDeleteCurrencyRate()){
+							 handler = applicationContext.getBean("deleteCurrencyRateCommandHandler",NewCommandSourceHandler.class); 
+						 } 
 				}else {
-			            throw new UnsupportedCommandException(wrapper.commandName());
-				}
+			               throw new UnsupportedCommandException(wrapper.commandName());
+		              }
 			       
 					
 	       return handler;

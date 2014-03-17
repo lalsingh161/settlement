@@ -929,7 +929,6 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						
 						}catch (DataIntegrityViolationException e) {
 							errorData.add(new MRNErrorData((long)i, "Error: "+e.getLocalizedMessage()));
-							System.out.println("yes");
 						}catch (PlatformApiDataValidationException e) {
 							errorData.add(new MRNErrorData((long)i, "Error: "+e.getErrors().get(0).getParameterName()+" : "+e.getErrors().get(0).getDefaultUserMessage()));
 						}catch (PlatformDataIntegrityException e) {
@@ -1262,11 +1261,11 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				Sheet interactiveHeaderSheet = wb.getSheetAt(0);
 				
 				//Sheet mediaLocationSheet = wb.getSheetAt(2);
-				int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
-				int lastRowNumber = interactiveHeaderSheet.getLastRowNum();
+				//int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
+				
+				int msNumberOfRows  = getNumberOfRows(interactiveHeaderSheet,0);
 				
 				System.out.println("Number of rows : "+msNumberOfRows);
-				System.out.println("Number of rows : "+lastRowNumber);
 				
 				JSONObject parentJsonObject = new JSONObject();
 				
@@ -1619,7 +1618,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			
 			}else if(e.toString().contains("PlatformDataIntegrityException")){
 			   
-				errormessage="Serial Number is already exist";	
+				errormessage="Serial Number already exist";	
 			   
 			}else if(e.toString().contains("OrderQuantityExceedsException")){
 				errormessage ="order quntity is completed";
@@ -2167,6 +2166,17 @@ private void writeCSVData(String fileLocation,
 			}
 		}
 	}
+	
+	protected Integer getNumberOfRows(Sheet sheet, int primaryColumn) {
+        Integer noOfEntries = 1;
+        // getLastRowNum and getPhysicalNumberOfRows showing false values
+        // sometimes
+           while (sheet.getRow(noOfEntries) !=null && sheet.getRow(noOfEntries).getCell(primaryColumn) != null) {
+               noOfEntries++;
+           }
+        	
+        return noOfEntries;
+    }
 }
 
 

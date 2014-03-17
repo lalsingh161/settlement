@@ -715,7 +715,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 	@Override
 	public Collection<OperatorDeductionData> getDeductionCodes() {
-		final String sql = "select dc.id as id, dc.ded_code as deductionCode, dc.deduction as deduction, dc.ded_type as deductionType, dc.ded_source as deductionSource, dc.ded_category as deductionCategory from bp_deduction_codes dc";
+		final String sql = "select dc.id as id, dc.ded_code as deductionCode, dc.deduction as deduction, dc.ded_type as deductionType, dc.ded_source as deductionSource, dc.ded_category as deductionCategory from bp_deduction_codes dc where dc.is_deleted='N'";
 		DeductionCodeMapper mapper = new DeductionCodeMapper();
 		return jdbcTemplate.query(sql, mapper);
 	}
@@ -909,7 +909,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 	public List<InteractiveHeaderData> retriveAllInteractiveForThisClient(
 			Long clientId) {
 		/*final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select mc1.code_value from m_code_value mc1 where mc1.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory,(select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";*/
-		final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select im.int_event_code from bp_intevent_master im where im.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory,(select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";
+		final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select im.int_event_code from bp_intevent_master im where im.id = ih.business_line) as businessLine, ih.activity_month as activityMonth, ih.data_upload_date as dataUploadedDate, (select cc.charge_code from b_charge_codes cc where cc.id = ih.charge_code) as chargeCode from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N'";
+		/*,(select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory*/
 		
 		InteractiveHeaderDataMapper mapper = new InteractiveHeaderDataMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { clientId });
@@ -927,11 +928,11 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs,
 					"dataUploadedDate");
-			final String mediaCategoryStr = rs.getString("mediaCategory");
+			/*final String mediaCategoryStr = rs.getString("mediaCategory");*/
 			final String chargeCodeStr = rs.getString("chargeCode");
 			return new InteractiveHeaderData(id, clientId, externalId,
 					businessLineStr, activityMonth, dataUploadedDate,
-					mediaCategoryStr, chargeCodeStr);
+					/*mediaCategoryStr,*/ chargeCodeStr);
 		}
 	}
 
@@ -956,7 +957,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	public InteractiveData retrieveInteractiveHeaderData(
 			Long eventId) {
 		final String sql = "select client_id as clientId, client_external_id as externalId, activity_month as activityMonth, data_upload_date as dataUploadDate,"
-				+ "business_line as businessLine, media_category as mediaCategory, charge_code as chargeCode from bp_interactive_header where id = ?";
+				+ "business_line as businessLine, charge_code as chargeCode from bp_interactive_header where id = ?";
 		
 		InteractiveHeaderMapper mapper = new InteractiveHeaderMapper();
 		
@@ -974,9 +975,9 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadDate = JdbcSupport.getLocalDate(rs, "dataUploadDate");
 			final Long businessLine = rs.getLong("businessLine");
-			final Long mediaCategory = rs.getLong("mediaCategory");
+			
 			final Long chargeCode = rs.getLong("chargeCode");
-			return new InteractiveData(clientId,externalId,activityMonth,dataUploadDate,businessLine,mediaCategory,chargeCode);
+			return new InteractiveData(clientId,externalId,activityMonth,dataUploadDate,businessLine,chargeCode);
 		}
 		
 	}
@@ -990,6 +991,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 				+ "itd.content_provider as contentProvider,"
 				+ "itd.channel_name as channelName,"
 				+ "itd.service_name as serviceName,"
+				+ "itd.media_category as mediaCategory,"
 				+ "itd.end_user_price as endUserPrice, itd.downloads as downloads, itd.gross_revenue as grossRevenue from bp_interactive_detail "
 				+ "itd where interactive_header_id=?";
 		InteractiveDetailsMapper mapper = new InteractiveDetailsMapper();
@@ -1009,9 +1011,10 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final BigDecimal endUserPrice = rs.getBigDecimal("endUserPrice");
 			final BigDecimal downloads = rs.getBigDecimal("downloads");
 			final BigDecimal grossRevenue = rs.getBigDecimal("grossRevenue");
+			final Long mediaCategory = rs.getLong("mediaCategory");
 			return new InteractiveDetailsData(playSource, contentName,
 					contentProvider, channelName, serviceName, endUserPrice,
-					downloads, grossRevenue);
+					downloads, grossRevenue,mediaCategory);
 		}
 	}
 	

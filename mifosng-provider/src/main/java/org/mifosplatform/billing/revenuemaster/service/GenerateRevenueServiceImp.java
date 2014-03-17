@@ -50,18 +50,17 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	    
 	    for(RevenueMasterData detailData:detailDatas)
 		{
-	    	
+	
 			for(DeductionTaxesData deductionTax:deductionTaxes)
 			{
-			if(detailData.getId()==deductionTax.getDetailId()){
-				/*System.out.println(detailChargeTaxAmount);*/
+			if(detailData.getId().compareTo(deductionTax.getDetailId())==0){
 			 detailChargeTaxAmount=detailChargeTaxAmount.add(deductionTax.getTaxAmount());
 			
 			DeductionTax deduction=new DeductionTax(invoice,charge,deductionTax.getDeductionCode(),
 					                                 deductionTax.getDeductionValue(),deductionTax.getTaxAmount());
-			InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, deductionTax.getDeductionCode(),
+			/*InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, deductionTax.getDeductionCode(),
 				                deductionTax.getDeductionValue(), deductionTax.getTaxAmount());
-			charge.addChargeTaxes(invoiceTax);
+			charge.addChargeTaxes(invoiceTax);*/
 			charge.addDeductionTaxes(deduction);
 			}
 			}

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
+import org.mifosplatform.billing.mediasettlement.data.RawInteractiveHeaderDetailData;
 import org.mifosplatform.billing.mediasettlement.domain.AccountPartnerJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.ChannelPartnerMappingJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.CurrencyRate;
@@ -92,6 +93,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private CurrencyRateJpaRepository currencyRateJpaRepository;
 	final private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	final private RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository;
+	final private RawInteractiveHeaderDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService;
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(MediaSettlementWritePlatformServiceImp.class);
 	
@@ -116,7 +118,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final PartnerAgreementDetailRepository partnerAgreementDetailRepository,
 			final  CurrencyRateJpaRepository currencyRateJpaRepository,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
-			final RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository) {
+			final RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository,
+			final RawInteractiveHeaderDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService) {
 
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
@@ -139,6 +142,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		this.currencyRateJpaRepository = currencyRateJpaRepository;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.rawInteractiveHeaderDetailJpaRepository = rawInteractiveHeaderDetailJpaRepository;
+		this.rawInteractiveHeaderDetailReadPlatformService = rawInteractiveHeaderDetailReadPlatformService;
 
 	}
 	
@@ -156,30 +160,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			 accountPartnerJpaRepository.save(accountPartner);		
 			 
 			 //Long mediaCategory;String partnerName;String partnerAddress;Character isDeleted='N';Long currencyId;Long externalId;String contactNum;String emailId;
-		/*	 
-			transactionHistoryWritePlatformService.saveTransactionHistory(
-					0L,
-					"Create Partner",
-					accountPartner.getCreatedDate().toDate(),
-					"Partner Type: "
-							+ mediaSettlementReadPlatformService
-									.retrivePartnerType(
-											accountPartner.getPartnerType())
-									.getPartnerType(),
-					"Media Category: "
-							+ mediaSettlementReadPlatformService
-									.retrieveMediaCategory(
-											accountPartner.getMediaCategory())
-									.getMediaCategory(),
-					"Partner Name: "
-							+accountPartner.getPartnerName(),
-					"Partner Address: "
-							+accountPartner.getPartnerAddress(),
-					"Is Deleted: "
-							+accountPartner.getIsDeleted()					
-					);
-			*/
-			
+			 
 			
 			}catch(DataIntegrityViolationException e){
 				handleDataIntegrityIssue(e);
@@ -932,13 +913,14 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 			     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
 			     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
+			     final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory", element);
 			     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
 			     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
 			     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
 			     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
 			     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
 			     
-			     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads);
+			     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads,mediaCategory);
 			     header.add(interactiveDetailData);
 		    }
 			
@@ -1148,7 +1130,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	 			headerOld.setExternalId(headerNew.getExternalId());
 	 			headerOld.setActivityMonth(headerNew.getActivityMonth());
 	 			headerOld.setBusinessLine(headerNew.getBusinessLine());
-	 			headerOld.setMediaCategory(headerNew.getMediaCategory());
+	 			/*headerOld.setMediaCategory(headerNew.getMediaCategory());*/
 	 			headerOld.setChargeCode(headerNew.getChargeCode());
 	 			headerOld.setDataUploadedDate(headerNew.getDataUploadedDate());
 	 			
@@ -1163,13 +1145,14 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 				     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
 				     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
+				     final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory", element);
 				     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
 				     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
 				     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
 				     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
 				     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
 				     
-				     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads);
+				     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads,mediaCategory);
 				     headerOld.add(interactiveDetailData);
 			    }
 				
@@ -1269,12 +1252,19 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 			fromApiJsonDeserializer.validateForRawData(command.json());
 		 			rawData = RawInteractiveHeaderDetail.fromJson(command);
 		 			rawInteractiveHeaderDetailJpaRepository.saveAndFlush(rawData);
-		 			
+		 			executeRawData();
 		 		}catch(DataIntegrityViolationException dve){
 		 			handleCodeDataIntegrityIssues(command, dve);
 		 			return new CommandProcessingResultBuilder().withEntityId(-1L).build();
 		 		}		 		
 		 		return new CommandProcessingResultBuilder().withEntityId(rawData.getId()).build();
+		 	}
+		 	
+		 	public void executeRawData(){
+		 		
+		 		List<RawInteractiveHeaderDetailData> rawData = rawInteractiveHeaderDetailReadPlatformService.retriveAllData();
+		 		System.out.println(rawData);
+		 		
 		 	}
 
 }
