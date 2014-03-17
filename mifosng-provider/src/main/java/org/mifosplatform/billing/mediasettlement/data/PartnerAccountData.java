@@ -70,6 +70,9 @@ public class PartnerAccountData {
 	private LocalDate endDate;
 	private String sourceCurrencyStr;
 	private String targetCurrencyStr;
+	private String partnerTypeName;
+	private String currencyName;
+	private String royaltySequence;
 
 	public PartnerAccountData(Collection<MCodeData> partnerType,
 			Collection<MCodeData> mediaCategory, List<PartnerAccountData> countryData) {
@@ -280,6 +283,22 @@ public class PartnerAccountData {
 		this.startDate =startDate;
 		this.endDate = endDate;
 		
+		
+	}
+
+	public PartnerAccountData(Long id, Long externalId, String partnerName,
+			String partnerType, String contactNum, String emailId,
+			String currencyName, String royaltySequence) {
+		// TODO Auto-generated constructor stub
+		
+		this.id=id;
+		this.externalId=externalId;
+		this.partnerName=partnerName;
+		this.partnerTypeName=partnerType;
+		this.contactNum=contactNum;
+		this.emailId=emailId;
+		this.currencyName=currencyName;
+		this.royaltySequence=royaltySequence;
 		
 	}
 

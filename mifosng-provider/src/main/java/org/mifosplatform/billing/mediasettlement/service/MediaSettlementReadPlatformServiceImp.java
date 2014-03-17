@@ -18,6 +18,7 @@ import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
 import org.mifosplatform.billing.mediasettlement.data.OperatorDeductionData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerAccountData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerAgreementData;
+import org.mifosplatform.billing.mediasettlement.data.PartnerAgreementView;
 import org.mifosplatform.billing.mediasettlement.data.PartnerGameData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerGameDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueSettlementSequenceData;
@@ -416,7 +417,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			 * " g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType, g.start_date as startDate,g.end_date as endDate, a.media_category as mediaCategory,a.partner_type as partnerType,a.partner_name as partnerName, g.partner_account_id as partnerAccountId from bp_account a,bp_agreement g where g.partner_account_id=a.id and a.is_deleted='N'"
 			 */
 
-			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,a.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND d.partner_account_id = a.id and g.is_deleted='N'   ";
+			return " g.id as id, g.agreement_type as agreementType,g.settle_source as settlementSource ,g.agreement_category as agreementCategory,g.royalty_type as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate, a.partner_name as partnerName, g.partner_account_id as partnerAccountId,a.partner_type as partnerType from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND  g.is_deleted='N'   ";
 
 
 		}
@@ -1341,32 +1342,6 @@ public class MediaSettlementReadPlatformServiceImp implements
 		}
 		
 	
-		@Override
-		public List<PartnerAgreementData> retriveViewPA(Long partnerId) {
-			final String sql = "SELECT  b.id as id, b.media_category as mediaCategory,b.royalty_sequence as royaltySequence ,b.play_source as playSource ,b.royalty_share as royaltyShare, b.status as status from bp_agreement_dtl b where  b.agmt_id =?";
-			ViewPAMapper mapper = new ViewPAMapper();
-			return jdbcTemplate.query(sql, mapper,
-					new Object[] { partnerId });
-		}
-
-		private static final class ViewPAMapper implements
-				RowMapper<PartnerAgreementData> {
-
-			@Override
-			public PartnerAgreementData mapRow(ResultSet rs, int rowNum)
-					throws SQLException {
-
-				final Long id = rs.getLong("id");
-				final Long mediaCategory=rs.getLong("mediaCategory");
-				final Long royaltySequence = rs.getLong("royaltySequence");
-				final Long playSource = rs.getLong("playSource");
-				final Long royaltyShare = rs.getLong("royaltyShare");
-				final Long status = rs.getLong("status");
-				
-				return new PartnerAgreementData(id,mediaCategory,royaltySequence, playSource, royaltyShare, status);
-			
-			}
-		}
 		
 		
 		@Override
@@ -1384,5 +1359,133 @@ public class MediaSettlementReadPlatformServiceImp implements
 			return jdbcTemplate.queryForLong(sql, new Object[]{clientName});
 
 		}
+		
+		@Override
+		public PartnerAgreementView retrieveDocumentView(Long documentId) {
+			// TODO Auto-generated method stub
+
+			try {
+				this.context.authenticatedUser();
+
+				// TODO verify if the entities are valid and a
+				// user has data
+				// scope for the particular entities
+				final documentViewMapper mapper = new documentViewMapper();
+				final String sql = "select DISTINCT g.id as id,(select code_value from m_code_value where id=g.agreement_type) as agreementType,(select code_value from m_code_value where id=g.settle_source) as settlementSource ,(select code_value from m_code_value where id=g.agreement_category) as agreementCategory,(select code_value from m_code_value where id=g.royalty_type) as royaltyType,g.mg_amount as mgAmount , g.start_date as startDate,g.end_date as endDate,a.partner_name as partnerName, g.partner_account_id as partnerAccountId,(select code_value from m_code_value where id=a.partner_type) as partnerType,g.filename as fileName from bp_account a,bp_agreement g,bp_agreement_dtl d where g.partner_account_id=a.id AND  g.is_deleted='N' and g.id= ?  ";
+				return this.jdbcTemplate.queryForObject(sql, mapper,new Object[] { documentId });
+			} catch (final EmptyResultDataAccessException e) {
+				throw new DocumentNotFoundException("File Not Found", documentId,
+						documentId);
+			}
+		}
+		
+		private static final class documentViewMapper implements
+			RowMapper<PartnerAgreementView> {
+	
+		@Override
+		public PartnerAgreementView mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+			
+			final Long id = JdbcSupport.getLong(rs,	"id");
+			final String partnerType = rs.getString("partnerType");
+			final String fileName = rs.getString("fileName");
+			final String partnerName = rs.getString("partnerName");
+			final String agreementType = rs.getString("agreementType");
+			final String agreementCategory = rs.getString("agreementCategory");
+			final String royaltyType = rs.getString("royaltyType");
+			final String settlementSource = rs.getString("settlementSource");
+			final Long partnerAccountId = JdbcSupport.getLong(rs,"partnerAccountId");
+			final LocalDate startDate = JdbcSupport.getLocalDate(rs,"startDate");
+			final LocalDate endDate = JdbcSupport.getLocalDate(rs, "endDate");
+			final BigDecimal mgAmount= rs.getBigDecimal("mgAmount");
+			
+			
+			return new PartnerAgreementView(id,partnerAccountId,partnerType,partnerName,agreementType,agreementCategory,royaltyType,settlementSource,startDate,endDate,mgAmount,fileName);
+		
+			}
+		}
+		
+		
+	@Override	
+	public List<PartnerAgreementView> retrieveMediaView(Long documentId) {
+			// TODO Auto-generated method stub
+
+			try {
+				this.context.authenticatedUser();
+
+				// TODO verify if the entities are valid and a
+				// user has data
+				// scope for the particular entities
+				final MediaViewMapper mapper = new MediaViewMapper();
+				final String sql = "SELECT  b.id as id, (select code_value from m_code_value where id=b.media_category) as mediaCategory,b.royalty_sequence as royaltySequence ,(select code_value from m_code_value where id=b.play_source) as playSource ,b.royalty_share as royaltyShare, b.status as status from bp_agreement_dtl b where  b.agmt_id = ?  ";
+				return this.jdbcTemplate.query(sql, mapper,new Object[] { documentId });
+			} catch (final EmptyResultDataAccessException e) {
+				throw new DocumentNotFoundException("File Not Found", documentId,
+						documentId);
+			}
+		}
+		
+		private static final class MediaViewMapper implements
+		RowMapper<PartnerAgreementView> {
+
+		@Override
+		public PartnerAgreementView mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+			
+			final Long id = rs.getLong("id");
+			final String mediaCategory = rs.getString("mediaCategory");
+			final String playSource = rs.getString("playSource");
+			final String royaltySequence = rs.getString("royaltySequence");
+			final Long royaltyShare = rs.getLong("royaltyShare");
+			final Long status = rs.getLong("status");
+			
+			
+			return new PartnerAgreementView(id,mediaCategory,playSource,royaltySequence,royaltyShare,status);
+		
+			}
+		}
+		
+		
+		@Override
+		public PartnerAccountData retrievePartnerAccountView(Long id) {
+			// TODO Auto-generated method stub
+			
+			
+			try {
+				this.context.authenticatedUser();
+
+				// TODO verify if the entities are valid and a
+				// user has data
+				// scope for the particular entities
+				final PartnerAccountViewMapper mapper = new PartnerAccountViewMapper();
+				final String sql = "SELECT DISTINCT a.id as id, (select code_value from m_code_value where id=a.partner_type) as partnerType,a.partner_name as partnerName ,a.partner_address as partnerAddress ,a.contact_num as contactNum, a.official_email_id as emailId,a.external_id as externalId ,(select code from m_currency where a.currency_id=id) as currencyName from bp_account a where  a.id = ? ";
+				return this.jdbcTemplate.queryForObject(sql, mapper,new Object[] { id });
+			} catch (final EmptyResultDataAccessException e) {
+				throw new DocumentNotFoundException("Record Not Found", id,id);
+			}
+			
+		}
+		
+		private static final class PartnerAccountViewMapper implements
+		RowMapper<PartnerAccountData> {
+
+		@Override
+		public PartnerAccountData mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+			
+			final Long id = rs.getLong("id");
+			final Long externalId = rs.getLong("externalId");
+			final String partnerName = rs.getString("partnerName");
+			final String partnerType = rs.getString("partnerType");
+			final String contactNum = rs.getString("contactNum");
+			final String emailId = rs.getString("emailId");
+			final String currencyName = rs.getString("currencyName");
+			final String royaltySequence = rs.getString("contactNum");
+			
+			
+			return new PartnerAccountData(id,externalId,partnerName,partnerType,contactNum,emailId,currencyName,royaltySequence);
+		
+			}
+		}	
 		
 }
