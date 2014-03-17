@@ -36,8 +36,8 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 	
 	@Override
 	public List<GenerateInteractiveHeaderData> retriveInteractiveHeaderDetails(Long clientId){
-			final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId, (select mc1.code_value from m_code_value mc1 where mc1.id = ih.business_line) as businessLine, ih.activity_month as activityMonth," +
-				              "(select mc2.code_value from m_code_value mc2 where mc2.id = ih.media_category) as mediaCategory  from bp_interactive_header ih where ih.client_id=? and ih.is_deleted = 'N' order by ih.id asc";
+			final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId,ih.activity_month as activityMonth," +
+					"im.int_event_code as businessLine from bp_interactive_header ih,bp_intevent_master im where ih.business_line=im.id and ih.client_id=? and ih.is_deleted = 'N' order by ih.id asc";
 			HeaderDataMapper mapper = new HeaderDataMapper();
 			return jdbcTemplate.query(sql, mapper, new Object[]{clientId});
 		}
@@ -49,11 +49,11 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 				final Long id = rs.getLong("id");
 				final Long clientId = rs.getLong("clientId");
 				final Long externalId = rs.getLong("externalId");
-				final String businessLineStr = rs.getString("businessLine");
+				final String businessLine = rs.getString("businessLine");
 				final String activityMonth = rs.getString("activityMonth");
-				/*final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs, "dataUploadedDate");*/
-				final String mediaCategory = rs.getString("mediaCategory");
-				return new GenerateInteractiveHeaderData(id,clientId,externalId,businessLineStr,activityMonth,mediaCategory);
+				/*final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs, "dataUploadedDate");
+				final String mediaCategory = rs.getString("mediaCategory");*/
+				return new GenerateInteractiveHeaderData(id,clientId,externalId,businessLine,activityMonth);
 			}
 		}
 
@@ -63,7 +63,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 											"(select partner_name from bp_account where id = itd.content_provider) as contentProvider,"+
 											"(select partner_name from bp_account where id = itd.channel_name) as channelName,"+
 											"(select partner_name from bp_account where id = itd.service_name) as serviceName,"+
-											"itd.end_user_price as endUserPrice, itd.downloads as downloads, itd.gross_revenue as grossRevenue,ih.client_id as clientId,cc.charge_code  as chargeCode,"+
+											"itd.end_user_price as endUserPrice, itd.downloads as downloads, itd.gross_revenue as grossRevenue,ih.client_id as clientId,im.charge_code  as chargeCode,"+
                                             "cc.charge_type as chargeType,cc.tax_inclusive as taxInclusive from bp_interactive_detail itd, "+
 										   "bp_interactive_header ih, bp_intevent_master im,b_charge_codes cc where ih.id=itd.interactive_header_id and im.id=ih.business_line and cc.charge_code=im.charge_code  and itd.interactive_header_id=?";
 
@@ -98,7 +98,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 					@Override
 					public List<DeductionData> retriveOperatorDeductionData(
 							Long clientId) {
-							final String sql = "select od.id as id ,od.client_id as clientId, od.ded_code as deductionCode, od.ded_value as deductionValue , (select code_value from m_code_value  where id = dc.ded_type) as deductionType,dc.circle as circle from bp_operator_deduction od,bp_deduction_codes dc where client_id = ? and od.ded_code=dc.ded_code  order by id";
+							final String sql = "select od.id as id ,od.client_id as clientId, od.ded_code as deductionCode, od.ded_value as deductionValue , (select code_value from m_code_value  where id = dc.ded_type) as deductionType,dc.circle as circle from bp_operator_deduction od,bp_deduction_codes dc where client_id = ? and od.ded_code=dc.ded_code and dc.is_deleted='N' order by id";
 							DeductionMapper mapper = new DeductionMapper();
 							return jdbcTemplate.query(sql,mapper,new Object[]{clientId});
 						}
