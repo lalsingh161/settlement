@@ -18,7 +18,7 @@ import org.mifosplatform.useradministration.domain.AppUser;
 public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser, Long>{
 
 	
-	@Column(name="cust_name")
+	/*@Column(name="cust_name")
 	private String clientName;
 	
 	@Column(name="cust_code")
@@ -39,9 +39,9 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 	@Column(name="media_category")
 	private String mediaCategory;
 	
-	/*@Column(name="charge_code")
+	@Column(name="charge_code")
 	private String chargeCode;
-	*/
+	
 	
 	@Column(name="play_source", nullable=false)
 	private String playSource;
@@ -68,6 +68,58 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 	private BigDecimal grossRevenue;
 	
 	@Column(name="is_processed")
+	private Character isProcessed = 'N';*/
+	
+	@Column(name="cust_name")
+	private Long clientName;
+	
+	@Column(name="cust_code")
+	private Long clientCode;
+	
+	
+	
+	@Column(name="activity_month")
+	private String activityMonth;
+		
+	
+	@Column(name="data_upload_date")
+	private Date dataUploadedDate = new Date();
+	
+	@Column(name="business_line")
+	private Long businessLine;
+	
+	@Column(name="media_category")
+	private Long mediaCategory;
+	
+	/*@Column(name="charge_code")
+	private String chargeCode;
+	*/
+	
+	@Column(name="play_source", nullable=false)
+	private Long playSource;
+	
+	@Column(name="content_name", nullable=false)
+	private String contentName;
+	
+	@Column(name="content_provider", nullable=false)
+	private Long contentProvider;
+
+	@Column(name="channel_name", nullable=false)
+	private Long channelName;
+	
+	@Column(name="service_name", nullable=false)
+	private Long serviceName;
+
+	@Column(name="end_user_price", nullable=false)
+	private BigDecimal endUserPrice;
+	
+	@Column(name="downloads", nullable=false)
+	private Long downloads;
+
+	@Column(name="gross_revenue", nullable=false)
+	private BigDecimal grossRevenue;
+	
+	@Column(name="is_processed")
 	private Character isProcessed = 'N';
 	
 
@@ -78,7 +130,7 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 
 
 
-	public RawInteractiveHeaderDetail(Long custCode, String custName,
+	/*public RawInteractiveHeaderDetail(Long custCode, String custName,
 			String activityMonth, String businessLine, String mediaCategory,
 			String playSource, String contentName, String contentProvider,
 			String channelName, String serviceName, BigDecimal endUserPrice,
@@ -100,20 +152,32 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 		
 
 	}
+*/	
 	
-	
 
 
 
-	public String getClientName() {
-		return clientName;
+	public RawInteractiveHeaderDetail(Long custCode, Long custName,
+			String activityMonth, Long businessLine, Long mediaCategory,
+			Long playSource, String contentName, Long contentProvider,
+			Long channelName, Long serviceName, BigDecimal endUserPrice,
+			Long downloads, BigDecimal grossRevenue) {
+		this.clientCode = custCode;
+		this.clientName = custName;
+		this.activityMonth = activityMonth;
+		this.businessLine = businessLine;
+		this.mediaCategory = mediaCategory;
+		this.playSource = playSource;
+		this.contentName = contentName;
+		this.contentProvider = contentProvider;
+		this.channelName = channelName;
+		this.serviceName = serviceName;
+		this.endUserPrice = endUserPrice;
+		this.downloads = downloads;
+		this.grossRevenue = grossRevenue;
 	}
 
 
-
-	public void setClientName(String clientName) {
-		this.clientName = clientName;
-	}
 
 
 
@@ -149,40 +213,7 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 
 
 
-	public String getBusinessLine() {
-		return businessLine;
-	}
-
-
-
-	public void setBusinessLine(String businessLine) {
-		this.businessLine = businessLine;
-	}
-
-
-
-	public String getMediaCategory() {
-		return mediaCategory;
-	}
-
-
-
-	public void setMediaCategory(String mediaCategory) {
-		this.mediaCategory = mediaCategory;
-	}
-
-
-
-	public String getPlaySource() {
-		return playSource;
-	}
-
-
-
-	public void setPlaySource(String playSource) {
-		this.playSource = playSource;
-	}
-
+	
 
 
 	public String getContentName() {
@@ -194,44 +225,6 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 	public void setContentName(String contentName) {
 		this.contentName = contentName;
 	}
-
-
-
-	public String getContentProvider() {
-		return contentProvider;
-	}
-
-
-
-	public void setContentProvider(String contentProvider) {
-		this.contentProvider = contentProvider;
-	}
-
-
-
-	public String getChannelName() {
-		return channelName;
-	}
-
-
-
-	public void setChannelName(String channelName) {
-		this.channelName = channelName;
-	}
-
-
-
-	public String getServiceName() {
-		return serviceName;
-	}
-
-
-
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-	}
-
-
 
 	public BigDecimal getEndUserPrice() {
 		return endUserPrice;
@@ -281,8 +274,92 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 
 
 
+	public Long getClientName() {
+		return clientName;
+	}
+
+
+
+	public void setClientName(Long clientName) {
+		this.clientName = clientName;
+	}
+
+
+
+	public Long getBusinessLine() {
+		return businessLine;
+	}
+
+
+
+	public void setBusinessLine(Long businessLine) {
+		this.businessLine = businessLine;
+	}
+
+
+
+	public Long getMediaCategory() {
+		return mediaCategory;
+	}
+
+
+
+	public void setMediaCategory(Long mediaCategory) {
+		this.mediaCategory = mediaCategory;
+	}
+
+
+
+	public Long getPlaySource() {
+		return playSource;
+	}
+
+
+
+	public void setPlaySource(Long playSource) {
+		this.playSource = playSource;
+	}
+
+
+
+	public Long getContentProvider() {
+		return contentProvider;
+	}
+
+
+
+	public void setContentProvider(Long contentProvider) {
+		this.contentProvider = contentProvider;
+	}
+
+
+
+	public Long getChannelName() {
+		return channelName;
+	}
+
+
+
+	public void setChannelName(Long channelName) {
+		this.channelName = channelName;
+	}
+
+
+
+	public Long getServiceName() {
+		return serviceName;
+	}
+
+
+
+	public void setServiceName(Long serviceName) {
+		this.serviceName = serviceName;
+	}
+
+
+
 	public static RawInteractiveHeaderDetail fromJson(JsonCommand command) {
-		final Long custCode = command.longValueOfParameterNamed("externalId");
+		/*final Long custCode = command.longValueOfParameterNamed("externalId");
 		final String custName = command.stringValueOfParameterNamed("clientId");
 		final String activityMonth = command.stringValueOfParameterNamed("activityMonth");
 		final String businessLine = command.stringValueOfParameterNamed("businessLine");
@@ -295,7 +372,22 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 		final String serviceName = command.stringValueOfParameterNamed("serviceName");
 		final BigDecimal endUserPrice = command.bigDecimalValueOfParameterNamed("endUserPrice");
 		final Long downloads = command.longValueOfParameterNamed("downloads");
+		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");*/
+		final Long custCode = command.longValueOfParameterNamed("externalId");
+		final Long custName = command.longValueOfParameterNamed("clientId");
+		final String activityMonth = command.stringValueOfParameterNamed("activityMonth");
+		final Long businessLine = command.longValueOfParameterNamed("businessLine");
+		final Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");
+		
+		final Long playSource = command.longValueOfParameterNamed("playSource"); 
+		final String contentName = command.stringValueOfParameterNamed("contentName");
+		final Long contentProvider = command.longValueOfParameterNamed("contentProvider");
+		final Long channelName = command.longValueOfParameterNamed("channelName");
+		final Long serviceName = command.longValueOfParameterNamed("serviceName");
+		final BigDecimal endUserPrice = command.bigDecimalValueOfParameterNamed("endUserPrice");
+		final Long downloads = command.longValueOfParameterNamed("downloads");
 		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");
+		//return new RawInteractiveHeaderDetail(custCode,custName,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue);
 		return new RawInteractiveHeaderDetail(custCode,custName,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue);
 	}
 	
