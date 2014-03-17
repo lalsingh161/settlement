@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
+import org.mifosplatform.billing.mediasettlement.data.RawInteractiveHeaderDetailData;
 import org.mifosplatform.billing.mediasettlement.domain.AccountPartnerJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.ChannelPartnerMappingJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.CurrencyRate;
@@ -92,6 +93,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private CurrencyRateJpaRepository currencyRateJpaRepository;
 	final private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	final private RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository;
+	final private RawInteractiveHeaderDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService;
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(MediaSettlementWritePlatformServiceImp.class);
 	
@@ -116,7 +118,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final PartnerAgreementDetailRepository partnerAgreementDetailRepository,
 			final  CurrencyRateJpaRepository currencyRateJpaRepository,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
-			final RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository) {
+			final RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository,
+			final RawInteractiveHeaderDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService) {
 
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
@@ -139,6 +142,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		this.currencyRateJpaRepository = currencyRateJpaRepository;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.rawInteractiveHeaderDetailJpaRepository = rawInteractiveHeaderDetailJpaRepository;
+		this.rawInteractiveHeaderDetailReadPlatformService = rawInteractiveHeaderDetailReadPlatformService;
 
 	}
 	
@@ -1271,12 +1275,19 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 			fromApiJsonDeserializer.validateForRawData(command.json());
 		 			rawData = RawInteractiveHeaderDetail.fromJson(command);
 		 			rawInteractiveHeaderDetailJpaRepository.saveAndFlush(rawData);
-		 			
+		 			executeRawData();
 		 		}catch(DataIntegrityViolationException dve){
 		 			handleCodeDataIntegrityIssues(command, dve);
 		 			return new CommandProcessingResultBuilder().withEntityId(-1L).build();
 		 		}		 		
 		 		return new CommandProcessingResultBuilder().withEntityId(rawData.getId()).build();
+		 	}
+		 	
+		 	public void executeRawData(){
+		 		
+		 		List<RawInteractiveHeaderDetailData> rawData = rawInteractiveHeaderDetailReadPlatformService.retriveAllData();
+		 		System.out.println(rawData);
+		 		
 		 	}
 
 }
