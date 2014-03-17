@@ -44,6 +44,7 @@ import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
 import org.mifosplatform.billing.mediasettlement.data.OperatorDeductionData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerAccountData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerAgreementData;
+import org.mifosplatform.billing.mediasettlement.data.PartnerAgreementView;
 import org.mifosplatform.billing.mediasettlement.data.PartnerGameData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerGameDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueSettlementData;
@@ -1067,21 +1068,7 @@ public class MediaSettlementApiResources {
  	}
  }
  
- @GET
- @Path("/viewpartnerAgreement")
- @Produces({MediaType.APPLICATION_JSON})
- @Consumes({MediaType.APPLICATION_JSON})
- public String retrieveViewPA(@Context final UriInfo uriInfo, @QueryParam("partnerId") final Long partnerId){
- 	try{
- 	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
- 	List<PartnerAgreementData> partnerData = mediaSettlementReadPlatformService.retriveViewPA(partnerId);
- 	PartnerAgreementData partnerAgreementData= new PartnerAgreementData(partnerData);
- 	return toApiJsonSerializer.serialize(partnerAgreementData);
- 	}catch(EmptyResultDataAccessException e){
- 		throw new PlatformDataIntegrityException("empty.result.set", "empty.result.set", "empty.result.set");
- 	}
- }
- 
+
  @DELETE
 	@Path("/deleteMediaCategory/{detailId}")
 	@Consumes({MediaType.APPLICATION_JSON})
@@ -1091,6 +1078,37 @@ public class MediaSettlementApiResources {
 	final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 	return this.toApiJsonSerializer.serialize(result);
 
+ }
+ 
+ 
+ 
+ @GET
+ @Path("{documentId}/attachmentData")
+ @Consumes({ MediaType.APPLICATION_JSON })
+ @Produces({ MediaType.APPLICATION_JSON })
+ public String getDocumentView(@PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId,
+         @PathParam("documentId") final Long documentId) {
+ 	
+ 	
+	PartnerAgreementView agreementDetails = mediaSettlementReadPlatformService.retrieveDocumentView(documentId);
+ 	List<PartnerAgreementView> mediaCategoryDetails= mediaSettlementReadPlatformService.retrieveMediaView(documentId);
+ 	 	
+ 	PartnerAgreementView partnerAgreementView=new PartnerAgreementView(agreementDetails,mediaCategoryDetails);
+     
+ 	return toApiJsonSerializer.serialize(partnerAgreementView);
+    
+ }
+ 
+ @GET
+ @Path("{id}/partnerAccountView")
+ @Consumes({ MediaType.APPLICATION_JSON })
+ @Produces({ MediaType.APPLICATION_JSON })
+ public String getPartnerAccountView(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
+ 	
+	PartnerAccountData viewPartnerAccount = mediaSettlementReadPlatformService.retrievePartnerAccountView(id);
+ 	 
+ 	return toApiJsonSerializer.serialize(viewPartnerAccount);
+    
  }
  
 

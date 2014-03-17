@@ -1,8 +1,6 @@
 package org.mifosplatform.billing.mediasettlement.service;
 
-import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.mifosplatform.billing.address.data.StateDetails;
@@ -16,6 +14,7 @@ import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
 import org.mifosplatform.billing.mediasettlement.data.OperatorDeductionData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerAccountData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerAgreementData;
+import org.mifosplatform.billing.mediasettlement.data.PartnerAgreementView;
 import org.mifosplatform.billing.mediasettlement.data.PartnerGameData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerGameDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueSettlementSequenceData;
@@ -54,11 +53,6 @@ public interface MediaSettlementReadPlatformService {
 	RevenueSettlementSequenceData getGamePrice(Long gameId);
 
 	PartnerAccountData retrieveContentProviderPartnerId(String mediaCategory);
-	
-	List<PartnerAgreementData> retriveViewPA(Long partnerId);
-
-	
-
 	
 
 	Collection<PartnerAccountData> retriveAllChannelPartner();
@@ -146,6 +140,12 @@ public interface MediaSettlementReadPlatformService {
 	void  retrieveDeleteMediaCategoryData(Long entityId);
 
 	Long retriveClientId(String stringCellValue);
+	
+	PartnerAgreementView retrieveDocumentView(Long documentId);
+
+	List<PartnerAgreementView> retrieveMediaView(Long documentId);
+
+	PartnerAccountData retrievePartnerAccountView(Long id);
 
 
 }

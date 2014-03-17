@@ -156,7 +156,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			 accountPartnerJpaRepository.save(accountPartner);		
 			 
 			 //Long mediaCategory;String partnerName;String partnerAddress;Character isDeleted='N';Long currencyId;Long externalId;String contactNum;String emailId;
-			 
+		/*	 
 			transactionHistoryWritePlatformService.saveTransactionHistory(
 					0L,
 					"Create Partner",
@@ -178,7 +178,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 					"Is Deleted: "
 							+accountPartner.getIsDeleted()					
 					);
-			
+			*/
 			
 			
 			}catch(DataIntegrityViolationException e){
