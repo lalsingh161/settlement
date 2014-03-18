@@ -360,9 +360,10 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		// TODO Auto-generated method stub
 		PartnerAgreement detailMaster=null;
 		PartnerAgreementDetail detailChild=null;
+		PartnerAgreement detailMasterTable=null;
 		
-//		this.fromApiJsonDeserializer.validateForCreatePartnerAgreement(command.toString());
 		try{
+		this.fromApiJsonDeserializer.validateForCreatePartnerAgreement(command.json());
 		
 		detailMaster=PartnerAgreement.fromJson(command);
 		
@@ -389,7 +390,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
         }
         else{
         	
-        	PartnerAgreement detailMasterTable=this.partnerAgreementRepository.findOne(paId);
+        	 detailMasterTable=this.partnerAgreementRepository.findOne(paId);
  	         
         	if(detailMasterTable.getAgreementCategory() == null && detailMaster.getAgreementCategory() == null){
    			 
@@ -472,14 +473,16 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		
 		
 	} catch (DataIntegrityViolationException dve) {
-
-		logger.error(dve.getMessage(), dve);
+		handleCodeDataIntegrityIssues(command, dve);
 	     throw new PlatformDataIntegrityException("error.msg.document.unknown.data.integrity.issue",
 	             ""+dve.getMostSpecificCause().getMessage());
 	  
 	}
-
-			return new CommandProcessingResult(Long.valueOf(-1L));	
+		if(detailMaster.getId() == null){
+			return new CommandProcessingResult( detailMasterTable.getId());	
+		}else{
+			return new CommandProcessingResult( detailMaster.getId());
+		}
 			
 	}
 	
@@ -1017,7 +1020,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				PartnerAgreementDetail detail= null;
 				
 				try{
-					
+					this.fromApiJsonDeserializer.validateForCreatePartnerAgreement(command.json());
 				
 					final JsonArray partnerAgreementDatasArray = command.arrayOfParameterNamed("partnerAgreementData").getAsJsonArray();
 					List<Long> id = new ArrayList<Long>();
@@ -1100,6 +1103,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 
 					
 			 	}catch (DataIntegrityViolationException dve) {
+			 		handleCodeDataIntegrityIssues(command, dve);
 					throw new PlatformDataIntegrityException(dve.getLocalizedMessage(), dve.getRootCause().getCause().getMessage(), "");
 				}
 				return new CommandProcessingResultBuilder() 
