@@ -79,7 +79,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		 * "select pt.id as id,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt order by pt.id asc"
 		 * ;
 		 */
-		final String sql = "select pt.id as id,pt.partner_type as partnerType,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,(select code from m_currency where id=pt.currency_id) as currencyCode, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt order by pt.id asc";
+		final String sql = "select pt.id as id,(select code_value from m_code_value where id = pt.partner_type)  as partnerType,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,(select code from m_currency where id=pt.currency_id) as currencyCode, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt order by pt.id asc";
 		PartnerAccountMapper mapper = new PartnerAccountMapper();
 		return jdbcTemplate.query(sql, mapper);
 	}
@@ -90,14 +90,14 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public PartnerAccountData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long id = rs.getLong("id");
-			final Long partnerType = rs.getLong("partnerType");
+			final String partnerTypeName = rs.getString("partnerType");
 			final String partnerName = rs.getString("partnerName");
 			final String currencyCode = rs.getString("currencyCode");
 			final String partnerAddress = rs.getString("partnerAddress");
 			final Long externalId = rs.getLong("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
-			return new PartnerAccountData(id, partnerType,partnerName, partnerAddress,
+			return new PartnerAccountData(id,null, partnerTypeName,partnerName, partnerAddress,
 					null, currencyCode, externalId, contactNum, emailId);
 		}
 	}
@@ -109,13 +109,14 @@ public class MediaSettlementReadPlatformServiceImp implements
 				throws SQLException {
 			final Long id = rs.getLong("id");
 			final Long partnerType = rs.getLong("partnerType");
+			final String partnerTypeName = rs.getString("partnerTypeName");
 			final String partnerName = rs.getString("partnerName");
 			final Long currencyId = rs.getLong("currencyId");
 			final String partnerAddress = rs.getString("partnerAddress");
 			final Long externalId = rs.getLong("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
-			return new PartnerAccountData(id,partnerType, partnerName, partnerAddress,
+			return new PartnerAccountData(id,partnerType,partnerTypeName, partnerName, partnerAddress,
 					currencyId, null, externalId, contactNum, emailId);
 		}
 	}
@@ -128,7 +129,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		 * "select pt.id as id, pt.partner_type as partnerType, pt.currency_id as currencyCode, pt.media_category as mediaCategory, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ? and pt.is_deleted='N'"
 		 * ;
 		 */
-		final String sql = "select pt.id as id,pt.partner_type as partnerType,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ?";
+		final String sql = "select pt.id as id,(select code_value from m_code_value where id = pt.partner_type) as partnerTypeName ,pt.partner_type as partnerType,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ?";
 		EditPartnerAccountMapper mapper = new EditPartnerAccountMapper();
 		return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
 	}
