@@ -1267,7 +1267,9 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 	public void executeRawData(){
 		 		
 		 		List<RawInteractiveHeaderDetailData> rawData = rawInteractiveHeaderDetailReadPlatformService.retriveAllData();
-		 		System.out.println(rawData);
+		 		List<InteractiveHeader> headerData = new InteractiveHeaderHandler(rawData).getData();
+		 		interactiveHeaderJpaRepository.save(headerData);
+		 		//System.out.println(rawData);
 		 		
 		 	}
 

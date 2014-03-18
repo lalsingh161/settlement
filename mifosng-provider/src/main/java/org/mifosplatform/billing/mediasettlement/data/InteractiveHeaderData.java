@@ -31,6 +31,8 @@ public class InteractiveHeaderData {
 	private Long businessLineL;
 	/*private Long mediaCategoryL;*/
 	private Long chargeCodeL;
+	private Long clientCode;
+	private String clientName;
 
 	public InteractiveHeaderData() {
 		
@@ -76,4 +78,161 @@ public class InteractiveHeaderData {
 		/*this.mediaCategoryL = mediaCategory;*/
 		this.chargeCodeL = chargeCode;
 	}
+
+	
+
+	public InteractiveHeaderData(Long clientCode, Long clientName,
+			String activityMonth, Date dataUploadedDate, Long businessLine) {
+		this.clientCode = clientCode;
+		this.clientId = clientName;
+		this.activityMonth = activityMonth;
+		this.dataUploadedDate = dataUploadedDate;
+		this.businessLineL = businessLine;
+	}
+
+	public Collection<StateDetails> getCircleData() {
+		return circleData;
+	}
+
+	public Collection<MCodeData> getBusinessLineData() {
+		return businessLineData;
+	}
+
+	public Collection<MCodeData> getMediaCategoryData() {
+		return mediaCategoryData;
+	}
+
+	public Collection<MCodeData> getPlaySourceData() {
+		return playSourceData;
+	}
+
+	public List<MediaAssetData> getContentNameData() {
+		return contentNameData;
+	}
+
+	public List<ChargesData> getChargeCodesData() {
+		return chargeCodesData;
+	}
+
+	public Long getClientId() {
+		return clientId;
+	}
+
+	public String getCircle() {
+		return circle;
+	}
+
+	public String getBusinessLine() {
+		return businessLine;
+	}
+
+	public String getActivityMonth() {
+		return activityMonth;
+	}
+
+	public Date getDataUploadedDate() {
+		return dataUploadedDate;
+	}
+
+	public String getChargeCode() {
+		return chargeCode;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public Long getExternalId() {
+		return externalId;
+	}
+
+	public Long getBusinessLineL() {
+		return businessLineL;
+	}
+
+	public Long getChargeCodeL() {
+		return chargeCodeL;
+	}
+
+	public Long getClientCode() {
+		return clientCode;
+	}
+
+	public String getClientName() {
+		return clientName;
+	}
+
+	public void setCircleData(Collection<StateDetails> circleData) {
+		this.circleData = circleData;
+	}
+
+	public void setBusinessLineData(Collection<MCodeData> businessLineData) {
+		this.businessLineData = businessLineData;
+	}
+
+	public void setMediaCategoryData(Collection<MCodeData> mediaCategoryData) {
+		this.mediaCategoryData = mediaCategoryData;
+	}
+
+	public void setPlaySourceData(Collection<MCodeData> playSourceData) {
+		this.playSourceData = playSourceData;
+	}
+
+	public void setContentNameData(List<MediaAssetData> contentNameData) {
+		this.contentNameData = contentNameData;
+	}
+
+	public void setChargeCodesData(List<ChargesData> chargeCodesData) {
+		this.chargeCodesData = chargeCodesData;
+	}
+
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
+	}
+
+	public void setCircle(String circle) {
+		this.circle = circle;
+	}
+
+	public void setBusinessLine(String businessLine) {
+		this.businessLine = businessLine;
+	}
+
+	public void setActivityMonth(String activityMonth) {
+		this.activityMonth = activityMonth;
+	}
+
+	public void setDataUploadedDate(Date dataUploadedDate) {
+		this.dataUploadedDate = dataUploadedDate;
+	}
+
+	public void setChargeCode(String chargeCode) {
+		this.chargeCode = chargeCode;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setExternalId(Long externalId) {
+		this.externalId = externalId;
+	}
+
+	public void setBusinessLineL(Long businessLineL) {
+		this.businessLineL = businessLineL;
+	}
+
+	public void setChargeCodeL(Long chargeCodeL) {
+		this.chargeCodeL = chargeCodeL;
+	}
+
+	public void setClientCode(Long clientCode) {
+		this.clientCode = clientCode;
+	}
+
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+	
+	
 }

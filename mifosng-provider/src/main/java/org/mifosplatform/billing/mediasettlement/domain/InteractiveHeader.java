@@ -2,7 +2,10 @@ package org.mifosplatform.billing.mediasettlement.domain;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,6 +16,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.joda.time.LocalDate;
+import org.mifosplatform.billing.mediasettlement.data.RawInteractiveHeaderDetailData;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
@@ -75,6 +79,23 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		this.chargeCode = chargeCode;
 		this.dataUploadedDate = (null==dataUploadedDate)?new Date():dataUploadedDate.toDate();
 	}
+
+	public InteractiveHeader(Long clientId, Long clientCode,
+			String activityMonth, Long businessLineL, Long chargeCode,
+			Date dataUploadedDate) {
+		
+		this.clientId = clientId;
+		
+		this.externalId = clientCode;
+		this.activityMonth = activityMonth;
+		this.businessLine = businessLineL;
+		
+		
+		this.chargeCode = chargeCode;
+		this.dataUploadedDate  = dataUploadedDate;
+	
+	}
+
 
 	public String displayProperties(){
 		return "_clientId:"+clientId+" _externalId:"+externalId+" _activityMonth:"+activityMonth+"" +
@@ -183,6 +204,9 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	public void setActivityMonth(String activityMonth) {
 		this.activityMonth = activityMonth;
 	}
+
+
+	
 
 
 	

@@ -10,29 +10,32 @@ public class RawInteractiveHeaderDetailData {
 	
 	private Long id;
 	private Long clientCode;
-	private String clientName;
+	private Long clientName;
 	private String activityMonth;
-	private String businessLine;
-	private String mediaCategory;
-	private String playSource;
+	private Long businessLine;
+	private Long mediaCategory;
+	private Long playSource;
 	private String contentName;
-	private String contentProvider;
-	private String channelName;
-	private String serviceName;
+	private Long contentProvider;
+	private Long channelName;
+	private Long serviceName;
 	private BigDecimal endUserPrice;
 	private Long downloads;
 	private BigDecimal grossRevenue;
 	private Date dataUploadedDate;
 
-	public RawInteractiveHeaderDetailData(Long id,Long custCode, String custName,
-			String activityMonth, String businessLine, String mediaCategory,
-			String playSource, String contentName, String contentProvider,
-			String channelName, String serviceName, BigDecimal endUserPrice,
-			Long downloads, BigDecimal grossRevenue, LocalDate dataUploadedDate) {
-		
+	
+	
+	
+	public RawInteractiveHeaderDetailData(Long id, Long clientCode,
+			Long clientName, String activityMonth, Long businessLine,
+			Long mediaCategory, Long playSource, String contentName,
+			Long contentProvider, Long channelName, Long serviceName,
+			BigDecimal endUserPrice, Long downloads,
+			BigDecimal grossRevenue, LocalDate dataUploadedDate) {
 		this.id = id;
-		this.clientCode = custCode;
-		this.clientName = custName;
+		this.clientCode = clientCode;
+		this.clientName = clientName;
 		this.activityMonth = activityMonth;
 		this.businessLine = businessLine;
 		this.mediaCategory = mediaCategory;
@@ -44,8 +47,16 @@ public class RawInteractiveHeaderDetailData {
 		this.endUserPrice = endUserPrice;
 		this.downloads = downloads;
 		this.grossRevenue = grossRevenue;
-		this.dataUploadedDate = dataUploadedDate==null?null:dataUploadedDate.toDate();
-		
+		this.dataUploadedDate = dataUploadedDate==null?null:dataUploadedDate.toDate();//--
+	}
 
+
+	public InteractiveHeaderData getHeaderData(){
+		
+		return new InteractiveHeaderData(this.clientCode,this.clientName,this.activityMonth,this.dataUploadedDate,this.businessLine);
+	}
+	
+	public InteractiveDetailsData getDetailData(){
+		return new InteractiveDetailsData(mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue);
 	}
 }

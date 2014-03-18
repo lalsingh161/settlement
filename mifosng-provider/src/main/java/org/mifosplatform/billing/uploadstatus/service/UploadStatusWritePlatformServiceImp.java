@@ -1263,11 +1263,11 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				//Sheet mediaLocationSheet = wb.getSheetAt(2);
 				//int msNumberOfRows = interactiveHeaderSheet.getPhysicalNumberOfRows();
 				
-				int msNumberOfRows  = getNumberOfRows(interactiveHeaderSheet,0);
+				int msNumberOfRows  = getNumberOfRows(interactiveHeaderSheet,3);
 				
 				System.out.println("Number of rows : "+msNumberOfRows);
 				
-				JSONObject parentJsonObject = new JSONObject();
+				//JSONObject parentJsonObject = new JSONObject();
 				
 				for (int i = 4; i < msNumberOfRows; i++) {
 
@@ -1280,14 +1280,45 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						 
 						 
 						 	totalRecordCount++;
-						
+							Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
+
 						 	jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
-							jsonObject.put("clientId",headerRow.getCell(1).getStringCellValue());//-
+							//jsonObject.put("clientId",headerRow.getCell(1).getStringCellValue());//-
+						 	jsonObject.put("clientId",clientId);
 							/*clientIds.add(clientId);*/
 							SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
 							jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
-							jsonObject.put("businessLine",headerRow.getCell(3).getStringCellValue());
-							jsonObject.put("mediaCategory",headerRow.getCell(4).getStringCellValue());
+							
+							businessLineDataList = this.businessLineReadPlatformService.getBusinessLineData();
+							if(businessLineDataList.size()>0)
+							{
+								for(BusinessLineData businessData:businessLineDataList)
+								{
+									if(businessData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(3).getStringCellValue()))
+											{
+												//jsonObject.put("businessLine",businessData.getId());
+												jsonObject.put("businessLine",businessData.getId());
+											}
+								}
+							}
+							
+							//jsonObject.put("businessLine",headerRow.getCell(3).getStringCellValue());
+							
+							mediaCategoryDataList=this.mCodeReadPlatformService.getCodeValue("Media Category");
+							
+							if(mediaCategoryDataList.size()>0)
+							{
+								for(MCodeData mediaData:mediaCategoryDataList)
+								{
+									if(mediaData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(4).getStringCellValue()))
+											{
+										//jsonObject.put("mediaCategory",mediaData.getId());
+										jsonObject.put("mediaCategory",mediaData.getId());
+											}
+								}
+							}
+							
+							//jsonObject.put("mediaCategory",headerRow.getCell(4).getStringCellValue());
 							jsonObject.put("dateFormat","dd MMMM yyyy");
 							jsonObject.put("locale","en");
 							
@@ -1295,11 +1326,78 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							Map<String, Object> m = new LinkedHashMap<String, Object>();
 							*/
 							
-							jsonObject.put("playSource",headerRow.getCell(5).getStringCellValue());							
-							jsonObject.put("contentName", headerRow.getCell(6).getStringCellValue());						
-							jsonObject.put("contentProvider", headerRow.getCell(7).getStringCellValue());
-							jsonObject.put("channelName", headerRow.getCell(8).getStringCellValue());							   
-							jsonObject.put("serviceName", headerRow.getCell(9).getStringCellValue());
+							
+							playSourceDataList = this.mCodeReadPlatformService.getCodeValue("Play Source");
+							if(playSourceDataList.size()>0)
+							{
+								for(MCodeData playSourceData:playSourceDataList)
+								{
+									if(playSourceData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
+											{
+												//m.put("playSource",playSourceData.getId());
+												jsonObject.put("playSource",playSourceData.getId());
+											}
+								}
+							}
+							
+							//jsonObject.put("playSource",headerRow.getCell(5).getStringCellValue());	
+							
+							Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
+							if(mediaDataList.size()>0)
+							{
+								for(MediaAssetData mediaData:mediaDataList)
+								{
+									if(mediaData.getMediaTitle().equalsIgnoreCase(headerRow.getCell(6).getStringCellValue()))
+											{
+												//m.put("contentName",mediaData.getMediaId());
+												jsonObject.put("contentName",mediaData.getMediaId());
+											}
+								}
+							}
+							
+							//jsonObject.put("contentName", headerRow.getCell(6).getStringCellValue());	
+							
+							 contentDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");
+							   if(contentDataList.size()>0)
+							   {
+								   for(PartnerAccountData contentData:contentDataList){
+									   if(contentData.getPartnerName().equalsIgnoreCase(headerRow.getCell(7).getStringCellValue()))
+									   {
+										   //m.put("contentProvider", contentData.getId());
+										   jsonObject.put("contentProvider",contentData.getId());
+									   }
+								   }
+							   }
+							   
+							//jsonObject.put("contentProvider", headerRow.getCell(7).getStringCellValue());
+							
+							   channelDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
+							   if(contentDataList.size()>0)
+							   {
+								   for(PartnerAccountData channelData:channelDataList){
+									   if(channelData.getPartnerName().equalsIgnoreCase(headerRow.getCell(8).getStringCellValue()))
+									   {
+										   //m.put("channelName", channelData.getId());
+										   jsonObject.put("channelName", channelData.getId());
+									   }
+								   }
+							   }
+							   
+							//jsonObject.put("channelName", headerRow.getCell(8).getStringCellValue());							   
+							
+							   serviceDataList=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");
+							   if(contentDataList.size()>0)
+							   {
+								   for(PartnerAccountData serviceData:serviceDataList){
+									   if(serviceData.getPartnerName().equalsIgnoreCase(headerRow.getCell(9).getStringCellValue()))
+									   {
+										   //m.put("serviceName", serviceData.getId());
+										   jsonObject.put("serviceName", serviceData.getId());
+									   }
+								   }
+							   }
+							   
+							   //jsonObject.put("serviceName", headerRow.getCell(9).getStringCellValue());
 							jsonObject.put("endUserPrice", headerRow.getCell(10).getNumericCellValue());
 							jsonObject.put("downloads", headerRow.getCell(11).getNumericCellValue());
 							jsonObject.put("grossRevenue", headerRow.getCell(12).getNumericCellValue());
@@ -1618,7 +1716,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			
 			}else if(e.toString().contains("PlatformDataIntegrityException")){
 			   
-				errormessage="Serial Number already exist";	
+				errormessage="Serial Number is already exist";	
 			   
 			}else if(e.toString().contains("OrderQuantityExceedsException")){
 				errormessage ="order quntity is completed";
@@ -2171,7 +2269,7 @@ private void writeCSVData(String fileLocation,
         Integer noOfEntries = 1;
         // getLastRowNum and getPhysicalNumberOfRows showing false values
         // sometimes
-           while (sheet.getRow(noOfEntries) !=null && sheet.getRow(noOfEntries).getCell(primaryColumn) != null) {
+           while (sheet.getRow(noOfEntries) !=null && sheet.getRow(noOfEntries).getCell(primaryColumn)!=null) {
                noOfEntries++;
            }
         	
