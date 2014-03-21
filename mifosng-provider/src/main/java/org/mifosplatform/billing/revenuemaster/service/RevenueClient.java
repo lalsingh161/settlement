@@ -56,8 +56,8 @@ public class RevenueClient {
 	
 		try {
 			context.authenticatedUser();
-			BigDecimal invoiceAmount = this.RevenueOfClient(command.entityId());
-			invoiceAmount.doubleValue();
+			this.RevenueOfClient(command.entityId());//BigDecimal invoiceAmount = 
+													//invoiceAmount.doubleValue();
 			return new CommandProcessingResult(command.entityId());
 
 		} catch (DataIntegrityViolationException dve) {

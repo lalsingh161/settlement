@@ -1069,7 +1069,7 @@ public class MediaSettlementApiResources {
  }
  
 
- 	@DELETE
+ @DELETE
 	@Path("/deleteMediaCategory/{detailId}")
 	@Consumes({MediaType.APPLICATION_JSON})
 	@Produces({MediaType.APPLICATION_JSON})

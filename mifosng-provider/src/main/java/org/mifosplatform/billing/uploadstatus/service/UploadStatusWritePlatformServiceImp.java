@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -57,7 +58,6 @@ import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.item.service.ItemReadPlatformService;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 import org.mifosplatform.billing.mcodevalues.service.MCodeReadPlatformService;
-import org.mifosplatform.billing.media.data.MediaAssetData;
 import org.mifosplatform.billing.media.exception.NotaContentProviderException;
 import org.mifosplatform.billing.media.exceptions.NoEventMasterFoundException;
 import org.mifosplatform.billing.media.exceptions.NoEventPriceFoundException;
@@ -1249,9 +1249,15 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 			
 		}else if(uploadProcess.equalsIgnoreCase("GameEvent")){
-			Set<Long> clientIds = new HashSet<Long>();
+			List<Long> clientIds = new LinkedList<Long>();
 			Integer cellNumber = 13;
 			UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
+			if(uploadStatusForGameEvent.getProcessStatus().equalsIgnoreCase("Processing")){
+				return new CommandProcessingResult("2");
+			}else{
+				uploadStatusForGameEvent.setProcessStatus("Processing");
+				this.uploadStatusRepository.save(uploadStatusForGameEvent);
+			}
 			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
 			Workbook wb = null;
 			Long processRecordCount=0L;
@@ -1280,12 +1286,15 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						 
 						 
 						 	totalRecordCount++;
+						 	
 							Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
 
 						 	jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
 							//jsonObject.put("clientId",headerRow.getCell(1).getStringCellValue());//-
 						 	jsonObject.put("clientId",clientId);
-							/*clientIds.add(clientId);*/
+						 	jsonObject.put("customerName",headerRow.getCell(1).getStringCellValue());
+						 	
+							clientIds.add(clientId);
 							SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
 							jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
 							
@@ -1342,18 +1351,18 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							
 							//jsonObject.put("playSource",headerRow.getCell(5).getStringCellValue());	
 							
-							Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
+							/*Collection<MediaAssetData> mediaDataList=this.mediaAssetReadPlatformService.retrieveAllAssetdata();
 							if(mediaDataList.size()>0)
 							{
 								for(MediaAssetData mediaData:mediaDataList)
 								{
 									if(mediaData.getMediaTitle().equalsIgnoreCase(headerRow.getCell(6).getStringCellValue()))
-											{
+											{*/
 												//m.put("contentName",mediaData.getMediaId());
-												jsonObject.put("contentName",mediaData.getMediaId());
-											}
+												jsonObject.put("contentName",headerRow.getCell(6).getStringCellValue());
+							/*				}
 								}
-							}
+							}*/
 							
 							//jsonObject.put("contentName", headerRow.getCell(6).getStringCellValue());	
 							
@@ -1425,10 +1434,11 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					}catch (IllegalStateException e) {
 						errorData.add(new MRNErrorData((long)i,e.getMessage()));
 					}catch (Exception e) {
+						Throwable cause = e.getCause();
 						errorData.add(new MRNErrorData((long)i, "Error: "+e.getMessage()));
 					}
 				}
-
+				mediaSettlementReadPlatformService.executeProcedure();
 				uploadStatusForGameEvent.setProcessRecords(processRecordCount);
 				uploadStatusForGameEvent.setUnprocessedRecords(totalRecordCount-processRecordCount);
 				uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
@@ -1436,7 +1446,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				processRecordCount=0L;totalRecordCount=0L;
 				uploadStatusForGameEvent=null;
 				
-				/*for(Long cId: clientIds){
+				for(Long cId: clientIds){
 					
 					 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
 					 final String json = wrapper.getJson();
@@ -1449,9 +1459,9 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									wrapper.getLoanId(), wrapper.getSavingsId(),
 									wrapper.getCodeId(), wrapper.getSupportedEntityType(),
 									wrapper.getSupportedEntityId(), wrapper.getTransactionId());
-					this.revenueClient.createRevenueInvoice(command); 
+					this.revenueClient.createRevenueInvoice(command);
 					
-				}*/
+				}
 				//clientIds = null;
 
 			} catch (IOException e) {

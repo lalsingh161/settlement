@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mifosplatform.billing.mediasettlement.data.InteractiveDetailsData;
-import org.mifosplatform.billing.mediasettlement.data.InteractiveHeaderData;
-import org.mifosplatform.billing.mediasettlement.data.RawInteractiveHeaderDetailData;
+import org.mifosplatform.billing.mediasettlement.data.OperatorStageDetailData;
 import org.mifosplatform.billing.mediasettlement.domain.InteractiveDetails;
 import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeader;
 import org.springframework.stereotype.Service;
@@ -15,21 +14,21 @@ public class InteractiveHeaderHandler {
 
 	
 	List<InteractiveHeader> header = new ArrayList<InteractiveHeader>();
-	private List<RawInteractiveHeaderDetailData> rawData;
+	private List<OperatorStageDetailData> rawData;
 	
 	
 	public InteractiveHeaderHandler() {
 		
 	}
 	
-	public InteractiveHeaderHandler(List<RawInteractiveHeaderDetailData> rawData) {
+	public InteractiveHeaderHandler(List<OperatorStageDetailData> rawData) {
 		this.rawData = rawData;
 	}
 
 	public InteractiveHeader fromJson(
-			List<RawInteractiveHeaderDetailData> rawData) {
+			List<OperatorStageDetailData> rawData) {
 		
-		for(RawInteractiveHeaderDetailData d:rawData){
+		for(OperatorStageDetailData d:rawData){
 			InteractiveHeader hData = new InteractiveHeader();
 			//hData.setClientId(clientId);
 		}
@@ -42,13 +41,13 @@ public class InteractiveHeaderHandler {
 
 	public List<InteractiveHeader> getData() {
 
-		for(RawInteractiveHeaderDetailData d:this.rawData){
+		for(OperatorStageDetailData d:this.rawData){
 			InteractiveHeader hData  = getCurrentHeader();
 			if(alreadyExist(hData)){
 				InteractiveHeader h = getCurrentHeader();
 				add(h,d.getDetailData());
 			}else{
-				hData = new InteractiveHeader(d.getHeaderData().getClientId(), d.getHeaderData().getClientCode(), d.getHeaderData().getActivityMonth(), d.getHeaderData().getBusinessLineL(), null,d.getHeaderData().getDataUploadedDate());
+				hData = new InteractiveHeader(d.getHeaderData().getClientId(), d.getHeaderData().getClientCode(), d.getHeaderData().getBusinessLineL(), null,d.getHeaderData().getDataUploadedDate(),d.getHeaderData().getActivityMonth());
 				add(hData, d.getDetailData());
 				header.add(hData);
 			}
@@ -74,7 +73,7 @@ public class InteractiveHeaderHandler {
 			return false;
 		if(!header.isEmpty()){
 			for(InteractiveHeader h:header){
-				if(h.getClientId().equals(hData.getClientId()) || h.getActivityMonth().equals(hData.getActivityMonth()) || h.getBusinessLine().equals(hData.getBusinessLine()))
+				if(h.getClientId().equals(hData.getClientId()) || h.getBusinessLine().equals(hData.getBusinessLine()) || h.getActivityMonth().equalsIgnoreCase(hData.getActivityMonth()))
 					return true;
 			}
 		}

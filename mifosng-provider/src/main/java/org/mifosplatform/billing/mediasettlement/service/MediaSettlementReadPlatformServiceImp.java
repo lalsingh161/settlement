@@ -750,6 +750,12 @@ public class MediaSettlementReadPlatformServiceImp implements
 		jdbcTemplate.update("call proc_settle_stg()", new Object[] {});
 
 	}
+	
+	@Override 
+	public void executeProcedure(){
+		System.out.println("Executing Procedure ...!");
+		jdbcTemplate.update("call load_from_stg()", new Object[] {});
+	}
 
 	/*
 	 * @Override public List<PartnerAccountData> retrieveCountryDetails() {
@@ -1356,7 +1362,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		@Override
 		public Long retriveClientId(String clientName) {
 			
-			final String sql = "select id from m_client where firstname=?";
+			final String sql = "select id from m_client where display_name=?";
 			return jdbcTemplate.queryForLong(sql, new Object[]{clientName});
 
 		}

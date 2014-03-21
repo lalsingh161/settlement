@@ -33,11 +33,11 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     		"id","chData","deductionCodes","deductionData","clientId","deductionValue","deductionCode","country",
     		"settlementSequenceData","partnerType1","partnerType2","partnerType3","partnerType4",
     		"partnerType5","partnerType6","royaltyType","currencyId","currencyCode","eventId","playSource","contentName",
-    		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId","royaltyShare","status","agreementType","agreementCategory","settlementSource","partnerAgreementData","startDate","endDate","dateFormat","partnerAccountId"));
+    		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId","royaltyShare","status","agreementType","agreementCategory","settlementSource","partnerAgreementData","startDate","endDate","dateFormat","partnerAccountId","mgAmount"));
     
     private final static Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
     		"clientId","circle","externalId","activityMonth","businessLine","mediaCategory","contentName",
-    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate","downloads","grossRevenue","endUserPrice","serviceName","channelName","contentProvider","playSource"));
+    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate","downloads","grossRevenue","endUserPrice","serviceName","channelName","contentProvider","playSource","customerName"));
 	
     private final static Set<String> supportedParametersforRevenue = new HashSet<String>(
 			Arrays.asList("locale", "businessLine", "mediaCategory",
@@ -368,11 +368,10 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        final BigDecimal externalId = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("externalId", element);
 	        baseDataValidator.reset().parameter("externalId").value(externalId).notBlank().notExceedingLengthOf(50);
 	        
-	        /*final BigDecimal activityMonth = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("activityMonth",element);
-	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank().notExceedingLengthOf(50);*/
+	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth",element);
+	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank().notExceedingLengthOf(50);
 	        
-	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth", element);
-	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank();
+	        
 	        
 	        final BigDecimal businessLine = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("businessLine", element);
 	        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank().notExceedingLengthOf(50);
@@ -404,6 +403,8 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	 	    	
 		        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", elements);
 		        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
+		        
+		        
 		        
 		        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", elements);
 		        baseDataValidator.reset().parameter("contentProvider").value(contentProvider).notBlank();
@@ -601,6 +602,9 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth", element);
 	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank();
 	        
+	        final String customerName = fromApiJsonHelper.extractStringNamed("customerName", element);
+	        baseDataValidator.reset().parameter("customerName").value(customerName).notBlank();
+	        
 	        final Long businessLine = fromApiJsonHelper.extractLongNamed("businessLine", element);
 	        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank().notExceedingLengthOf(50);
 	        
@@ -610,7 +614,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	    	final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
 	        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
 	    	
-	        final Long contentName = fromApiJsonHelper.extractLongNamed("contentName", element);
+	        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 	        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
 	        
 	        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);

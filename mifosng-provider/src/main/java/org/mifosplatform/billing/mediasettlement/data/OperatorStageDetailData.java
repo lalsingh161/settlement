@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.joda.time.LocalDate;
 
-public class RawInteractiveHeaderDetailData {
+public class OperatorStageDetailData {
 
 	
 	private Long id;
@@ -27,7 +27,7 @@ public class RawInteractiveHeaderDetailData {
 	
 	
 	
-	public RawInteractiveHeaderDetailData(Long id, Long clientCode,
+	public OperatorStageDetailData(Long id, Long clientCode,
 			Long clientName, String activityMonth, Long businessLine,
 			Long mediaCategory, Long playSource, String contentName,
 			Long contentProvider, Long channelName, Long serviceName,
