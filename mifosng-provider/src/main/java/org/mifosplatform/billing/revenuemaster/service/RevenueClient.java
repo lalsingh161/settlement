@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.mifosplatform.billing.billingorder.domain.Invoice;
 import org.mifosplatform.billing.billingorder.service.BillingOrderWritePlatformService;
 import org.mifosplatform.billing.clientbalance.data.ClientBalanceData;
@@ -133,7 +136,7 @@ public class RevenueClient {
 				grossRevenueAmount=detailData.getEndUserPrice().multiply(detailData.getDownloads());
 			}
 		    final  Long  detailId=detailData.getId();
-			deductionTax=this.calculatedeductiontaxes(deductionDatas,grossRevenueAmount,detailId);	
+			deductionTax=this.calculatedeductiontaxes(deductionDatas,grossRevenueAmount,detailId,  detailData.getActivityMonth());	
 			 deductionTaxes.addAll(deductionTax);
 			// System.out.println(deductionTaxes);
 		}
@@ -157,13 +160,14 @@ public class RevenueClient {
 	
 
 	public List<DeductionTaxesData> calculatedeductiontaxes(
-			List<DeductionData> deductionDatas, BigDecimal grossRevenueAmount,Long detailId) {
+			List<DeductionData> deductionDatas, BigDecimal grossRevenueAmount,Long detailId, String activityMonth) {
 		
 		String deductionCode=null;
 		String deductionType=null;
 		BigDecimal deductionValue=null;
 		BigDecimal taxAmount=BigDecimal.ZERO;
 		BigDecimal WpcTaxAmount=BigDecimal.ZERO;
+		 DateTimeFormatter formatter = DateTimeFormat.forPattern("MMMM yyyy");
 		List<DeductionTaxesData> taxes=new ArrayList<DeductionTaxesData>();
 		DeductionTaxesData tax=null;
 		
@@ -185,7 +189,7 @@ public class RevenueClient {
 			    deductionData.setWpcTaxAmount(taxAmount);
 			    WpcTaxAmount=deductionData.getWpcTaxAmount();
 			
-			} if(deductionData.getDeductionCode().equalsIgnoreCase("ED")){
+			} if(deductionData.getDeductionCode().equalsIgnoreCase("ED")&&formatter.print(new DateTime()).equalsIgnoreCase(activityMonth)){
 				
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();

@@ -24,8 +24,11 @@ public class RevenueMaster extends AbstractAuditableCustom<AppUser, Long>{
 	@Column(name="client_id")
 	private Long clientId;
 
-	@Column(name="business_line")
-	private Long businessLine;
+	/*@Column(name="business_line")
+	private Long businessLine;*/
+	
+	@Column(name="revenue_share_code")
+	private Long revenueShareCode;
 	
 	@Column(name="media_category")
 	private Long mediaCategory;
@@ -41,20 +44,21 @@ public class RevenueMaster extends AbstractAuditableCustom<AppUser, Long>{
 			
 		}
 		
-		public RevenueMaster(Long businessLine, Long mediaCategory,
+		public RevenueMaster(Long revenueShareCode, Long mediaCategory,
 			Long revenueShareType, Long clientId) {
-		this.businessLine=businessLine;
+		this.revenueShareCode=revenueShareCode;
 		this.mediaCategory=mediaCategory;
 		this.revenueShareType=revenueShareType;
 		this.clientId=clientId;
 	}
 		public static RevenueMaster fromJson(final JsonCommand command){
 		
-		final Long businessLine = command.longValueOfParameterNamed("businessLine");
+		//final Long businessLine = command.longValueOfParameterNamed("businessLine");
+	    final Long revenueShareCode = command.longValueOfParameterNamed("revenueShareCode");	
 		final Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");
 		final Long revenueShareType = command.longValueOfParameterNamed("revenueShareType");
 		/*final Long clientId = command.longValueOfParameterNamed("clientId");*/
-		return new RevenueMaster(businessLine,mediaCategory,revenueShareType,command.entityId());
+		return new RevenueMaster(revenueShareCode,mediaCategory,revenueShareType,command.entityId());
 	}
 
 	public void addRevenueParamValues(RevenueParam revenueParam) {
@@ -68,16 +72,16 @@ public class RevenueMaster extends AbstractAuditableCustom<AppUser, Long>{
 		final Map<String, Object> actualChanges = new LinkedHashMap<String, Object>(
 				1);
 
-		final String businessLine = "businessLine";
+		final String revenueShareCode = "revenueShareCode";
 		final String mediaCategory = "mediaCategory";
 		final String revenueShareType = "revenueShareType";
 
-		if (command.isChangeInLongParameterNamed(businessLine,
-				this.businessLine)) {
+		if (command.isChangeInLongParameterNamed(revenueShareCode,
+				this.revenueShareCode)) {
 			final Long newValue = command
-					.longValueOfParameterNamed(businessLine);
-			actualChanges.put(businessLine, newValue);
-			this.businessLine = newValue;
+					.longValueOfParameterNamed(revenueShareCode);
+			actualChanges.put(revenueShareCode, newValue);
+			this.revenueShareCode = newValue;
 		}
 		if (command.isChangeInLongParameterNamed(mediaCategory,
 				this.mediaCategory)) {
@@ -124,13 +128,13 @@ public class RevenueMaster extends AbstractAuditableCustom<AppUser, Long>{
 		this.clientId = clientId;
 	}
 
-	public Long getBusinessLine() {
+/*	public Long getBusinessLine() {
 		return businessLine;
 	}
 
 	public void setBusinessLine(Long businessLine) {
 		this.businessLine = businessLine;
-	}
+	}*/
 
 	public Long getMediaCategory() {
 		return mediaCategory;
@@ -154,6 +158,14 @@ public class RevenueMaster extends AbstractAuditableCustom<AppUser, Long>{
 
 	public void setDetails(List<RevenueParam> details) {
 		this.details = details;
+	}
+
+	public Long getRevenueShareCode() {
+		return revenueShareCode;
+	}
+
+	public void setRevenueShareCode(Long revenueShareCode) {
+		this.revenueShareCode = revenueShareCode;
 	}
 	
 	

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.mifosplatform.billing.businessline.data.BusinessLineData;
+import org.mifosplatform.billing.masterdeduction.data.DeductionMasterData;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 
 public class RevenueShareData {
@@ -60,6 +61,9 @@ public class RevenueShareData {
 	private String mediaCategoryStr;
 	private String revenueShareTypeStr;
 	List<RevenueShareData> datas;
+	private Long revenueShareCode;
+	private String revenueShareCodeStr;
+	private Collection<DeductionMasterData> deductionMasterData;
 	public RevenueShareData() {
 		
 	}
@@ -100,20 +104,20 @@ public class RevenueShareData {
 			this.datas=datas;
 	}
 
-	public RevenueShareData(Long id, String businessLine,
+	public RevenueShareData(Long id, String revenueShareCode,
 			String mediaCategory, String revenueShareType) {
 		
 		this.id = id;
-		this.businessLineStr = businessLine;
+		this.revenueShareCodeStr = revenueShareCode;
 		this.mediaCategoryStr = mediaCategory;
 		this.revenueShareTypeStr = revenueShareType;
 
 	}
 
-	public RevenueShareData(Long id, Long businessLine, Long mediaCategory,
+	public RevenueShareData(Long id, Long revenueShareCode, Long mediaCategory,
 			Long revenueShareType, Long clientId) {
 		this.id=id;
-		this.businessLine=businessLine;
+		this.revenueShareCode=revenueShareCode;
 		this.mediaCategory=mediaCategory;
 		this.revenueShareType=revenueShareType;
 		this.clientId = clientId;
@@ -127,4 +131,11 @@ public class RevenueShareData {
 		this.flat = flat;
 	}
 
+	public void setDeductionMasterData(Collection<DeductionMasterData> deductionMasterData) {
+		this.deductionMasterData = deductionMasterData;
+	}
+	public Collection<DeductionMasterData> getDeductionMasterData() {
+		return deductionMasterData;
+	}
+   
 }

@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.address.data.StateDetails;
+import org.mifosplatform.billing.clientprospect.service.SearchSqlQuery;
+import org.mifosplatform.billing.inventory.data.InventoryItemDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementData;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementsData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveData;
@@ -29,6 +31,8 @@ import org.mifosplatform.billing.mediasettlement.domain.RevenueOEMSettlementJpaR
 import org.mifosplatform.billing.mediasettlement.domain.RevenueSettlementJpaRepository;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.infrastructure.core.service.Page;
+import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.documentmanagement.exception.DocumentNotFoundException;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -49,7 +53,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 	final private RevenueOEMSettlementJpaRepository revenueOEMSettlementJpaRepository;
 	final private RevenueSettlementJpaRepository revenueSettlementJpaRepository;
 	final private InteractiveHeaderJpaRepository interactiveHeaderJpaRepository;
-
+	final private  PaginationHelper<PartnerAccountData> paginationHelper = new PaginationHelper<PartnerAccountData>();
+	final private  PaginationHelper<PartnerAgreementData> paginationHelperAgre = new PaginationHelper<PartnerAgreementData>();
 	@Autowired
 	public MediaSettlementReadPlatformServiceImp(
 			final PlatformSecurityContext context,
@@ -67,7 +72,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	}
 
 	@Override
-	public List<PartnerAccountData> retrieveAllAccountPartnerDetails() {
+	public Page<PartnerAccountData> retrieveAllAccountPartnerDetails(SearchSqlQuery searchPartnerAccountHistory) {
 		context.authenticatedUser();
 		/*
 		 * final String sql =
@@ -79,26 +84,63 @@ public class MediaSettlementReadPlatformServiceImp implements
 		 * "select pt.id as id,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt order by pt.id asc"
 		 * ;
 		 */
-		final String sql = "select pt.id as id,(select code_value from m_code_value where id = pt.partner_type)  as partnerType,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,(select code from m_currency where id=pt.currency_id) as currencyCode, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt order by pt.id asc";
 		PartnerAccountMapper mapper = new PartnerAccountMapper();
-		return jdbcTemplate.query(sql, mapper);
-	}
+		StringBuilder sqlBuilder = new StringBuilder(200);
+        sqlBuilder.append("select ");
+        sqlBuilder.append(mapper.partnerAccountSchema());
+        String sqlSearch = searchPartnerAccountHistory.getSqlSearch();
+        String extraCriteria = "";
+   	    if (sqlSearch != null) {
+   	    	sqlSearch=sqlSearch.trim();
+   	    	extraCriteria = " and (pt.partner_name  like '%"+sqlSearch+"%' OR"
+   	    			+ " pt.external_id like '%"+sqlSearch+"%' OR"
+   	    			+ " pt.contact_num like '%"+sqlSearch+"%')";
+   	    			
+   	    }
+        
+   	  sqlBuilder.append(extraCriteria);
+        
+        if (searchPartnerAccountHistory.isLimited()) {
+            sqlBuilder.append(" limit ").append(searchPartnerAccountHistory.getLimit());
+        }
 
-	private static final class PartnerAccountMapper implements
+        if (searchPartnerAccountHistory.isOffset()) {
+            sqlBuilder.append(" offset ").append(searchPartnerAccountHistory.getOffset());
+        }
+        
+      //  sqlBuilder.append(" order by pt.id asc");
+
+		//	return jdbcTemplate.query(sql, rowMapper,new Object[]{id});
+		return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
+	            new Object[] {}, mapper);
+		
+
+}  
+
+	private static final  class PartnerAccountMapper implements
 			RowMapper<PartnerAccountData> {
-		@Override
+		
+	@Override
 		public PartnerAccountData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long id = rs.getLong("id");
-			final String partnerTypeName = rs.getString("partnerType");
+			final Long partnerType = rs.getLong("partnerType");
 			final String partnerName = rs.getString("partnerName");
+			final String partnerTypeName = rs.getString("partnerTypeName");
 			final String currencyCode = rs.getString("currencyCode");
 			final String partnerAddress = rs.getString("partnerAddress");
 			final Long externalId = rs.getLong("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
-			return new PartnerAccountData(id,null, partnerTypeName,partnerName, partnerAddress,
+			return new PartnerAccountData(id, partnerType,partnerTypeName,partnerName,partnerAddress,
 					null, currencyCode, externalId, contactNum, emailId);
+		}
+
+		public String partnerAccountSchema() {
+			
+		String sql= "SQL_CALC_FOUND_ROWS pt.id as id,pt.partner_type as partnerType,(select code_value from m_code_value where id = pt.partner_type ) as partnerTypeName,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId," +
+				     "(select code from m_currency where id=pt.currency_id) as currencyCode, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.is_deleted='N'";
+		return sql;
 		}
 	}
 
@@ -135,11 +177,36 @@ public class MediaSettlementReadPlatformServiceImp implements
 	}
 
 	@Override
-	public List<PartnerAgreementData> retrievePartnerAgreementDetails() {
+	public Page<PartnerAgreementData> retrievePartnerAgreementDetails(SearchSqlQuery searchPartnerAgreementHistory) {
 		
-	final String sql = "select a.id as id,(select v.code_value from m_code_value v,bp_account f where v.id=f.partner_type and f.id = a.partner_account_id and is_deleted='N' ) as partnerType,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' order by id asc";
 		PartnerAgreementMapper mapper = new PartnerAgreementMapper();
-		return jdbcTemplate.query(sql, mapper);
+		StringBuilder sqlBuilder = new StringBuilder(200);
+        sqlBuilder.append("select ");
+        sqlBuilder.append(mapper.partnerAgreementSchema());
+        String sqlSearch = searchPartnerAgreementHistory.getSqlSearch();
+        String extraCriteria = "";
+   	    if (sqlSearch != null) {
+   	    	sqlSearch=sqlSearch.trim();
+   	    	extraCriteria = " and ( a.start_date like '%"+sqlSearch+"%' OR"
+   	    			+ " a.end_date like '%"+sqlSearch+"%')";
+   	    			
+   	    }
+        
+   	    sqlBuilder.append(extraCriteria);
+   	    
+        if (searchPartnerAgreementHistory.isLimited()) {
+            sqlBuilder.append(" limit ").append(searchPartnerAgreementHistory.getLimit());
+        }
+
+        if (searchPartnerAgreementHistory.isOffset()) {
+            sqlBuilder.append(" offset ").append(searchPartnerAgreementHistory.getOffset());
+        }
+        
+      
+       // sqlBuilder.append(" order by a.id asc");
+		return this.paginationHelperAgre.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
+	            new Object[] {}, mapper);
+
 	}
 
 	private final static class PartnerAgreementMapper implements
@@ -161,6 +228,14 @@ public class MediaSettlementReadPlatformServiceImp implements
 			return new PartnerAgreementData(id,partnerType, partnerName, agreementType,
 					agreementCategory, royaltyType, startDate, endDate,
 					agmtLocation, settlementSource, fileName);
+		}
+
+		public String partnerAgreementSchema() {
+			
+		final String sql = "SQL_CALC_FOUND_ROWS a.id as id,(select v.code_value from m_code_value v,bp_account f where v.id=f.partner_type and f.id = a.partner_account_id and is_deleted='N' ) as partnerType,(select partner_name from bp_account where id = a.partner_account_id and is_deleted='N') as partnerName ,(select code_value from m_code_value where id = a.agreement_type) as agreementType, " +
+				             " (select code_value from m_code_value where id = a.agreement_category) as agreementCategory,(select code_value from m_code_value where id = a.settle_source) as settlementSource, (select code_value from m_code_value where id = a.royalty_type) as royaltyType, a.start_date as startDate, a.end_date as endDate, " +
+				             " a.agmt_location as agmtLocation,a.filename as fileName from bp_agreement a where a.is_deleted='N' ";
+		return sql;
 		}
 	}
 
@@ -1125,7 +1200,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	@Override
 	public List<RevenueShareData> retriveAllrevenueshareForThisClient(
 			Long clientId) {
-		final String sql = "select sm.id as id,(select int_event_desc from bp_intevent_master where sm.business_line=id) as businessLine,"+
+		final String sql = "select sm.id as id,(select deduction from bp_deduction_codes where sm.revenue_share_code=id) as revenueShareCode,"+
 				"(select code_value from m_code_value where sm.media_category=id) as mediaCategory,"+
 				"(select code_value from m_code_value where sm.revenue_share_type=id) as revenueShareType "+
 				"from bp_revenue_share_master sm where client_id=?";
@@ -1141,10 +1216,10 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public RevenueShareData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long id = rs.getLong("id");
-			final String businessLine = rs.getString("businessLine");
+			final String revenueShareCode = rs.getString("revenueShareCode");
 			final String mediaCategory = rs.getString("mediaCategory");
 			final String revenueShareType = rs.getString("revenueShareType");
-			return new RevenueShareData(id, businessLine, mediaCategory,
+			return new RevenueShareData(id, revenueShareCode, mediaCategory,
 					revenueShareType);
 		}
 
@@ -1182,7 +1257,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 	@Override
 	public RevenueShareData retriveEditRevenueRecord(Long id) {
-		final String sql ="select rsm.id as id,rsm.business_line as businessLine,rsm.media_category as mediaCategory,"+
+		final String sql ="select rsm.id as id,rsm.revenue_share_code as revenueShareCode,rsm.media_category as mediaCategory,"+
 							"rsm.revenue_share_type as revenueShareType, rsm.client_id as clientId "+
 							"from bp_revenue_share_master rsm "+
 							"where rsm.id=?";
@@ -1198,10 +1273,10 @@ public class MediaSettlementReadPlatformServiceImp implements
 		throws SQLException {
 			final Long id = rs.getLong("id");
 			final Long clientId = rs.getLong("clientId");
-			final Long businessLine = rs.getLong("businessLine");
+			final Long revenueShareCode = rs.getLong("revenueShareCode");
 			final Long mediaCategory = rs.getLong("mediaCategory");
 			final Long revenueShareType = rs.getLong("revenueShareType");
-			return new RevenueShareData(id, businessLine, mediaCategory,
+			return new RevenueShareData(id, revenueShareCode, mediaCategory,
 					revenueShareType,clientId);
 }
 

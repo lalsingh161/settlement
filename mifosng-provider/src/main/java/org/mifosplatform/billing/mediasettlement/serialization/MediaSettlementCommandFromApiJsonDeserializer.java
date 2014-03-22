@@ -42,7 +42,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     private final static Set<String> supportedParametersforRevenue = new HashSet<String>(
 			Arrays.asList("locale", "businessLine", "mediaCategory",
 					"revenueShareType", "startValue", "endValue", "percentage",
-					"flat", "percentageParams","clientId"));
+					"flat", "percentageParams","clientId","revenueShareCode"));
     
     private final static Set<String> supportedParametersForUpdateDeductionCode = new HashSet<String>(Arrays.asList("deductionCode","deductionValue","locale","clientId"));
     
@@ -451,8 +451,11 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 
 		        final JsonElement element = fromApiJsonHelper.parse(json);
 		        
-		        final Long businessLine = fromApiJsonHelper.extractLongNamed("businessLine", element);
-		        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank();
+		       /* final Long businessLine = fromApiJsonHelper.extractLongNamed("businessLine", element);
+		        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank();*/
+		        
+		        final Long revenueShareCode = fromApiJsonHelper.extractLongNamed("revenueShareCode", element);
+		        baseDataValidator.reset().parameter("revenueShareCode").value(revenueShareCode).notBlank();
 		        
 		        final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory", element);
 		        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank();

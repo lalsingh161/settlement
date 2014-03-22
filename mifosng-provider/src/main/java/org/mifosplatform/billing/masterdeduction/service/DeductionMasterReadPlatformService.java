@@ -14,4 +14,6 @@ public interface DeductionMasterReadPlatformService {
 
 	Collection<StateDetails> retrieveAllStateDetails();
 
+	Collection<DeductionMasterData> getDeductionCodeData();
+
 }
