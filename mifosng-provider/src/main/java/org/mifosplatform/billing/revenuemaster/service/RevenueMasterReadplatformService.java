@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.mifosplatform.billing.revenuemaster.data.DeductionData;
 import org.mifosplatform.billing.revenuemaster.data.GenerateInteractiveHeaderData;
+import org.mifosplatform.billing.revenuemaster.data.OperatorShareData;
 import org.mifosplatform.billing.revenuemaster.data.RevenueMasterData;
 
 public interface RevenueMasterReadplatformService {
@@ -13,5 +14,7 @@ public interface RevenueMasterReadplatformService {
 	List<RevenueMasterData> retriveAllinteractiveDetails(Long id);
 
 	List<DeductionData> retriveOperatorDeductionData(Long entityId);
+
+	List<OperatorShareData> retriveOperatorRevenueShareData(Long clientId);
 
 }

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class RevenueMasterData {
 	
 	private Long id;
-	private String playSource;
+	private String activityMonth;
 	private String contentProvider;
 	private String channelName;
 	private String serviceName;
@@ -19,14 +19,16 @@ public class RevenueMasterData {
 	private Long clientId;
 	private BigDecimal netRevenueAmount=BigDecimal.ZERO;
 	private BigDecimal detailChargeTaxAmount=BigDecimal.ZERO;
+	private BigDecimal operatorShareAmount=BigDecimal.ZERO;
+	private BigDecimal revenueAmountOfIg=BigDecimal.ZERO;
 
-	public RevenueMasterData(Long id,Long headerId,String playSource,
+	public RevenueMasterData(Long id,Long headerId,String activityMonth,
 			String contentProvider, String channelName, String serviceName,
 			BigDecimal endUserPrice, BigDecimal downloads,
 			BigDecimal grossRevenue,String chargeCode,String chargeType,Integer taxInclusive,Long clientId) {
 		this.id=id;
 		this.headerId=headerId;
-	/*	this.contentName=contentName;*/
+		this.activityMonth=activityMonth;
 		this.endUserPrice=endUserPrice;
 		this.downloads= downloads;
 		this.grossRevenue = grossRevenue;
@@ -97,6 +99,30 @@ public class RevenueMasterData {
 		this.detailChargeTaxAmount = detailChargeTaxAmount;
 	}
 
+	public void setOperatorShareAmount(BigDecimal operatorShareAmount) {
+		
+		this.operatorShareAmount = operatorShareAmount;
+	}
 
+	public String getActivityMonth() {
+		return activityMonth;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public BigDecimal getOperatorShareAmount() {
+		return operatorShareAmount;
+	}
+
+	public void setRevenueAmountOfIg(BigDecimal revenueAmountOfIg) {
+	
+		this.revenueAmountOfIg =revenueAmountOfIg;
+	}
+
+	public BigDecimal getRevenueAmountOfIg() {
+		return revenueAmountOfIg;
+	}
 	
 }

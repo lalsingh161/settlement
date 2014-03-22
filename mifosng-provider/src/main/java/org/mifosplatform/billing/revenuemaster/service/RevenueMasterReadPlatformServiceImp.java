@@ -9,6 +9,7 @@ import java.util.List;
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.revenuemaster.data.DeductionData;
 import org.mifosplatform.billing.revenuemaster.data.GenerateInteractiveHeaderData;
+import org.mifosplatform.billing.revenuemaster.data.OperatorShareData;
 import org.mifosplatform.billing.revenuemaster.data.RevenueMasterData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
@@ -36,7 +37,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 	
 	@Override
 	public List<GenerateInteractiveHeaderData> retriveInteractiveHeaderDetails(Long clientId){
-			final String sql = "select ih.id as id, ih.client_id as clientId, ih.client_external_id as externalId,ih.activity_month as activityMonth," +
+			final String sql = "select ih.id as id, ih.client_id as clientId,ih.activity_month as activityMonth," +
 					"im.int_event_code as businessLine from bp_interactive_header ih,bp_intevent_master im where ih.business_line=im.id and ih.client_id=? and ih.is_deleted = 'N' order by ih.id asc";
 			HeaderDataMapper mapper = new HeaderDataMapper();
 			return jdbcTemplate.query(sql, mapper, new Object[]{clientId});
@@ -48,18 +49,18 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 					throws SQLException {
 				final Long id = rs.getLong("id");
 				final Long clientId = rs.getLong("clientId");
-				final Long externalId = rs.getLong("externalId");
+				//final Long externalId = rs.getLong("externalId");
 				final String businessLine = rs.getString("businessLine");
 				final String activityMonth = rs.getString("activityMonth");
 				/*final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs, "dataUploadedDate");
 				final String mediaCategory = rs.getString("mediaCategory");*/
-				return new GenerateInteractiveHeaderData(id,clientId,externalId,businessLine,activityMonth);
+				return new GenerateInteractiveHeaderData(id,clientId,businessLine,activityMonth);
 			}
 		}
 
 		@Override
 		public List<RevenueMasterData> retriveAllinteractiveDetails(Long id) {
-			final String sql="select itd.id as id ,itd.interactive_header_id as headerId,(select code_value from m_code_value where id = itd.play_source) as playSource,"+
+			final String sql="select itd.id as id ,itd.interactive_header_id as headerId,ih.activity_month as activityMonth,"+
 											"(select partner_name from bp_account where id = itd.content_provider) as contentProvider,"+
 											"(select partner_name from bp_account where id = itd.channel_name) as channelName,"+
 											"(select partner_name from bp_account where id = itd.service_name) as serviceName,"+
@@ -78,7 +79,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 					    public RevenueMasterData mapRow(ResultSet rs, int rowNum) throws SQLException {
 						 final Long id=rs.getLong("id");  
 						 final Long headerId=rs.getLong("headerId");
-					     final String playSource = rs.getString("playSource");
+					     final String activityMonth = rs.getString("activityMonth");
 					    /* final String contentName = rs.getString("contentName");*/
 					     final String contentProvider = rs.getString("contentProvider");
 					     final String channelName = rs.getString("channelName");
@@ -90,7 +91,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 						 final String chargeType = rs.getString("chargeType");
 						 final Integer taxInclusive = rs.getInt("taxInclusive");
 						 final Long clientId = rs.getLong("clientId");
-						return new RevenueMasterData(id,headerId,playSource,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,chargeCode,chargeType,taxInclusive,clientId);
+						return new RevenueMasterData(id,headerId,activityMonth,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,chargeCode,chargeType,taxInclusive,clientId);
 					   }
 					
 					}
@@ -115,7 +116,35 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 								final Integer circle = rs.getInt("circle");
 								return new DeductionData(id,clientId, deductionCode, deductionValue,deductionType,circle);
 							}
+						}
+
+						@Override
+						public List<OperatorShareData> retriveOperatorRevenueShareData(
+								Long clientId) {
+							final String sql="select rm.id as id ,(select ded_code from bp_deduction_codes where id=rm.revenue_share_code) as revenueShareCode,(select code_value from m_code_value where id=rm.revenue_share_type) as revenueShareType,rp.id as revenueParamId, rp.start_value as startValue,rp.end_value as endValue,rp.percentage as revenuePercentage,rp.flat as revenueFlat from bp_revenue_share_master rm,bp_revenue_share_params rp where rm.id=rp.revenue_share_master_id and rm.client_id=?";
+							OperatorShareMapper mapper=new OperatorShareMapper();
+							return jdbcTemplate.query(sql,mapper,new Object[]{clientId});
 						}						
+						
+						
+						 private final static class OperatorShareMapper implements RowMapper<OperatorShareData>{
+								
+								@Override
+								public OperatorShareData mapRow(ResultSet rs, int rowNum)
+										throws SQLException {
+									final Long id = rs.getLong("id");
+									//final String businessLine = rs.getString("businessLine");
+									final String revenueShareCode = rs.getString("revenueShareCode");
+									final String revenueShareType = rs.getString("revenueShareType");
+									final Long revenueParamId = rs.getLong("revenueParamId");
+									final  BigDecimal startValue = rs.getBigDecimal("startValue");
+									final BigDecimal endValue = rs.getBigDecimal("endValue");
+									final BigDecimal revenuePercentage = rs.getBigDecimal("revenuePercentage");
+									final BigDecimal revenueFlat = rs.getBigDecimal("revenueFlat");
+									return new OperatorShareData(id,revenueShareCode, revenueShareType, revenueParamId,startValue,endValue,revenuePercentage,revenueFlat);
+								}
+							}
+						
 						
 					}
 

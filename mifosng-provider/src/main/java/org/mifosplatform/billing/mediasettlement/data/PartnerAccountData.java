@@ -111,10 +111,11 @@ public class PartnerAccountData {
 	}
 
 	
-	public PartnerAccountData(Long id,Long partnerType,	String partnerName, String partnerAddress,Long currencyId,String currencyCode,Long externalId,String contactNum,String emailId) {
+	public PartnerAccountData(Long id,Long partnerType,	String partnerName,String partnerTypeName , String partnerAddress,Long currencyId,String currencyCode,Long externalId,String contactNum,String emailId) {
 		
 		this.id = id;
 		this.partnerType=partnerType;
+		this.partnerTypeName = partnerTypeName;
 		this.partnerName = partnerName;
 		this.partnerAddress = partnerAddress;
 		this.currencyId=currencyId;
@@ -430,13 +431,13 @@ public class PartnerAccountData {
 	}
 
 
-	public String getPartnerTypeStr() {
-		return partnerTypeStr;
+	public String getPartnerTypeName() {
+		return partnerTypeName;
 	}
 
 
-	public void setPartnerTypeStr(String partnerTypeStr) {
-		this.partnerTypeStr = partnerTypeStr;
+	public void setPartnerTypeName(String partnerTypeName) {
+		this.partnerTypeName = partnerTypeName;
 	}
 
 
