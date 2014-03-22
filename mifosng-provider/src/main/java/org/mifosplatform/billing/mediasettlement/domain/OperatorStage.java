@@ -18,58 +18,6 @@ import org.mifosplatform.useradministration.domain.AppUser;
 public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 
 	
-	/*@Column(name="cust_name")
-	private String clientName;
-	
-	@Column(name="cust_code")
-	private Long clientCode;
-	
-	
-	
-	@Column(name="activity_month")
-	private String activityMonth;
-		
-	
-	@Column(name="data_upload_date")
-	private Date dataUploadedDate = new Date();
-	
-	@Column(name="business_line")
-	private String businessLine;
-	
-	@Column(name="media_category")
-	private String mediaCategory;
-	
-	@Column(name="charge_code")
-	private String chargeCode;
-	
-	
-	@Column(name="play_source", nullable=false)
-	private String playSource;
-	
-	@Column(name="content_name", nullable=false)
-	private String contentName;
-	
-	@Column(name="content_provider", nullable=false)
-	private String contentProvider;
-
-	@Column(name="channel_name", nullable=false)
-	private String channelName;
-	
-	@Column(name="service_name", nullable=false)
-	private String serviceName;
-
-	@Column(name="end_user_price", nullable=false)
-	private BigDecimal endUserPrice;
-	
-	@Column(name="downloads", nullable=false)
-	private Long downloads;
-
-	@Column(name="gross_revenue", nullable=false)
-	private BigDecimal grossRevenue;
-	
-	@Column(name="is_processed")
-	private Character isProcessed = 'N';*/
-	
 	@Column(name="client_id")
 	private Long clientId;
 	
@@ -91,9 +39,6 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 	@Column(name="media_category")
 	private Long mediaCategory;
 	
-	/*@Column(name="charge_code")
-	private String chargeCode;
-	*/
 	
 	@Column(name="play_source", nullable=false)
 	private Long playSource;
