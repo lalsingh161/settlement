@@ -54,6 +54,7 @@ public class InteractiveDetails extends AbstractAuditableCustom<AppUser, Long>{
 	
 	
 	
+	
 	public InteractiveDetails(){
 		
 	}
@@ -74,6 +75,7 @@ public class InteractiveDetails extends AbstractAuditableCustom<AppUser, Long>{
     	   this.mediaCategory = mediaCategory;
     	   
 	}
+    
 
 	
 

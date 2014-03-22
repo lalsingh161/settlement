@@ -149,5 +149,7 @@ public interface MediaSettlementReadPlatformService {
 
 	PartnerAccountData retrievePartnerAccountView(Long id);
 
+	void executeProcedure();
+
 
 }

@@ -33,11 +33,11 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     		"id","chData","deductionCodes","deductionData","clientId","deductionValue","deductionCode","country",
     		"settlementSequenceData","partnerType1","partnerType2","partnerType3","partnerType4",
     		"partnerType5","partnerType6","royaltyType","currencyId","currencyCode","eventId","playSource","contentName",
-    		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId","royaltyShare","status","agreementType","agreementCategory","settlementSource"));
+    		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId","royaltyShare","status","agreementType","agreementCategory","settlementSource","partnerAgreementData","startDate","endDate","dateFormat","partnerAccountId","mgAmount"));
     
     private final static Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
     		"clientId","circle","externalId","activityMonth","businessLine","mediaCategory","contentName",
-    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate","downloads","grossRevenue","endUserPrice","serviceName","channelName","contentProvider","playSource"));
+    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate","downloads","grossRevenue","endUserPrice","serviceName","channelName","contentProvider","playSource","customerName"));
 	
     private final static Set<String> supportedParametersforRevenue = new HashSet<String>(
 			Arrays.asList("locale", "businessLine", "mediaCategory",
@@ -368,11 +368,10 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        final BigDecimal externalId = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("externalId", element);
 	        baseDataValidator.reset().parameter("externalId").value(externalId).notBlank().notExceedingLengthOf(50);
 	        
-	        /*final BigDecimal activityMonth = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("activityMonth",element);
-	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank().notExceedingLengthOf(50);*/
+	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth",element);
+	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank().notExceedingLengthOf(50);
 	        
-	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth", element);
-	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank();
+	        
 	        
 	        final BigDecimal businessLine = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("businessLine", element);
 	        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank().notExceedingLengthOf(50);
@@ -404,6 +403,8 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	 	    	
 		        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", elements);
 		        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
+		        
+		        
 		        
 		        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", elements);
 		        baseDataValidator.reset().parameter("contentProvider").value(contentProvider).notBlank();
@@ -604,6 +605,9 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth", element);
 	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank();
 	        
+	        final String customerName = fromApiJsonHelper.extractStringNamed("customerName", element);
+	        baseDataValidator.reset().parameter("customerName").value(customerName).notBlank();
+	        
 	        final Long businessLine = fromApiJsonHelper.extractLongNamed("businessLine", element);
 	        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank().notExceedingLengthOf(50);
 	        
@@ -613,7 +617,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	    	final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
 	        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
 	    	
-	        final Long contentName = fromApiJsonHelper.extractLongNamed("contentName", element);
+	        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 	        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
 	        
 	        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
@@ -642,7 +646,72 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	    
 		
 	 }	
+
+	 
+		public void validateForCreatePartnerAgreement(String json) {
+			final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+	        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParameters);
+
+	        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+	        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("partnerAgreement");
+
+	        final JsonElement element = fromApiJsonHelper.parse(json);
 		
+	        final Long agreementType = fromApiJsonHelper.extractLongNamed("agreementType", element);
+	        baseDataValidator.reset().parameter("agreementType").value(agreementType).notBlank();
+	        
+	        final Long agreementCategory = fromApiJsonHelper.extractLongNamed("agreementCategory", element);
+	        baseDataValidator.reset().parameter("agreementCategory").value(agreementCategory).notBlank();
+	        
+	        final Long royaltyType = fromApiJsonHelper.extractLongNamed("royaltyType", element);
+	        baseDataValidator.reset().parameter("royaltyType").value(royaltyType).notBlank();
+	        
+	        final Long settlementSource = fromApiJsonHelper.extractLongNamed("settlementSource", element);
+	        baseDataValidator.reset().parameter("settlementSource").value(settlementSource).notBlank();
+	        
+	        final LocalDate startDate = fromApiJsonHelper.extractLocalDateNamed("startDate", element);
+	        baseDataValidator.reset().parameter("startDate").value(startDate).notBlank();
+	        
+	        final LocalDate endDate = fromApiJsonHelper.extractLocalDateNamed("endDate", element);
+	        baseDataValidator.reset().parameter("endDate").value(endDate).notBlank();
+	       
+	        final JsonArray partnerAgreementDataArray = fromApiJsonHelper.extractJsonArrayNamed("partnerAgreementData",element);
+	          
+	          if(partnerAgreementDataArray!=null && partnerAgreementDataArray.size()>0){
+	        	    String[] percentageParamsDataArrayAttributes =null;
+			          percentageParamsDataArrayAttributes = new String[partnerAgreementDataArray.size()];
+			 	      int DataSize = partnerAgreementDataArray.size();
+			 	      baseDataValidator.reset().parameter(null).value(DataSize).integerGreaterThanZero();
+			 	    
+			 	      for(int i=0; i<partnerAgreementDataArray.size();i++){
+			 	    	 percentageParamsDataArrayAttributes[i] = partnerAgreementDataArray.get(i).toString();
+			 	       }
+			        
+			 	      for(String singleData: percentageParamsDataArrayAttributes){
+			 	    	 
+			 	    	 final JsonElement elements = fromApiJsonHelper.parse(singleData);
+			 	    	 
+			 	    	final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", elements);
+				        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
+			 	    	
+				        final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory", elements);
+				        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank();
+				        
+				        final Integer royaltyShare = fromApiJsonHelper.extractIntegerWithLocaleNamed("royaltyShare", elements);
+				        baseDataValidator.reset().parameter("royaltyShare").value(royaltyShare).notBlank().integerGreaterThanZero();
+				        
+				        final Long royaltySequence = fromApiJsonHelper.extractLongNamed("royaltySequence", elements);
+				        baseDataValidator.reset().parameter("royaltySequence").value(royaltySequence).notBlank();
+				        
+				        final Long status = fromApiJsonHelper.extractLongNamed("status", elements);
+				        baseDataValidator.reset().parameter("status").value(status).notBlank();
+				       
+					     throwExceptionIfValidationWarningsExist(dataValidationErrors);
+			 	      }
+	          }
+	        
+	        throwExceptionIfValidationWarningsExist(dataValidationErrors);
+		}
 }
 
 

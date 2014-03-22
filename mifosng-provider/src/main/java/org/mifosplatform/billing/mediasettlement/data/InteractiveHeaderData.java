@@ -33,6 +33,7 @@ public class InteractiveHeaderData {
 	private Long chargeCodeL;
 	private Long clientCode;
 	private String clientName;
+	private String mediaCategory;
 
 	public InteractiveHeaderData() {
 		
@@ -56,14 +57,14 @@ public class InteractiveHeaderData {
 
 	public InteractiveHeaderData(Long id,Long clientId, Long externalId,
 			String businessLineStr, String activityMonth, LocalDate dataUploadedDate,
-			/*String mediaCategoryStr,*/ String chargeCodeStr) {
+			String chargeCodeStr) {
 		this.id = id;
 		this.clientId = clientId;
 		this.externalId = externalId;
 		this.businessLine = businessLineStr;
 		this.activityMonth = activityMonth;
 		this.dataUploadedDate = (null==dataUploadedDate)?null:dataUploadedDate.toDate();
-		/*this.mediaCategory = mediaCategoryStr;*/
+
 		this.chargeCode = chargeCodeStr;
 	}
 
@@ -232,6 +233,14 @@ public class InteractiveHeaderData {
 
 	public void setClientName(String clientName) {
 		this.clientName = clientName;
+	}
+
+	public String getMediaCategory() {
+		return mediaCategory;
+	}
+
+	public void setMediaCategory(String mediaCategory) {
+		this.mediaCategory = mediaCategory;
 	}
 	
 	

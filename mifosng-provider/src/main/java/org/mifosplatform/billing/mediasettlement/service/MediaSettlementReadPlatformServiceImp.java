@@ -132,7 +132,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final Long externalId = rs.getLong("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
-			return new PartnerAccountData(id, partnerType,partnerName, partnerTypeName,partnerAddress,
+			return new PartnerAccountData(id, partnerType,partnerTypeName,partnerName,partnerAddress,
 					null, currencyCode, externalId, contactNum, emailId);
 		}
 
@@ -151,14 +151,14 @@ public class MediaSettlementReadPlatformServiceImp implements
 				throws SQLException {
 			final Long id = rs.getLong("id");
 			final Long partnerType = rs.getLong("partnerType");
-			final String partnerName = rs.getString("partnerName");
 			final String partnerTypeName = rs.getString("partnerTypeName");
+			final String partnerName = rs.getString("partnerName");
 			final Long currencyId = rs.getLong("currencyId");
 			final String partnerAddress = rs.getString("partnerAddress");
 			final Long externalId = rs.getLong("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
-			return new PartnerAccountData(id,partnerType, partnerName,partnerTypeName, partnerAddress,
+			return new PartnerAccountData(id,partnerType,partnerTypeName, partnerName, partnerAddress,
 					currencyId, null, externalId, contactNum, emailId);
 		}
 	}
@@ -171,7 +171,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		 * "select pt.id as id, pt.partner_type as partnerType, pt.currency_id as currencyCode, pt.media_category as mediaCategory, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ? and pt.is_deleted='N'"
 		 * ;
 		 */
-		final String sql = "select pt.id as id,pt.partner_type as partnerType,(select code_value from m_code_value where id = pt.partner_type ) as partnerTypeName,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ?";
+		final String sql = "select pt.id as id,(select code_value from m_code_value where id = pt.partner_type) as partnerTypeName ,pt.partner_type as partnerType,pt.contact_num as contactNum,pt.official_email_id as emailId,pt.external_id as externalId,pt.currency_id as currencyId, pt.partner_name as partnerName, pt.partner_address as partnerAddress from bp_account pt where pt.id = ?";
 		EditPartnerAccountMapper mapper = new EditPartnerAccountMapper();
 		return jdbcTemplate.queryForObject(sql, mapper, new Object[] { id });
 	}
@@ -825,6 +825,12 @@ public class MediaSettlementReadPlatformServiceImp implements
 		jdbcTemplate.update("call proc_settle_stg()", new Object[] {});
 
 	}
+	
+	@Override 
+	public void executeProcedure(){
+		System.out.println("Executing Procedure ...!");
+		jdbcTemplate.update("call load_from_stg()", new Object[] {});
+	}
 
 	/*
 	 * @Override public List<PartnerAccountData> retrieveCountryDetails() {
@@ -1431,7 +1437,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		@Override
 		public Long retriveClientId(String clientName) {
 			
-			final String sql = "select id from m_client where firstname=?";
+			final String sql = "select id from m_client where display_name=?";
 			return jdbcTemplate.queryForLong(sql, new Object[]{clientName});
 
 		}

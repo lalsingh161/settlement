@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.mediasettlement.data.MediaSettlementCommand;
-import org.mifosplatform.billing.mediasettlement.data.RawInteractiveHeaderDetailData;
+import org.mifosplatform.billing.mediasettlement.data.OperatorStageDetailData;
 import org.mifosplatform.billing.mediasettlement.domain.AccountPartnerJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.ChannelPartnerMappingJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.CurrencyRate;
@@ -21,6 +21,8 @@ import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeader;
 import org.mifosplatform.billing.mediasettlement.domain.InteractiveHeaderJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.OperatorDeduction;
 import org.mifosplatform.billing.mediasettlement.domain.OperatorDeductionJpaRepository;
+import org.mifosplatform.billing.mediasettlement.domain.OperatorStage;
+import org.mifosplatform.billing.mediasettlement.domain.OperatorStageDetailJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerAccount;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerAgreement;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerAgreementDetail;
@@ -30,8 +32,6 @@ import org.mifosplatform.billing.mediasettlement.domain.PartnerGame;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetails;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetailsJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameJpaRepository;
-import org.mifosplatform.billing.mediasettlement.domain.RawInteractiveHeaderDetail;
-import org.mifosplatform.billing.mediasettlement.domain.RawInteractiveHeaderDetailJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMaster;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMasterJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueOEMSettlement;
@@ -92,8 +92,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private RevenueMasterJpaRepository revenueMasterJpaRepository;
 	final private CurrencyRateJpaRepository currencyRateJpaRepository;
 	final private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
-	final private RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository;
-	final private RawInteractiveHeaderDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService;
+	final private OperatorStageDetailJpaRepository rawInteractiveHeaderDetailJpaRepository;
+	final private OperatorStageDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService;
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(MediaSettlementWritePlatformServiceImp.class);
 	
@@ -118,8 +118,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final PartnerAgreementDetailRepository partnerAgreementDetailRepository,
 			final  CurrencyRateJpaRepository currencyRateJpaRepository,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
-			final RawInteractiveHeaderDetailJpaRepository rawInteractiveHeaderDetailJpaRepository,
-			final RawInteractiveHeaderDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService) {
+			final OperatorStageDetailJpaRepository rawInteractiveHeaderDetailJpaRepository,
+			final OperatorStageDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService) {
 
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
@@ -360,9 +360,10 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		// TODO Auto-generated method stub
 		PartnerAgreement detailMaster=null;
 		PartnerAgreementDetail detailChild=null;
+		PartnerAgreement detailMasterTable=null;
 		
-//		this.fromApiJsonDeserializer.validateForCreatePartnerAgreement(command.toString());
 		try{
+		this.fromApiJsonDeserializer.validateForCreatePartnerAgreement(command.json());
 		
 		detailMaster=PartnerAgreement.fromJson(command);
 		
@@ -389,7 +390,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
         }
         else{
         	
-        	PartnerAgreement detailMasterTable=this.partnerAgreementRepository.findOne(paId);
+        	 detailMasterTable=this.partnerAgreementRepository.findOne(paId);
  	         
         	if(detailMasterTable.getAgreementCategory() == null && detailMaster.getAgreementCategory() == null){
    			 
@@ -472,14 +473,16 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		
 		
 	} catch (DataIntegrityViolationException dve) {
-
-		logger.error(dve.getMessage(), dve);
+		handleCodeDataIntegrityIssues(command, dve);
 	     throw new PlatformDataIntegrityException("error.msg.document.unknown.data.integrity.issue",
 	             ""+dve.getMostSpecificCause().getMessage());
 	  
 	}
-
-			return new CommandProcessingResult(Long.valueOf(-1L));	
+		if(detailMaster.getId() == null){
+			return new CommandProcessingResult( detailMasterTable.getId());	
+		}else{
+			return new CommandProcessingResult( detailMaster.getId());
+		}
 			
 	}
 	
@@ -1017,7 +1020,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				PartnerAgreementDetail detail= null;
 				
 				try{
-					
+					this.fromApiJsonDeserializer.validateForCreatePartnerAgreement(command.json());
 				
 					final JsonArray partnerAgreementDatasArray = command.arrayOfParameterNamed("partnerAgreementData").getAsJsonArray();
 					List<Long> id = new ArrayList<Long>();
@@ -1100,6 +1103,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 
 					
 			 	}catch (DataIntegrityViolationException dve) {
+			 		handleCodeDataIntegrityIssues(command, dve);
 					throw new PlatformDataIntegrityException(dve.getLocalizedMessage(), dve.getRootCause().getCause().getMessage(), "");
 				}
 				return new CommandProcessingResultBuilder() 
@@ -1128,9 +1132,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	 			
 	 			headerOld.setClientId(headerNew.getClientId());
 	 			headerOld.setExternalId(headerNew.getExternalId());
-	 			headerOld.setActivityMonth(headerNew.getActivityMonth());
 	 			headerOld.setBusinessLine(headerNew.getBusinessLine());
-	 			/*headerOld.setMediaCategory(headerNew.getMediaCategory());*/
+	 			headerOld.setActivityMonth(headerNew.getActivityMonth());
 	 			headerOld.setChargeCode(headerNew.getChargeCode());
 	 			headerOld.setDataUploadedDate(headerNew.getDataUploadedDate());
 	 			
@@ -1150,6 +1153,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 				     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
 				     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
 				     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
+				     
 				     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
 				     
 				     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads,mediaCategory);
@@ -1245,14 +1249,15 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 	public CommandProcessingResult createRawData(JsonCommand command) {
 		 		
 		 		context.authenticatedUser();
-		 		RawInteractiveHeaderDetail rawData = null;
+		 		OperatorStage rawData = null;
 		 		
 		 		try{
 		 			
 		 			fromApiJsonDeserializer.validateForRawData(command.json());
-		 			rawData = RawInteractiveHeaderDetail.fromJson(command);
+		 			rawData = OperatorStage.fromJson(command);
 		 			rawInteractiveHeaderDetailJpaRepository.saveAndFlush(rawData);
-		 			executeRawData();
+		 			
+		 			//executeRawData();
 		 		}catch(DataIntegrityViolationException dve){
 		 			handleCodeDataIntegrityIssues(command, dve);
 		 			return new CommandProcessingResultBuilder().withEntityId(-1L).build();
@@ -1262,7 +1267,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 	
 		 	public void executeRawData(){
 		 		
-		 		List<RawInteractiveHeaderDetailData> rawData = rawInteractiveHeaderDetailReadPlatformService.retriveAllData();
+		 		List<OperatorStageDetailData> rawData = rawInteractiveHeaderDetailReadPlatformService.retriveAllData();
 		 		List<InteractiveHeader> headerData = new InteractiveHeaderHandler(rawData).getData();
 		 		interactiveHeaderJpaRepository.save(headerData);
 		 		//System.out.println(rawData);
