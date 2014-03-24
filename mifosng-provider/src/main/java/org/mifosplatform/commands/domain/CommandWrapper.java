@@ -1221,5 +1221,13 @@ public class CommandWrapper {
 	public boolean isCreateRawData(){
 		return this.entityName.equalsIgnoreCase("RAWDATA") && this.actionName.equalsIgnoreCase("CREATE");
 	}
+	
+	public boolean isPlatformStageData(){
+		return this.entityName.equalsIgnoreCase("PLATFORMSTAGE");
+	}
+	
+	public boolean isCreatePlatformStage(){
+		return this.entityName.equalsIgnoreCase("PLATFORMSTAGE") && this.actionName.equalsIgnoreCase("CREATE");
+	}
 }
 

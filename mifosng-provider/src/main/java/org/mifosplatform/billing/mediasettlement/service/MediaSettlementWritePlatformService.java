@@ -73,4 +73,6 @@ public interface MediaSettlementWritePlatformService {
 			Long entityId);
 
 	public CommandProcessingResult createRawData(JsonCommand command);
+
+	public CommandProcessingResult createPlatformStageData(JsonCommand command);
 }

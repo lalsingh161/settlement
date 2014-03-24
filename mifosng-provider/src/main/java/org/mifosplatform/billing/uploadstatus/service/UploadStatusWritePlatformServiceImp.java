@@ -133,6 +133,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 	
 	 private static final String MEDIAASSETS_RESOURCE_TYPE = "ASSESTS";
+	 private static final String PLATFORM_STAGE_TYPE = "PLATFORMSTAGE";
 	 private static final String EPG_RESOURCE_TYPE = "EPGPROGRAMGUIDE";
 	 private static final  String MRN_RESOURCE_TYPE = "MRNDETAILS";
 	 private static final String GAMEEVENT_RESOURCE_TYPE = "GAMEEVENT";
@@ -1248,7 +1249,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			}
 	
 			
-		}else if(uploadProcess.equalsIgnoreCase("GameEvent")){
+		}else if(uploadProcess.equalsIgnoreCase("OperatorUpload")){
 			List<Long> clientIds = new LinkedList<Long>();
 			Integer cellNumber = 13;
 			UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
@@ -1306,7 +1307,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									if(businessData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(3).getStringCellValue()))
 											{
 												//jsonObject.put("businessLine",businessData.getId());
-												jsonObject.put("businessLine",businessData.getId());
+												jsonObject.put("businessLine",headerRow.getCell(3).getStringCellValue());
 											}
 								}
 							}
@@ -1322,7 +1323,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									if(mediaData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(4).getStringCellValue()))
 											{
 										//jsonObject.put("mediaCategory",mediaData.getId());
-										jsonObject.put("mediaCategory",mediaData.getId());
+										jsonObject.put("mediaCategory",headerRow.getCell(4).getStringCellValue());
 											}
 								}
 							}
@@ -1344,7 +1345,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									if(playSourceData.getmCodeValue().equalsIgnoreCase(headerRow.getCell(5).getStringCellValue()))
 											{
 												//m.put("playSource",playSourceData.getId());
-												jsonObject.put("playSource",playSourceData.getId());
+												jsonObject.put("playSource",headerRow.getCell(5).getStringCellValue());
 											}
 								}
 							}
@@ -1373,7 +1374,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									   if(contentData.getPartnerName().equalsIgnoreCase(headerRow.getCell(7).getStringCellValue()))
 									   {
 										   //m.put("contentProvider", contentData.getId());
-										   jsonObject.put("contentProvider",contentData.getId());
+										   jsonObject.put("contentProvider",headerRow.getCell(7).getStringCellValue());
 									   }
 								   }
 							   }
@@ -1387,7 +1388,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									   if(channelData.getPartnerName().equalsIgnoreCase(headerRow.getCell(8).getStringCellValue()))
 									   {
 										   //m.put("channelName", channelData.getId());
-										   jsonObject.put("channelName", channelData.getId());
+										   jsonObject.put("channelName",headerRow.getCell(8).getStringCellValue());
 									   }
 								   }
 							   }
@@ -1401,7 +1402,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									   if(serviceData.getPartnerName().equalsIgnoreCase(headerRow.getCell(9).getStringCellValue()))
 									   {
 										   //m.put("serviceName", serviceData.getId());
-										   jsonObject.put("serviceName", serviceData.getId());
+										   jsonObject.put("serviceName", headerRow.getCell(9).getStringCellValue());
 									   }
 								   }
 							   }
@@ -1471,17 +1472,17 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			}
 	
 			
-		}else if(uploadProcess.equalsIgnoreCase("Platform")){/*
+		}else if(uploadProcess.equalsIgnoreCase("PlatformUpload")){
 			
 			
 
-			Integer cellNumber = 28;
+			Integer cellNumber = 27;
 			UploadStatus uploadStatusForMediaAsset = this.uploadStatusRepository.findOne(orderId);
 			
-			if(uploadStatusForMediaAsset.getProcessStatus().equalsIgnoreCase("Processing")){
+			if(uploadStatusForMediaAsset.getProcessStatus().equalsIgnoreCase("Processing...")){
 				return new CommandProcessingResult("2");
 			}else{
-				uploadStatusForMediaAsset.setProcessStatus("Processing");
+				uploadStatusForMediaAsset.setProcessStatus("Processing...");
 				this.uploadStatusRepository.save(uploadStatusForMediaAsset);
 			}
 			
@@ -1510,31 +1511,43 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							 throw new EOFException();
 						totalRecordCount++;
 						
-						jsonObject.put("custCode", operatorRow.getCell(i).getNumericCellValue());
-						jsonObject.put("ba",operatorRow.getCell(i).getStringCellValue());
-						jsonObject.put("pc", operatorRow.getCell(i).getNumericCellValue());
-						jsonObject.put("mpm",operatorRow.getCell(i).getNumericCellValue());
-						jsonObject.put("invoiceNo",operatorRow.getCell(i).getStringCellValue());
-						jsonObject.put("invoiceDate",operatorRow.getCell(i).getStringCellValue());
-						jsonObject.put("customerName",operatorRow.getCell(i).getStringCellValue());
-						jsonObject.put("customerCircle",operatorRow.getCell(i).getStringCellValue());
-						jsonObject.put("activityMonth",operatorRow.getCell(i).getStringCellValue());
-						jsonObject.put("business",operatorRow.getCell(i).getStringCellValue());
-						jsonObject.put("type",operatorRow.getCell(i).getStringCellValue);
+						jsonObject.put("custCode", getCellData(operatorRow.getCell(0)));
+						jsonObject.put("ba",getCellData(operatorRow.getCell(1)));
+						jsonObject.put("pc", getCellData(operatorRow.getCell(2)));
+						jsonObject.put("mpm",getCellData(operatorRow.getCell(3)));
+						jsonObject.put("invoiceNo",getCellData(operatorRow.getCell(4)));
 						
-						jsonObject.put("mediaTitle",mediaRow.getCell(0).getStringCellValue());//-
-						jsonObject.put("overview",mediaRow.getCell(1).getStringCellValue());//-
-						Long partnerId = mediaSettlementReadPlatformService.getPartnerId(mediaRow.getCell(2).getStringCellValue());
-						jsonObject.put("partnerName",partnerId);//-
-						jsonObject.put("mediaCategory",mediaRow.getCell(3).getStringCellValue());//-
+						SimpleDateFormat invoiceDateFormater = new SimpleDateFormat("dd MMMM yyyy");
+						jsonObject.put("invoiceDate",invoiceDateFormater.format(operatorRow.getCell(5).getDateCellValue()));
+						
+						jsonObject.put("customerName",getCellData(operatorRow.getCell(6)));
+						jsonObject.put("customerCircle",getCellData(operatorRow.getCell(7)));
+						
+						SimpleDateFormat activityMonthFormater = new SimpleDateFormat("MMM yyyy");
+						jsonObject.put("activityMonth",activityMonthFormater.format(operatorRow.getCell(8).getDateCellValue()));
+						
+						jsonObject.put("business",getCellData(operatorRow.getCell(9)));
+						jsonObject.put("type",getCellData(operatorRow.getCell(10)));
+						jsonObject.put("category",getCellData(operatorRow.getCell(11)));
+						jsonObject.put("contentName",getCellData(operatorRow.getCell(12)));
+						jsonObject.put("contentProviderName",getCellData(operatorRow.getCell(13)));
+						jsonObject.put("channelName",getCellData(operatorRow.getCell(14)));
+						jsonObject.put("serviceName",getCellData(operatorRow.getCell(15)));
+						jsonObject.put("eup",getCellData(operatorRow.getCell(16)));
+						jsonObject.put("downloads",getCellData(operatorRow.getCell(17)));
+						jsonObject.put("grossRevenue",getCellData(operatorRow.getCell(18)));
+						jsonObject.put("wpc",getCellData(operatorRow.getCell(19)));
+						jsonObject.put("employeeDeduction",getCellData(operatorRow.getCell(20)));
+						jsonObject.put("entTax",getCellData(operatorRow.getCell(21)));
+						jsonObject.put("waivers",getCellData(operatorRow.getCell(22)));
+						jsonObject.put("netRevenueAfterTax",getCellData(operatorRow.getCell(23)));
+						jsonObject.put("operatorRevShare",getCellData(operatorRow.getCell(24)));
+						jsonObject.put("operatorRevenueAmt",getCellData(operatorRow.getCell(25)));
 						jsonObject.put("dateFormat","dd MMMM yyyy");
 						jsonObject.put("locale","en");
-								
 						
-						
-						
-						context.authenticatedUser().validateHasReadPermission(MEDIAASSETS_RESOURCE_TYPE );
-						final CommandWrapper commandRequest = new CommandWrapperBuilder().createGameMediaAsset().withJson(jsonObject.toString()).build();
+						context.authenticatedUser().validateHasReadPermission(PLATFORM_STAGE_TYPE);
+						final CommandWrapper commandRequest = new CommandWrapperBuilder().createPlatformStageData().withJson(jsonObject.toString()).build();
 						final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 						
 						if(result!=null){
@@ -1577,7 +1590,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				e.getStackTrace();
 			}		
 		
-		*/}else if(uploadProcess.equalsIgnoreCase("MediaGames")){
+		}else if(uploadProcess.equalsIgnoreCase("MediaGames")){
 			Integer cellNumber = 4;
 			UploadStatus uploadStatusForMediaAsset = this.uploadStatusRepository.findOne(orderId);
 			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
@@ -2391,6 +2404,33 @@ private void writeCSVData(String fileLocation,
         	
         return noOfEntries;
     }
+	
+	public Object getCellData(Cell cell){
+		
+		switch (cell.getCellType()) {
+		case Cell.CELL_TYPE_BLANK:
+			return cell.getStringCellValue();
+
+		case Cell.CELL_TYPE_BOOLEAN:
+			return cell.getBooleanCellValue();
+			
+		case Cell.CELL_TYPE_ERROR:
+			return cell.getErrorCellValue();
+				
+		case Cell.CELL_TYPE_FORMULA:
+			return cell.getCellFormula();
+			
+		case Cell.CELL_TYPE_NUMERIC:
+			return cell.getNumericCellValue();
+			
+		case Cell.CELL_TYPE_STRING:
+			return cell.getStringCellValue();
+						
+		default:
+			System.out.println(cell.getCellType());
+			return cell.getStringCellValue();
+		}
+	}
 }
 
 
