@@ -913,6 +913,10 @@ public class SynchronousCommandProcessingService implements
 						 }else if(wrapper.isDeleteCurrencyRate()){
 							 handler = applicationContext.getBean("deleteCurrencyRateCommandHandler",NewCommandSourceHandler.class); 
 						 } 
+				}else if(wrapper.isAdvertisementResource()){
+	                     if(wrapper.isCreateAdvertisementStageData()){			 
+	                    	 handler = applicationContext.getBean("createAdvertisementStageCommandHandler",NewCommandSourceHandler.class); 
+	                     } 
 				}else {
 			               throw new UnsupportedCommandException(wrapper.commandName());
 		              }

@@ -2,6 +2,7 @@ package org.mifosplatform.billing.revenuemaster.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.LocalDate;
@@ -15,6 +16,7 @@ import org.mifosplatform.billing.revenuemaster.data.DeductionTaxesData;
 import org.mifosplatform.billing.revenuemaster.data.OperatorShareData;
 import org.mifosplatform.billing.revenuemaster.data.RevenueMasterData;
 import org.mifosplatform.billing.revenuemaster.domain.DeductionTax;
+import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	    BigDecimal detailChargeTaxAmount = BigDecimal.ZERO;
 	    BigDecimal operatorShareAmount = BigDecimal.ZERO;
 	    BigDecimal netOperatorShareAmount = BigDecimal.ZERO;
+	    BigDecimal totalChargeAmount = BigDecimal.ZERO;
 	   
 	    
 		List<OperatorShareData> revenueShareDatas=this.revenueReadplatformService.retriveOperatorRevenueShareData(detailDatas.get(0).getClientId()); 
@@ -54,7 +57,6 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		if(revenueShareDatas.size()!=0){
 			revenueShareData=revenueShareDatas.get(0);
 		}*/
-		
 		
 	    Invoice invoice = new Invoice(detailDatas.get(0).getClientId(),new LocalDate().toDate(), invoiceAmount, invoiceAmount, netTaxAmount, "active");
 	    
@@ -81,8 +83,9 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			netRevenueAmount=detailData.getGrossRevenue().subtract(detailChargeTaxAmount);
 			detailData.setDetailChargeTaxAmount(detailChargeTaxAmount);
 		    detailData.updateNetRevenueAmount(netRevenueAmount);
-		    
+		    //for(OperatorShareData revenuShareData:revenueShareDatas)
 		    operatorShareAmount=this.calculateOperatorShareAmount(revenueShareDatas,detailData.getNetRevenueAmount(),detailData);
+		    
 		    detailData.setOperatorShareAmount(operatorShareAmount);
 		    detailChargeTaxAmount=BigDecimal.ZERO;
 			System.out.println(detailData.getNetRevenueAmount());
@@ -91,24 +94,44 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	    
 	    for(RevenueMasterData detailData:detailDatas)
 	    {
-	    	netChargeTaxAmount=netChargeTaxAmount.add(detailData.getDetailChargeTaxAmount());
+	    	//netChargeTaxAmount=netChargeTaxAmount.add(detailData.getDetailChargeTaxAmount());
 	    	netChargeAmount=netChargeAmount.add(detailData.getNetRevenueAmount());	
 	    	netOperatorShareAmount=netOperatorShareAmount.add(detailData.getOperatorShareAmount());
 	    }
 	   
+	    List<InvoiceTaxCommand> listOfTaxes = this.calculateTax(detailDatas,netChargeAmount);
+	    
+	    
+	    for(InvoiceTaxCommand  invoiceTaxCommand : listOfTaxes)
+	    {
+	    	netChargeTaxAmount = netChargeTaxAmount.add(invoiceTaxCommand.getTaxAmount());
+			InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, invoiceTaxCommand.getTaxCode(),
+					 invoiceTaxCommand.getTaxPercentage(), invoiceTaxCommand.getTaxAmount());
+			charge.addChargeTaxes(invoiceTax);
+	    }
+	    
+	    if(detailDatas.get(0).getTaxInclusive()!=null){
+		   if(isTaxInclusive(detailDatas.get(0).getTaxInclusive())){
+				netChargeAmount = netChargeAmount.subtract(netChargeTaxAmount);
+				
+				charge.setNetChargeAmount(netChargeAmount);
+				charge.setChargeAmount(netChargeAmount);
+			}
+			  }
+	    
 		DeductionTax deduction=new DeductionTax(invoice,charge,"OPRS",null,netOperatorShareAmount);
 	    charge.addDeductionTaxes(deduction);
 	    
+	    netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
+		totalChargeAmount = totalChargeAmount.add(netChargeAmount);
+	    
 		charge.setNetChargeAmount(netChargeAmount);
-		charge.setChargeAmount(netChargeAmount);    
-	    
-	    
-		invoiceAmount=netChargeAmount;
+		charge.setChargeAmount(netChargeAmount);
 		
-		invoice.addCharges(charge);
-		
+	    invoice.addCharges(charge);		
 	    
-		invoice.setNetChargeAmount(invoiceAmount);
+	    invoiceAmount = totalChargeAmount.add(netTaxAmount);
+		invoice.setNetChargeAmount(totalChargeAmount);
 		invoice.setTaxAmount(netTaxAmount);
 		
 		invoice.setInvoiceAmount(invoiceAmount);
@@ -117,7 +140,6 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		return this.invoiceRepository.save(invoice);
 	}
 	
-
 	public BigDecimal calculateOperatorShareAmount(List<OperatorShareData> revenueShareDatas, BigDecimal netRevenueAmount, RevenueMasterData detailData) {
 		
 	  BigDecimal revenueAmountOfIg=BigDecimal.ZERO;
@@ -149,6 +171,73 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		  return  operatorShareAmount; 
 	}
 
+	public  List<InvoiceTaxCommand> calculateTax(
+			List<RevenueMasterData> detailDatas, BigDecimal netChargeAmount) {
+		
+		
+		List<TaxMappingRateData> taxMappingRateDatas = this.revenueReadplatformService.retrieveTaxMappingDate(detailDatas.get(0).getClientId(),detailDatas.get(0).getChargeCode());
+		
+		if(taxMappingRateDatas.isEmpty()){
+			
+			 taxMappingRateDatas = this.revenueReadplatformService.retrieveDefaultTaxMappingDate(detailDatas.get(0).getClientId(),detailDatas.get(0).getChargeCode());
+		}
+		List<InvoiceTaxCommand> invoiceTaxCommand = generateInvoiceTax(taxMappingRateDatas, netChargeAmount,detailDatas.get(0).getClientId());
+		//List<InvoiceTax> listOfTaxes = invoiceTaxPlatformService.createInvoiceTax(invoiceTaxCommand);
+		return invoiceTaxCommand;
+	}
+	
+	// Generate Invoice Tax
+		public List<InvoiceTaxCommand> generateInvoiceTax(List<TaxMappingRateData> taxMappingRateDatas, BigDecimal price, long clientId) {
+
+			BigDecimal taxPercentage = null;
+			String taxCode = null;
+			BigDecimal taxAmount = null;
+			BigDecimal taxFlat=null;
+			List<InvoiceTaxCommand> invoiceTaxCommands = new ArrayList<InvoiceTaxCommand>();
+			InvoiceTaxCommand invoiceTaxCommand = null;
+		
+				if (taxMappingRateDatas != null) {
+
+					for (TaxMappingRateData taxMappingRateData : taxMappingRateDatas) {
+
+						if (taxMappingRateData.getTaxType().equalsIgnoreCase("Percentage")) {
+						      taxPercentage = taxMappingRateData.getRate();
+						      taxCode = taxMappingRateData.getTaxCode();
+						      taxAmount = price.multiply(taxPercentage.divide(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP));
+						     } else if (taxMappingRateData.getTaxType().equalsIgnoreCase("Flat")) {
+						      taxFlat = taxMappingRateData.getRate();
+						      taxCode = taxMappingRateData.getTaxCode();
+						      taxAmount =taxFlat;
+						     }
+						
+						/*taxPercentage = taxMappingRateData.getRate();
+						taxCode = taxMappingRateData.getTaxCode();
+						taxAmount = price.multiply(taxPercentage.divide(new BigDecimal(100)));*/	
+
+						invoiceTaxCommand = new InvoiceTaxCommand(clientId, null, null,
+								taxCode, null, taxPercentage, taxAmount);
+						invoiceTaxCommands.add(invoiceTaxCommand);
+				}
+
+				}
+				return invoiceTaxCommands;
+
+			}
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public Boolean isTaxInclusive(Integer taxInclusive){
 		
