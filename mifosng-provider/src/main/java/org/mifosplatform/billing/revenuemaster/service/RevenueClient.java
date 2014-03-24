@@ -73,13 +73,13 @@ public class RevenueClient {
 	
 	public BigDecimal RevenueOfClient(Long clientId){
 		List<RevenueMasterData> detailDatas=null;
+		BigDecimal invoiceAmount=null;
 		List<DeductionData> deductionDatas=this.revenueReadplatformService.retriveOperatorDeductionData(clientId);
 		if(deductionDatas.size()==0){
 			throw new NoDeductionsForOperatorException();
 		}
 		
 		List<GenerateInteractiveHeaderData> headerDatas=this.revenueReadplatformService.retriveInteractiveHeaderDetails(clientId);
-		BigDecimal invoiceAmount=null;
 		if(headerDatas.size() !=0)
 		{
 		   for(GenerateInteractiveHeaderData headerData:headerDatas)
@@ -171,10 +171,10 @@ public class RevenueClient {
 		List<DeductionTaxesData> taxes=new ArrayList<DeductionTaxesData>();
 		DeductionTaxesData tax=null;
 		
-		if(deductionDatas.size()==0){
+/*		if(deductionDatas.size()==0){
 		  throw new NoInteractiveHeadersFoundException();
 
-		}
+		}*/
 		
 		for(DeductionData deductionData:deductionDatas)
 		{
@@ -189,7 +189,7 @@ public class RevenueClient {
 			    deductionData.setWpcTaxAmount(taxAmount);
 			    WpcTaxAmount=deductionData.getWpcTaxAmount();
 			
-			} if(deductionData.getDeductionCode().equalsIgnoreCase("ED")&&formatter.print(new DateTime()).equalsIgnoreCase(activityMonth)){
+			} if(deductionData.getDeductionCode().equalsIgnoreCase("ED")/*&&formatter.print(new DateTime()).equalsIgnoreCase(activityMonth)*/){
 				
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();

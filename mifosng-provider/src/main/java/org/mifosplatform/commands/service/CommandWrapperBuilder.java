@@ -2140,5 +2140,13 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
+	public CommandWrapperBuilder createAdvertiseStageData() {
+		
+		this.actionName = "CREATE";
+		this.entityName = "ADVERTISEMENT";
+		this.entityId = null;
+		this.href = "advertisement";
+		return this;
+	}
 	
 }

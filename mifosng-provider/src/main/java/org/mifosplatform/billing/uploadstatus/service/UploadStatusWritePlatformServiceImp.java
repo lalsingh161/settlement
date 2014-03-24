@@ -136,6 +136,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	 private static final String EPG_RESOURCE_TYPE = "EPGPROGRAMGUIDE";
 	 private static final  String MRN_RESOURCE_TYPE = "MRNDETAILS";
 	 private static final String GAMEEVENT_RESOURCE_TYPE = "GAMEEVENT";
+	 private static final String ADVERTISEMENT_STAGE_TYPE = "ADVERTISEMENT";
 	
 	 private final String EVENTORDER = "EVENTORDER";
 	 private String uploadProcess=null;
@@ -1552,6 +1553,121 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			}
 	
 			
+		}else if(uploadProcess.equalsIgnoreCase("Advertisement")){
+		
+			Integer cellNumber = 25;
+			UploadStatus uploadStatusForMediaAsset = this.uploadStatusRepository.findOne(orderId);
+			
+		/*	if(uploadStatusForMediaAsset.getProcessStatus().equalsIgnoreCase("Processing")){
+				return new CommandProcessingResult("2");
+			}else{
+				uploadStatusForMediaAsset.setProcessStatus("Processing");
+				this.uploadStatusRepository.save(uploadStatusForMediaAsset);
+			}*/
+			
+			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
+			Workbook wb = null;
+			Long processRecordCount=0L;
+			Long totalRecordCount=0L;
+			try {
+
+				
+				wb = WorkbookFactory.create(new File(fileLocation));
+				Sheet operatorSheet = wb.getSheetAt(0);
+				int msNumberOfRows =  getNumberOfRows(operatorSheet, 1);
+				System.out.println("Number of rows : "+msNumberOfRows);
+				
+				
+				for (int i = 4; i < msNumberOfRows; i++) {
+
+						Row operatorRow = operatorSheet.getRow(i);
+						
+						JSONObject jsonObject = new JSONObject();
+		
+								 try {
+									 if(operatorRow.getCell(1).getStringCellValue().equalsIgnoreCase("EOF"))
+										 throw new EOFException();
+									totalRecordCount++;
+									
+									jsonObject.put("custCode",getCellData(operatorRow.getCell(0)));
+									jsonObject.put("ba",getCellData(operatorRow.getCell(1)));
+									jsonObject.put("pc", getCellData(operatorRow.getCell(2)));
+									jsonObject.put("mpm",getCellData(operatorRow.getCell(3)));
+									jsonObject.put("invoiceNo",getCellData(operatorRow.getCell(4)));
+									
+									SimpleDateFormat invoiceDateFormater = new SimpleDateFormat("dd MMMM yyyy");
+									jsonObject.put("invoiceDate",invoiceDateFormater.format(operatorRow.getCell(5).getDateCellValue()));
+									
+									jsonObject.put("customerName",getCellData(operatorRow.getCell(6)));
+									jsonObject.put("customerCircle",getCellData(operatorRow.getCell(7)));
+									
+									SimpleDateFormat activityMonthFormater = new SimpleDateFormat("MMM yyyy");
+									jsonObject.put("activityMonth",activityMonthFormater.format(operatorRow.getCell(8).getDateCellValue()));
+									
+									jsonObject.put("business",getCellData(operatorRow.getCell(9)));
+									jsonObject.put("currency",getCellData(operatorRow.getCell(10)));
+									jsonObject.put("category",getCellData(operatorRow.getCell(11)));
+									jsonObject.put("contentName",getCellData(operatorRow.getCell(12)));
+									jsonObject.put("contentProviderName",getCellData(operatorRow.getCell(13)));
+									jsonObject.put("request",getCellData(operatorRow.getCell(14)));
+									jsonObject.put("impressions",getCellData(operatorRow.getCell(15)));
+									jsonObject.put("clicks",getCellData(operatorRow.getCell(16)));
+									jsonObject.put("clickThroughRatio",getCellData(operatorRow.getCell(17)));
+									jsonObject.put("eipm",getCellData(operatorRow.getCell(18)));
+									jsonObject.put("eipc",getCellData(operatorRow.getCell(19)));
+									jsonObject.put("income",getCellData(operatorRow.getCell(20)));
+									jsonObject.put("exrtaRate",getCellData(operatorRow.getCell(21)));
+									jsonObject.put("igRevenueAmount",getCellData(operatorRow.getCell(22)));
+									jsonObject.put("cpShareAmount",getCellData(operatorRow.getCell(23)));
+									jsonObject.put("igAfterRoyaltyPayouts",getCellData(operatorRow.getCell(24)));
+									jsonObject.put("dateFormat","dd MMMM yyyy");
+									jsonObject.put("locale","en");
+									
+									context.authenticatedUser().validateHasReadPermission(ADVERTISEMENT_STAGE_TYPE);
+									final CommandWrapper commandRequest = new CommandWrapperBuilder().createAdvertiseStageData().withJson(jsonObject.toString()).build();
+									final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+									
+									if(result!=null){
+								    	//Long rsId = result.resourceId();
+								    	errorData.add(new MRNErrorData((long)i, "Success"));
+								    	processRecordCount++;
+								    }
+								}catch(NotaContentProviderException e){
+									 errorData.add(new MRNErrorData((long)i, "Not a content provider"));
+								}catch(EmptyResultDataAccessException e){
+									 errorData.add(new MRNErrorData((long)i, "Content Provider does not exist")); 
+								}catch(DataIntegrityViolationException dve){
+									errorData.add(new MRNErrorData((long)i, dve.getMessage()));
+								}catch(PlatformDataIntegrityException e){
+									errorData.add(new MRNErrorData((long)i, e.getParameterName()+" : "+e.getDefaultUserMessage()));
+								}catch (PlatformApiDataValidationException e) {
+									errorData.add(new MRNErrorData((long)i, e.getErrors().get(0).getParameterName()+" : "+e.getDefaultUserMessage()));
+								}catch (NullPointerException e) {
+									errorData.add(new MRNErrorData((long)i, "Error: value cannot be null"));
+								}catch (EOFException e){
+									errorData.add(new MRNErrorData((long)i, "Completed: End Of Record"));
+									break;
+								}catch (IllegalStateException e) {
+									errorData.add(new MRNErrorData((long)i,e.getMessage()));
+								}catch (Exception e) {
+									errorData.add(new MRNErrorData((long)i, "Error: "+e.toString()));
+								}
+							}
+							
+							uploadStatusForMediaAsset.setProcessRecords(processRecordCount);
+							uploadStatusForMediaAsset.setUnprocessedRecords(totalRecordCount-processRecordCount);
+							uploadStatusForMediaAsset.setTotalRecords(totalRecordCount);
+							writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForMediaAsset,cellNumber);
+							processRecordCount=0L;totalRecordCount=0L;
+							uploadStatusForMediaAsset=null;
+
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (InvalidFormatException e) {
+							e.getStackTrace();
+						}
+		
+		
 		}else{
 		try {
 			File file=new File(filePath);
@@ -1762,7 +1878,33 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 
 	}
 	
-	
+   public Object getCellData(Cell cell){
+		
+		switch (cell.getCellType()) {
+		case Cell.CELL_TYPE_BLANK:
+			return cell.getStringCellValue();
+
+		case Cell.CELL_TYPE_BOOLEAN:
+			return cell.getBooleanCellValue();
+			
+		case Cell.CELL_TYPE_ERROR:
+			return cell.getErrorCellValue();
+				
+		case Cell.CELL_TYPE_FORMULA:
+			return cell.getCellFormula();
+			
+		case Cell.CELL_TYPE_NUMERIC:
+			return cell.getNumericCellValue();
+			
+		case Cell.CELL_TYPE_STRING:
+			return cell.getStringCellValue();
+						
+		default:
+			System.out.println(cell.getCellType());
+			return cell.getStringCellValue();
+		}
+	}
+
 	public CommandProcessingResult updateUploadStatusReadXls(String filepath,int rowvalue)
 	{
 		try {
