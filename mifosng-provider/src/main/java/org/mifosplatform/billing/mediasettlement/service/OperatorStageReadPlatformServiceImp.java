@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.joda.time.LocalDate;
-import org.mifosplatform.billing.mediasettlement.data.RawInteractiveHeaderDetailData;
+import org.mifosplatform.billing.mediasettlement.data.OperatorStageDetailData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
@@ -17,15 +17,15 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class RawInteractiveHeaderDetailReadPlatformServiceImp implements
-		RawInteractiveHeaderDetailReadPlatformService {
+public class OperatorStageReadPlatformServiceImp implements
+		OperatorStageDetailReadPlatformService {
 	
 	
 	private final JdbcTemplate jdbcTemplate;
 	private final PlatformSecurityContext context;
 	
 	@Autowired
-	public RawInteractiveHeaderDetailReadPlatformServiceImp(final TenantAwareRoutingDataSource dataSource, final PlatformSecurityContext context) {
+	public OperatorStageReadPlatformServiceImp(final TenantAwareRoutingDataSource dataSource, final PlatformSecurityContext context) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.context = context;
 	}
@@ -33,7 +33,7 @@ public class RawInteractiveHeaderDetailReadPlatformServiceImp implements
 	
 	
 	@Override
-	public List<RawInteractiveHeaderDetailData> retriveAllData(){
+	public List<OperatorStageDetailData> retriveAllData(){
 		
 		final String sql = "select * from bp_raw_headerdetail where is_processed='N' order by id";
 		RawInteractiveHeaderDetailMapper mapper = new RawInteractiveHeaderDetailMapper();
@@ -41,9 +41,9 @@ public class RawInteractiveHeaderDetailReadPlatformServiceImp implements
 	}
 	
 	
-	private final class RawInteractiveHeaderDetailMapper implements RowMapper<RawInteractiveHeaderDetailData>{
+	private final class RawInteractiveHeaderDetailMapper implements RowMapper<OperatorStageDetailData>{
 		@Override
-		public RawInteractiveHeaderDetailData mapRow(ResultSet rs, int rowNum)
+		public OperatorStageDetailData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long id = rs.getLong("id");
 			final Long clientName = rs.getLong("cust_name");
@@ -60,7 +60,7 @@ public class RawInteractiveHeaderDetailReadPlatformServiceImp implements
 			final BigDecimal endUserPrice = rs.getBigDecimal("end_user_price");
 			final Long downloads = rs.getLong("downloads");
 			final BigDecimal grossRevenue = rs.getBigDecimal("gross_revenue");
-			return new RawInteractiveHeaderDetailData(id,clientCode, clientName, activityMonth, businessLine, mediaCategory, playSource, contentName, contentProvider, channelName, serviceName, endUserPrice, downloads, grossRevenue,dataUploadedDate);
+			return new OperatorStageDetailData(id,clientCode, clientName, activityMonth, businessLine, mediaCategory, playSource, contentName, contentProvider, channelName, serviceName, endUserPrice, downloads, grossRevenue,dataUploadedDate);
 		}
 	}
 

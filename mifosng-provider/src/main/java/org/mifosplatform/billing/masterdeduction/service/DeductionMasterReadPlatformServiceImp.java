@@ -2,6 +2,7 @@ package org.mifosplatform.billing.masterdeduction.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 import org.mifosplatform.billing.address.data.StateDetails;
@@ -104,4 +105,29 @@ public class DeductionMasterReadPlatformServiceImp implements DeductionMasterRea
 		}
 	
 	}
+
+	@Override
+	public Collection<DeductionMasterData> getDeductionCodeData() {
+		context.authenticatedUser();
+		final String sql="select id as id,ded_code as deductionCode,deduction as deductionName,ded_type as deductionType FROM bp_deduction_codes where is_deleted='N'";
+		DeductionDataMapper mapper=new DeductionDataMapper();
+		return jdbcTemplate.query(sql, mapper,new Object[]{});
+	}
+	
+	private static final class DeductionDataMapper implements  RowMapper<DeductionMasterData>{
+
+		@Override
+		public DeductionMasterData mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+		
+			final Long id = rs.getLong("id");
+			final String  deductionCode = rs.getString("deductionCode");
+			final String deductionName = rs.getString("deductionName");
+			final Long deductionType = rs.getLong("deductionType");
+			return new DeductionMasterData(id,deductionCode,deductionName,deductionType,null,null,null);
+		}
+	
+	}
+	
+	
 }

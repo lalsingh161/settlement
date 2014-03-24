@@ -29,8 +29,11 @@ import javax.ws.rs.core.UriInfo;
 import org.mifosplatform.billing.businessline.data.BusinessLineData;
 import org.mifosplatform.billing.businessline.service.BusinessLineReadPlatformService;
 import org.mifosplatform.billing.chargecode.service.ChargeCodeReadPlatformService;
+import org.mifosplatform.billing.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.billing.item.data.ChargesData;
 import org.mifosplatform.billing.item.service.ItemReadPlatformService;
+import org.mifosplatform.billing.masterdeduction.data.DeductionMasterData;
+import org.mifosplatform.billing.masterdeduction.service.DeductionMasterReadPlatformService;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 import org.mifosplatform.billing.mcodevalues.service.MCodeReadPlatformService;
 import org.mifosplatform.billing.media.data.MediaAssetData;
@@ -61,8 +64,10 @@ import org.mifosplatform.infrastructure.core.api.ApiConstants;
 import org.mifosplatform.infrastructure.core.api.ApiRequestParameterHelper;
 import org.mifosplatform.infrastructure.core.data.CommandProcessingResult;
 import org.mifosplatform.infrastructure.core.exception.PlatformDataIntegrityException;
+import org.mifosplatform.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.mifosplatform.infrastructure.core.service.FileUtils;
+import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.organisation.monetary.data.CurrencyData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +105,7 @@ public class MediaSettlementApiResources {
     private final ItemReadPlatformService itemReadPlatformService;
     private final MediaAssetReadPlatformService assetReadPlatformService;
     private final BusinessLineReadPlatformService businessLineReadPlatformService;
+    private final DeductionMasterReadPlatformService deductionMasterReadPlatformService;
     
     
     @Autowired
@@ -115,7 +121,8 @@ public class MediaSettlementApiResources {
     		final MediaAssetReadPlatformService mediaAssetReadPlatformService,
     		final ItemReadPlatformService itemReadPlatformService,
     		final MediaAssetReadPlatformService assetReadPlatformService,
-    		final BusinessLineReadPlatformService businessLineReadPlatformService) {
+    		final BusinessLineReadPlatformService businessLineReadPlatformService,
+    		final DeductionMasterReadPlatformService deductionMasterReadPlatformService) {
 		this.context = context;
 		this.mCodeReadPlatformService = mCodeReadPlatformService;
 		this.toApiJsonSerializer = toApiJsonSerializer;
@@ -129,6 +136,7 @@ public class MediaSettlementApiResources {
 		this.itemReadPlatformService = itemReadPlatformService;
 		this.assetReadPlatformService = assetReadPlatformService;
 		this.businessLineReadPlatformService = businessLineReadPlatformService;
+		this.deductionMasterReadPlatformService = deductionMasterReadPlatformService;
 	
 	}
     
@@ -168,12 +176,13 @@ public class MediaSettlementApiResources {
     @GET
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public String getPartnerAccountDetails(@Context final UriInfo uriInfo){
+    public String getPartnerAccountDetails(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch, @QueryParam("limit") final Integer limit, 
+    		@QueryParam("offset") final Integer offset,  @QueryParam("sortOrder") final String sortOrder){
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
-    	List<PartnerAccountData> partnerAccountData = mediaSettlementReadPlatformService.retrieveAllAccountPartnerDetails();
-    	
-    	PartnerAccountData pd = new PartnerAccountData(partnerAccountData);
-    	return toApiJsonSerializer.serialize(pd);
+      final SearchSqlQuery searchPartnerAccountHistory =SearchSqlQuery.forSearch(sqlSearch, offset,limit);
+      final Page<PartnerAccountData> partnerAccountData = mediaSettlementReadPlatformService.retrieveAllAccountPartnerDetails(searchPartnerAccountHistory);
+      final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+    	return toApiJsonSerializer.serialize(partnerAccountData);
     }
     
     @GET
@@ -414,10 +423,11 @@ public class MediaSettlementApiResources {
     	Collection<MCodeData> mediaCategoryData = mCodeReadPlatformService.getCodeValue("Media Category");
 
     	if(revenueData!=null){
-    		/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");*/
-    		Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
+    		/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
+    		Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();*/
+    		Collection<DeductionMasterData> deductionMasterData = this.deductionMasterReadPlatformService.getDeductionCodeData();
     		Collection<MCodeData> royaltyType = this.mCodeReadPlatformService.getCodeValue("Royalty Type");
-        	RevenueSettlementData  datas = new RevenueSettlementData(businessLineData,mediaCategoryData,royaltyType);
+        	RevenueSettlementData  datas = new RevenueSettlementData(deductionMasterData,mediaCategoryData,royaltyType);
         	return toApiJsonSerializer.serialize(datas);
     	}
     	RevenueSettlementData  datas = new RevenueSettlementData(mediaCategoryData);
@@ -493,11 +503,14 @@ public class MediaSettlementApiResources {
     @Path("/partneragreement")
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public String retrievePartnerAgreementDetails(@Context final UriInfo uriInfo){
+    public String retrievePartnerAgreementDetails(@Context final UriInfo uriInfo,@QueryParam("sqlSearch") final String sqlSearch, @QueryParam("limit") final Integer limit, 
+    		@QueryParam("offset") final Integer offset){
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
-    	List<PartnerAgreementData> partnerAgreementDatas = mediaSettlementReadPlatformService.retrievePartnerAgreementDetails();
-    	PartnerAgreementData partnerAgreement = new PartnerAgreementData(partnerAgreementDatas);
-    	return toApiJsonSerializer.serialize(partnerAgreement);
+    	  final SearchSqlQuery searchPartnerAgreementHistory =SearchSqlQuery.forSearch(sqlSearch, offset,limit);
+    	Page<PartnerAgreementData> partnerAgreementDatas = mediaSettlementReadPlatformService.retrievePartnerAgreementDetails(searchPartnerAgreementHistory);
+    	  final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+    	//PartnerAgreementData partnerAgreement = new PartnerAgreementData(partnerAgreementDatas);
+    	return toApiJsonSerializer.serialize(partnerAgreementDatas);
     }
     
     
@@ -926,14 +939,14 @@ public class MediaSettlementApiResources {
     	RevenueShareData templateData=mediaSettlementReadPlatformService.retriveEditRevenueRecord(id);
     	Collection<MCodeData> mediaCategoryData = mCodeReadPlatformService.getCodeValue("Media Category");
     	
-    	/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");*/
-    	
-    	Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
-    	
+    	/*Collection<MCodeData> businessLineData = this.mCodeReadPlatformService.getCodeValue("Business");
+    	Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();*/
+    	Collection<DeductionMasterData> deductionMasterData = this.deductionMasterReadPlatformService.getDeductionCodeData();
  		Collection<MCodeData>  	royaltyTypeData = mCodeReadPlatformService.getCodeValue("Royalty Type");
     	List<RevenueShareData> percentageDatas = mediaSettlementReadPlatformService.retriveSingleRevenueRecord(id);
     	templateData.setMediaCategoryData(mediaCategoryData);
-    	templateData.setBusinessLineData(businessLineData);
+    	//templateData.setBusinessLineData(businessLineData);
+    	templateData.setDeductionMasterData(deductionMasterData);
     	templateData.setRoyaltyTypeData(royaltyTypeData);
     	templateData.setPercentageDatas(percentageDatas);
 

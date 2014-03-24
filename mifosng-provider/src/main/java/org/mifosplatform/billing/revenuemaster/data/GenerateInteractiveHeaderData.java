@@ -12,11 +12,10 @@ public class GenerateInteractiveHeaderData {
 	private String activityMonth;
 
 	public GenerateInteractiveHeaderData(Long id, Long clientId,
-			Long externalId, String businessLine, String activityMonth) {
+			 String businessLine, String activityMonth) {
 		
 		this.id=id;
 		this.clientId= clientId;
-		this.externalId= externalId;
 		this.businessLine = businessLine;
 		this.activityMonth = activityMonth;
 		
@@ -26,24 +25,8 @@ public class GenerateInteractiveHeaderData {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public Long getClientId() {
 		return clientId;
-	}
-
-	public void setClientId(Long clientId) {
-		this.clientId = clientId;
-	}
-
-	public Long getExternalId() {
-		return externalId;
-	}
-
-	public void setExternalId(Long externalId) {
-		this.externalId = externalId;
 	}
 
 	public String getBusinessLine() {

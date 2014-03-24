@@ -14,64 +14,12 @@ import org.mifosplatform.useradministration.domain.AppUser;
 
 
 @Entity
-@Table(name="bp_raw_headerdetail")
-public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser, Long>{
+@Table(name="obs_stg_operator")
+public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 
 	
-	/*@Column(name="cust_name")
-	private String clientName;
-	
-	@Column(name="cust_code")
-	private Long clientCode;
-	
-	
-	
-	@Column(name="activity_month")
-	private String activityMonth;
-		
-	
-	@Column(name="data_upload_date")
-	private Date dataUploadedDate = new Date();
-	
-	@Column(name="business_line")
-	private String businessLine;
-	
-	@Column(name="media_category")
-	private String mediaCategory;
-	
-	@Column(name="charge_code")
-	private String chargeCode;
-	
-	
-	@Column(name="play_source", nullable=false)
-	private String playSource;
-	
-	@Column(name="content_name", nullable=false)
-	private String contentName;
-	
-	@Column(name="content_provider", nullable=false)
-	private String contentProvider;
-
-	@Column(name="channel_name", nullable=false)
-	private String channelName;
-	
-	@Column(name="service_name", nullable=false)
-	private String serviceName;
-
-	@Column(name="end_user_price", nullable=false)
-	private BigDecimal endUserPrice;
-	
-	@Column(name="downloads", nullable=false)
-	private Long downloads;
-
-	@Column(name="gross_revenue", nullable=false)
-	private BigDecimal grossRevenue;
-	
-	@Column(name="is_processed")
-	private Character isProcessed = 'N';*/
-	
-	@Column(name="cust_name")
-	private Long clientName;
+	@Column(name="client_id")
+	private Long clientId;
 	
 	@Column(name="cust_code")
 	private Long clientCode;
@@ -91,9 +39,6 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 	@Column(name="media_category")
 	private Long mediaCategory;
 	
-	/*@Column(name="charge_code")
-	private String chargeCode;
-	*/
 	
 	@Column(name="play_source", nullable=false)
 	private Long playSource;
@@ -121,12 +66,13 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 	
 	@Column(name="is_processed")
 	private Character isProcessed = 'N';
+
+	@Column(name="cust_name",nullable=false)
+	private String customerName;
 	
 
 	
-	public RawInteractiveHeaderDetail() {
-		
-	}
+	public OperatorStage(){}
 
 
 
@@ -157,13 +103,13 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 
 
 
-	public RawInteractiveHeaderDetail(Long custCode, Long custName,
+	public OperatorStage(Long custCode, Long clientId,
 			String activityMonth, Long businessLine, Long mediaCategory,
 			Long playSource, String contentName, Long contentProvider,
 			Long channelName, Long serviceName, BigDecimal endUserPrice,
-			Long downloads, BigDecimal grossRevenue) {
+			Long downloads, BigDecimal grossRevenue,String customerName) {
 		this.clientCode = custCode;
-		this.clientName = custName;
+		this.clientId = clientId;
 		this.activityMonth = activityMonth;
 		this.businessLine = businessLine;
 		this.mediaCategory = mediaCategory;
@@ -175,6 +121,7 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 		this.endUserPrice = endUserPrice;
 		this.downloads = downloads;
 		this.grossRevenue = grossRevenue;
+		this.customerName = customerName;
 	}
 
 
@@ -274,16 +221,13 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 
 
 
-	public Long getClientName() {
-		return clientName;
+	public Long getClientId() {
+		return clientId;
 	}
-
-
-
-	public void setClientName(Long clientName) {
-		this.clientName = clientName;
+	
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
 	}
-
 
 
 	public Long getBusinessLine() {
@@ -358,7 +302,7 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 
 
 
-	public static RawInteractiveHeaderDetail fromJson(JsonCommand command) {
+	public static OperatorStage fromJson(JsonCommand command) {
 		/*final Long custCode = command.longValueOfParameterNamed("externalId");
 		final String custName = command.stringValueOfParameterNamed("clientId");
 		final String activityMonth = command.stringValueOfParameterNamed("activityMonth");
@@ -374,11 +318,11 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 		final Long downloads = command.longValueOfParameterNamed("downloads");
 		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");*/
 		final Long custCode = command.longValueOfParameterNamed("externalId");
-		final Long custName = command.longValueOfParameterNamed("clientId");
+		final Long clientId = command.longValueOfParameterNamed("clientId");
 		final String activityMonth = command.stringValueOfParameterNamed("activityMonth");
 		final Long businessLine = command.longValueOfParameterNamed("businessLine");
 		final Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");
-		
+		final String customerName = command.stringValueOfParameterNamed("customerName");
 		final Long playSource = command.longValueOfParameterNamed("playSource"); 
 		final String contentName = command.stringValueOfParameterNamed("contentName");
 		final Long contentProvider = command.longValueOfParameterNamed("contentProvider");
@@ -388,7 +332,7 @@ public class RawInteractiveHeaderDetail extends AbstractAuditableCustom<AppUser,
 		final Long downloads = command.longValueOfParameterNamed("downloads");
 		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");
 		//return new RawInteractiveHeaderDetail(custCode,custName,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue);
-		return new RawInteractiveHeaderDetail(custCode,custName,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue);
+		return new OperatorStage(custCode,clientId,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,customerName);
 	}
 	
 	

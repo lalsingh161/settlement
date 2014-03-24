@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.mifosplatform.billing.address.data.StateDetails;
+import org.mifosplatform.billing.clientprospect.service.SearchSqlQuery;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementData;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementsData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveData;
@@ -19,16 +20,17 @@ import org.mifosplatform.billing.mediasettlement.data.PartnerGameData;
 import org.mifosplatform.billing.mediasettlement.data.PartnerGameDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueSettlementSequenceData;
 import org.mifosplatform.billing.mediasettlement.data.RevenueShareData;
+import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.organisation.monetary.data.CurrencyData;
 
 
 public interface MediaSettlementReadPlatformService {
 
-	List<PartnerAccountData> retrieveAllAccountPartnerDetails();
+	Page<PartnerAccountData> retrieveAllAccountPartnerDetails(SearchSqlQuery searchPartnerAccountHistory);
 
 	PartnerAccountData retrieveAllAccountPartnerDetail(Long id);
 
-	List<PartnerAgreementData> retrievePartnerAgreementDetails();
+	Page<PartnerAgreementData> retrievePartnerAgreementDetails(SearchSqlQuery searchPartnerAgreementHistory);
 
 	Collection<PartnerAccountData> retrievePartnerNames();
 
@@ -146,6 +148,8 @@ public interface MediaSettlementReadPlatformService {
 	List<PartnerAgreementView> retrieveMediaView(Long documentId);
 
 	PartnerAccountData retrievePartnerAccountView(Long id);
+
+	void executeProcedure();
 
 
 }
