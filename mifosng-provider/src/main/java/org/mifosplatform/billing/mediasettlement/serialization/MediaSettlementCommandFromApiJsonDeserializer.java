@@ -33,7 +33,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     		"id","chData","deductionCodes","deductionData","clientId","deductionValue","deductionCode","country",
     		"settlementSequenceData","partnerType1","partnerType2","partnerType3","partnerType4",
     		"partnerType5","partnerType6","royaltyType","currencyId","currencyCode","eventId","playSource","contentName",
-    		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId","royaltyShare","status","agreementType","agreementCategory","settlementSource","partnerAgreementData","startDate","endDate","dateFormat","partnerAccountId"));
+    		"contentProvider","channelName","serviceName","endUserPrice","downloads","grossRevenue","activeData","externalId","contactNum","emailId","royaltyShare","status","agreementType","agreementCategory","settlementSource","partnerAgreementData","startDate","endDate","dateFormat","partnerAccountId","mgAmount"));
     
     private final static Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
     		"clientId","circle","externalId","activityMonth","businessLine","mediaCategory","contentName",
