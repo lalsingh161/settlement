@@ -1,11 +1,13 @@
 package org.mifosplatform.billing.mediasettlement.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
 
@@ -15,22 +17,22 @@ import org.mifosplatform.useradministration.domain.AppUser;
 public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	
 	@Column(name="cust_code")
-	private Double custCode;
+	private Long custCode;
 	
 	@Column(name="ba")
 	private String ba;
 	
 	@Column(name="pc")
-	private Double pc;
+	private Long pc;
 	
 	@Column(name="mpm")
-	private Double mpm;
+	private Long mpm;
 	
 	@Column(name="invoice_no")
-	private Double invoiceNumber;
+	private String invoiceNumber;
 	
 	@Column(name="invoice_date")
-	private Date invoiceDate;
+	private String invoiceDate;
 	
 	@Column(name="customer_name")
 	private String customerName;
@@ -63,44 +65,87 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	private String serviceName;
 	
 	@Column(name="eup")
-	private Double eup;
+	private BigDecimal eup;
 	
 	@Column(name="downloads")
-	private Double downloads;
+	private Long downloads;
 	
 	@Column(name="gross_revenue")
-	private String grossRevenue;
+	private BigDecimal grossRevenue;
 	
 	@Column(name="wpc")
-	private String wpc;
+	private BigDecimal wpc;
 	
 	@Column(name="employee_deduction")
-	private String employeeDeduction;
+	private BigDecimal employeeDeduction;
 	
 	@Column(name="ent_tax")
-	private Double entTax;
+	private BigDecimal entTax;
 	
 	@Column(name="waivers")
-	private Double waivres;
+	private BigDecimal waivers;
 	
 	@Column(name="net_revenue_after_tax")
-	private String netRevenueAfterTax;
+	private BigDecimal netRevenueAfterTax;
 	
 	@Column(name="operator_rev_share")
-	private Double operatorRevShare;
+	private String operatorRevShare;
 	
 	@Column(name="operator_revenue_amt")
-	private String operatorRevenueAmt;
+	private BigDecimal operatorRevenueAmt;
 	
 	
 	public PlatformStage() {
 		
 	}
+	
+	
+	public PlatformStage(final Long custCode, final String ba,
+			final Long pc, final Long mpm, final String invoiceNumber,
+			final String invoiceDate, final String customerName,
+			final String customerCircle, final String activityMonth,
+			final String business, final String type, final String category,
+			final String contentName, final String contentProviderName,
+			final String channelName, final String serviceName,
+			final BigDecimal eup, final Long downloads,
+			final BigDecimal grossRevenue, final BigDecimal wpc,
+			final BigDecimal employeeDeduction, final BigDecimal entTax,
+			final BigDecimal waivers, final BigDecimal netRevenueAfterTax,
+			final String operatorRevShare, final BigDecimal operatorRevenueAmt) {
+		
+		this.custCode = custCode;
+		this.ba = ba;
+		this.pc= pc;
+		this.mpm = mpm;
+		this.invoiceNumber = invoiceNumber;
+		this.invoiceDate = invoiceDate;
+		this.customerName = customerName;
+		this.customerCircle = customerCircle;
+		this.activityMonth = activityMonth;
+		this.business = business;
+		this.type = type;
+		this.category = category;
+		this.contentName = contentName;
+		this.contentProviderName = contentProviderName;
+		this.channelName = channelName;
+		this.serviceName = serviceName;
+		this.eup = eup;
+		this.downloads = downloads;
+		this.grossRevenue = grossRevenue;
+		this.wpc = wpc;
+		this.employeeDeduction = employeeDeduction;
+		this.entTax = entTax;
+		this.waivers = waivers;
+		this.netRevenueAfterTax = netRevenueAfterTax;
+		this.operatorRevShare = operatorRevShare;
+		this.operatorRevenueAmt = operatorRevenueAmt;
+			
 
-
-	public Double getCustCode() {
-		return custCode;
 	}
+	
+
+
+	
 
 
 	public String getBa() {
@@ -108,23 +153,13 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public Double getPc() {
+	public Long getPc() {
 		return pc;
 	}
 
 
-	public Double getMpm() {
+	public Long getMpm() {
 		return mpm;
-	}
-
-
-	public Double getInvoiceNumber() {
-		return invoiceNumber;
-	}
-
-
-	public Date getInvoiceDate() {
-		return invoiceDate;
 	}
 
 
@@ -178,83 +213,22 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public Double getEup() {
-		return eup;
-	}
-
-
-	public Double getDownloads() {
+	public Long getDownloads() {
 		return downloads;
 	}
-
-
-	public String getGrossRevenue() {
-		return grossRevenue;
-	}
-
-
-	public String getWpc() {
-		return wpc;
-	}
-
-
-	public String getEmployeeDeduction() {
-		return employeeDeduction;
-	}
-
-
-	public Double getEntTax() {
-		return entTax;
-	}
-
-
-	public Double getWaivres() {
-		return waivres;
-	}
-
-
-	public String getNetRevenueAfterTax() {
-		return netRevenueAfterTax;
-	}
-
-
-	public Double getOperatorRevShare() {
-		return operatorRevShare;
-	}
-
-
-	public String getOperatorRevenueAmt() {
-		return operatorRevenueAmt;
-	}
-
-
-	public void setCustCode(Double custCode) {
-		this.custCode = custCode;
-	}
-
 
 	public void setBa(String ba) {
 		this.ba = ba;
 	}
 
 
-	public void setPc(Double pc) {
+	public void setPc(Long pc) {
 		this.pc = pc;
 	}
 
 
-	public void setMpm(Double mpm) {
+	public void setMpm(Long mpm) {
 		this.mpm = mpm;
-	}
-
-
-	public void setInvoiceNumber(Double invoiceNumber) {
-		this.invoiceNumber = invoiceNumber;
-	}
-
-
-	public void setInvoiceDate(Date invoiceDate) {
-		this.invoiceDate = invoiceDate;
 	}
 
 
@@ -308,57 +282,42 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public void setEup(Double eup) {
-		this.eup = eup;
-	}
-
-
-	public void setDownloads(Double downloads) {
+	public void setDownloads(Long downloads) {
 		this.downloads = downloads;
 	}
-
-
-	public void setGrossRevenue(String grossRevenue) {
-		this.grossRevenue = grossRevenue;
-	}
-
-
-	public void setWpc(String wpc) {
-		this.wpc = wpc;
-	}
-
-
-	public void setEmployeeDeduction(String employeeDeduction) {
-		this.employeeDeduction = employeeDeduction;
-	}
-
-
-	public void setEntTax(Double entTax) {
-		this.entTax = entTax;
-	}
-
-
-	public void setWaivres(Double waivres) {
-		this.waivres = waivres;
-	}
-
-
-	public void setNetRevenueAfterTax(String netRevenueAfterTax) {
-		this.netRevenueAfterTax = netRevenueAfterTax;
-	}
-
-
-	public void setOperatorRevShare(Double operatorRevShare) {
-		this.operatorRevShare = operatorRevShare;
-	}
-
-
-	public void setOperatorRevenueAmt(String operatorRevenueAmt) {
-		this.operatorRevenueAmt = operatorRevenueAmt;
-	}
 	
 	
-	
+	public static PlatformStage fromJson(JsonCommand command){
+		
+		final Long custCode = command.longValueOfParameterNamed("custCode");
+		final String ba = command.stringValueOfParameterNamed("ba");
+		final Long pc = command.longValueOfParameterNamed("pc");
+		final Long mpm = command.longValueOfParameterNamed("mpm");
+		final String invoiceNumber = command.stringValueOfParameterNamed("invoiceNo");
+		final String invoiceDate  = command.stringValueOfParameterNamed("invoiceDate");
+		final String customerName = command.stringValueOfParameterNamed("customerName");
+		final String customerCircle = command.stringValueOfParameterNamed("customerCircle");
+		final String activityMonth = command.stringValueOfParameterNamed("activityMonth");
+		final String business = command.stringValueOfParameterNamed("business");
+		final String type = command.stringValueOfParameterNamed("type");
+		final String category = command.stringValueOfParameterNamed("category");
+		final String contentName = command.stringValueOfParameterNamed("contentName");
+		final String contentProviderName = command.stringValueOfParameterNamed("contentProviderName");
+		final String channelName = command.stringValueOfParameterNamed("channelName");
+		final String serviceName = command.stringValueOfParameterNamed("serviceName");
+		final BigDecimal eup = command.bigDecimalValueOfParameterNamed("eup");
+		final Long downloads = command.longValueOfParameterNamed("downloads");
+		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");
+		final BigDecimal wpc = command.bigDecimalValueOfParameterNamed("wpc");
+		final BigDecimal employeeDeduction = command.bigDecimalValueOfParameterNamed("employeeDeduction");
+		final BigDecimal entTax = command.bigDecimalValueOfParameterNamed("entTax");
+		final BigDecimal waivers = command.bigDecimalValueOfParameterNamed("waivers");
+		final BigDecimal netRevenueAfterTax = command.bigDecimalValueOfParameterNamed("netRevenueAfterTax");
+		final String operatorRevShare = command.stringValueOfParameterNamed("operatorRevShare");
+		final BigDecimal operatorRevenueAmt = command.bigDecimalValueOfParameterNamed("operatorRevenueAmt");
+		
+		return new PlatformStage(custCode, ba, pc, mpm, invoiceNumber, invoiceDate, customerName, customerCircle, activityMonth, business, type, category, contentName, contentProviderName, channelName, serviceName, eup, downloads, grossRevenue, wpc, employeeDeduction, entTax, waivers, netRevenueAfterTax, operatorRevShare, operatorRevenueAmt);
+	}
 	
 	
 	

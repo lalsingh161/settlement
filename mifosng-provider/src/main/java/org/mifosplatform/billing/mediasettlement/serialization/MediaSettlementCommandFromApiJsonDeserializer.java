@@ -608,25 +608,25 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        final String customerName = fromApiJsonHelper.extractStringNamed("customerName", element);
 	        baseDataValidator.reset().parameter("customerName").value(customerName).notBlank();
 	        
-	        final Long businessLine = fromApiJsonHelper.extractLongNamed("businessLine", element);
+	        final String businessLine = fromApiJsonHelper.extractStringNamed("businessLine", element);
 	        baseDataValidator.reset().parameter("businessLine").value(businessLine).notBlank().notExceedingLengthOf(50);
 	        
-	        final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory",element);
+	        final String mediaCategory = fromApiJsonHelper.extractStringNamed("mediaCategory",element);
 	        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank().notExceedingLengthOf(50);
 	    	 
-	    	final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
+	    	final String playSource = fromApiJsonHelper.extractStringNamed("playSource", element);
 	        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
 	    	
 	        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
 	        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
 	        
-	        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
+	        final String contentProvider = fromApiJsonHelper.extractStringNamed("contentProvider", element);
 	        baseDataValidator.reset().parameter("contentProvider").value(contentProvider).notBlank();
 	       
-	        final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
+	        final String channelName = fromApiJsonHelper.extractStringNamed("channelName", element);
 	        baseDataValidator.reset().parameter("channelName").value(channelName).notBlank();
 	        
-	        final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
+	        final String serviceName = fromApiJsonHelper.extractStringNamed("serviceName", element);
 	        baseDataValidator.reset().parameter("serviceName").value(serviceName).notBlank();
 	        
 	        final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);

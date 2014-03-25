@@ -897,6 +897,10 @@ public class SynchronousCommandProcessingService implements
 					if(wrapper.isCreateRawData()){
 						handler = applicationContext.getBean("createRawDataCommandHandler", NewCommandSourceHandler.class);
 					}
+			    }else if(wrapper.isPlatformStageData()){
+			    	if(wrapper.isCreatePlatformStage()){
+			    		handler = applicationContext.getBean("createPlatformStageCommandHandler",NewCommandSourceHandler.class);
+			    	}
 			    }else if(wrapper.isInvoiceRevenue()){
 						 if(wrapper.isCreateRevenueInvoice()){
 							 handler = applicationContext.getBean("createRevenueInvoiceCommandHandler",NewCommandSourceHandler.class);	

@@ -32,6 +32,8 @@ import org.mifosplatform.billing.mediasettlement.domain.PartnerGame;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetails;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetailsJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameJpaRepository;
+import org.mifosplatform.billing.mediasettlement.domain.PlatformStage;
+import org.mifosplatform.billing.mediasettlement.domain.PlatformStageJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMaster;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMasterJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueOEMSettlement;
@@ -94,6 +96,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	final private OperatorStageDetailJpaRepository rawInteractiveHeaderDetailJpaRepository;
 	final private OperatorStageDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService;
+	final private PlatformStageJpaRepository platformStageJpaRepository;
 	
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(MediaSettlementWritePlatformServiceImp.class);
 	
@@ -119,7 +122,8 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final  CurrencyRateJpaRepository currencyRateJpaRepository,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 			final OperatorStageDetailJpaRepository rawInteractiveHeaderDetailJpaRepository,
-			final OperatorStageDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService) {
+			final OperatorStageDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService,
+			final PlatformStageJpaRepository platformStageJpaRepository) {
 
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
@@ -143,6 +147,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.rawInteractiveHeaderDetailJpaRepository = rawInteractiveHeaderDetailJpaRepository;
 		this.rawInteractiveHeaderDetailReadPlatformService = rawInteractiveHeaderDetailReadPlatformService;
+		this.platformStageJpaRepository = platformStageJpaRepository;
 
 	}
 	
@@ -1272,6 +1277,20 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 		interactiveHeaderJpaRepository.save(headerData);
 		 		//System.out.println(rawData);
 		 		
+		 	}
+		 	
+		 	@Override
+		 	public CommandProcessingResult createPlatformStageData(JsonCommand command) {
+		 		PlatformStage entity = null;
+		 		context.authenticatedUser();
+		 		try{
+		 			
+		 			entity = PlatformStage.fromJson(command);
+		 			platformStageJpaRepository.save(entity);
+		 		}catch(DataIntegrityViolationException dve){
+		 			handleCodeDataIntegrityIssues(command, dve);
+		 		}
+		 		return new CommandProcessingResultBuilder().withEntityId(entity.getId()).build();
 		 	}
 
 }

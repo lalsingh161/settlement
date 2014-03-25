@@ -2140,6 +2140,13 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
+	public CommandWrapperBuilder createPlatformStageData() {
+		this.actionName = "CREATE";
+		this.entityName = "PLATFORMSTAGE";
+		this.entityId = null;
+		this.href = "uploadstatus/";
+		return this;
+	}
 	public CommandWrapperBuilder createAdvertiseStageData() {
 		
 		this.actionName = "CREATE";
