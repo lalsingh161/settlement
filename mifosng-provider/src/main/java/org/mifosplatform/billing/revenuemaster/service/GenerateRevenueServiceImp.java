@@ -50,6 +50,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	    BigDecimal operatorShareAmount = BigDecimal.ZERO;
 	    BigDecimal netOperatorShareAmount = BigDecimal.ZERO;
 	    BigDecimal totalChargeAmount = BigDecimal.ZERO;
+	    BigDecimal netReveneShareAmount = BigDecimal.ZERO;
 	   
 	    
 		List<OperatorShareData> revenueShareDatas=this.revenueReadplatformService.retriveOperatorRevenueShareData(detailDatas.get(0).getClientId()); 
@@ -70,7 +71,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	
 			for(DeductionTaxesData deductionTax:deductionTaxes)
 			{
-			if(detailData.getId().compareTo(deductionTax.getDetailId())==0){
+			if(detailData.getId().compareTo(deductionTax.getDetailId())==0&&deductionTax.getDeductionCode()!=null){
 			 detailChargeTaxAmount=detailChargeTaxAmount.add(deductionTax.getTaxAmount());
 			
 			DeductionTax deduction=new DeductionTax(invoice,charge,detailData.getId(),deductionTax.getDeductionCode(),
@@ -90,6 +91,11 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		    detailData.setOperatorShareAmount(operatorShareAmount);
 		    detailChargeTaxAmount=BigDecimal.ZERO;
 			System.out.println(detailData.getNetRevenueAmount());
+			
+		  DeductionTax deduction=new DeductionTax(invoice,charge,detailData.getId(),revenueShareDatas.get(0).getRevenueShareCode(),
+				                       revenueShareDatas.get(0).getPercentage(),operatorShareAmount);
+
+		  charge.addDeductionTaxes(deduction);
 		}
 	    
 	    
@@ -98,10 +104,13 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	    	//netChargeTaxAmount=netChargeTaxAmount.add(detailData.getDetailChargeTaxAmount());
 	    	netChargeAmount=netChargeAmount.add(detailData.getNetRevenueAmount());	
 	    	netOperatorShareAmount=netOperatorShareAmount.add(detailData.getOperatorShareAmount());
-	    }
 	   
-	    List<InvoiceTaxCommand> listOfTaxes = this.calculateTax(detailDatas,netChargeAmount);
+	    }
+
+	    netReveneShareAmount=netChargeAmount.subtract(netOperatorShareAmount);
 	    
+	    List<InvoiceTaxCommand> listOfTaxes = this.calculateTax(detailDatas,netReveneShareAmount);
+	   
 	    
 	    for(InvoiceTaxCommand  invoiceTaxCommand : listOfTaxes)
 	    {
@@ -113,21 +122,19 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	    
 	    if(detailDatas.get(0).getTaxInclusive()!=null){
 		   if(isTaxInclusive(detailDatas.get(0).getTaxInclusive())){
-				netChargeAmount = netChargeAmount.subtract(netChargeTaxAmount);
-				
-				charge.setNetChargeAmount(netChargeAmount);
-				charge.setChargeAmount(netChargeAmount);
+			   netReveneShareAmount = netReveneShareAmount.subtract(netChargeTaxAmount);
+
+				charge.setNetChargeAmount(netReveneShareAmount);
+				charge.setChargeAmount(netReveneShareAmount);
 			}
 			  }
 	    
-		DeductionTax deduction=new DeductionTax(invoice,charge,new Long(0),"OPRS",revenueShareDatas.get(0).getPercentage(),netOperatorShareAmount);
-	    charge.addDeductionTaxes(deduction);
 	    
 	    netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
-		totalChargeAmount = totalChargeAmount.add(netChargeAmount);
+		totalChargeAmount = totalChargeAmount.add(netReveneShareAmount);
 	    
-		charge.setNetChargeAmount(netChargeAmount);
-		charge.setChargeAmount(netChargeAmount);
+		charge.setNetChargeAmount(netReveneShareAmount);
+		charge.setChargeAmount(netReveneShareAmount);
 		
 	    invoice.addCharges(charge);		
 	    
@@ -147,12 +154,14 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	  BigDecimal operatorShareAmount = BigDecimal.ZERO;
 		   
 		   for(OperatorShareData revenueShareData:revenueShareDatas){   
-			   
-		    	int a=detailData.getDownloads().compareTo(revenueShareData.getStartValue());
-		    	int b=detailData.getDownloads().compareTo(revenueShareData.getEndValue());
 		    
 		   //here revenueShare percentage depending on downloads	
+			 if(revenueShareData.getRevenueShareCode().equalsIgnoreCase("ops")) {
+			   
 		      if(revenueShareData.getRevenueShareType().equalsIgnoreCase("percentage")){
+		    	  
+		    	  int a=detailData.getDownloads().compareTo(revenueShareData.getStartValue());
+			      int b=detailData.getDownloads().compareTo(revenueShareData.getEndValue());
 		    	  
 		        if((a==1||a==0)&&(b==-1||b==0)){
 		           revenueAmountOfIg=detailData.getNetRevenueAmount().multiply(revenueShareData.getRevenuePercentage().divide
@@ -169,14 +178,15 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
                 revenueShareData.setPercentage(revenueShareData.getRevenuePercentage());
 		     }
 		           
-		     }
-		   
+		     }else{ }
+			 
+		   }
 		   detailData.setRevenueAmountOfIg(revenueAmountOfIg);
 		  return  operatorShareAmount; 
 	}
 
 	public  List<InvoiceTaxCommand> calculateTax(
-			List<RevenueMasterData> detailDatas, BigDecimal netChargeAmount) {
+			List<RevenueMasterData> detailDatas, BigDecimal netReveneShareAmount) {
 		
 		
 		List<TaxMappingRateData> taxMappingRateDatas = this.revenueReadplatformService.retrieveTaxMappingDate(detailDatas.get(0).getClientId(),detailDatas.get(0).getChargeCode());
@@ -185,7 +195,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			
 			 taxMappingRateDatas = this.revenueReadplatformService.retrieveDefaultTaxMappingDate(detailDatas.get(0).getClientId(),detailDatas.get(0).getChargeCode());
 		}
-		List<InvoiceTaxCommand> invoiceTaxCommand = generateInvoiceTax(taxMappingRateDatas, netChargeAmount,detailDatas.get(0).getClientId());
+		List<InvoiceTaxCommand> invoiceTaxCommand = generateInvoiceTax(taxMappingRateDatas, netReveneShareAmount,detailDatas.get(0).getClientId());
 		//List<InvoiceTax> listOfTaxes = invoiceTaxPlatformService.createInvoiceTax(invoiceTaxCommand);
 		return invoiceTaxCommand;
 	}

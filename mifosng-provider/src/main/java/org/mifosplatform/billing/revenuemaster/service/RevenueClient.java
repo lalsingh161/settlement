@@ -162,10 +162,9 @@ public class RevenueClient {
 	public List<DeductionTaxesData> calculatedeductiontaxes(
 			List<DeductionData> deductionDatas, BigDecimal grossRevenueAmount,Long detailId, String activityMonth) {
 		
-		String deductionCode=null;
+	/*	String deductionCode=null;
 		String deductionType=null;
-		BigDecimal deductionValue=null;
-		BigDecimal taxAmount=BigDecimal.ZERO;
+		BigDecimal deductionValue=null;*/
 		BigDecimal WpcTaxAmount=BigDecimal.ZERO;
 		 DateTimeFormatter formatter = DateTimeFormat.forPattern("MMMM yyyy");
 		List<DeductionTaxesData> taxes=new ArrayList<DeductionTaxesData>();
@@ -178,7 +177,11 @@ public class RevenueClient {
 		
 		for(DeductionData deductionData:deductionDatas)
 		{
-			deductionCode=deductionData.getDeductionCode();
+			String deductionCode=null;
+			String deductionType=null;
+			BigDecimal deductionValue=null;
+			BigDecimal taxAmount=BigDecimal.ZERO;
+			//deductionCode=deductionData.getDeductionCode();
 	
 			if(deductionData.getDeductionCode().equalsIgnoreCase("wpc"))
 			{   
@@ -189,7 +192,7 @@ public class RevenueClient {
 			    deductionData.setWpcTaxAmount(taxAmount);
 			    WpcTaxAmount=deductionData.getWpcTaxAmount();
 			
-			} if(deductionData.getDeductionCode().equalsIgnoreCase("ED")/*&&formatter.print(new DateTime()).equalsIgnoreCase(activityMonth)*/){
+			}else if(deductionData.getDeductionCode().equalsIgnoreCase("ED")/*&&formatter.print(new DateTime()).equalsIgnoreCase(activityMonth)*/){
 				
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();
@@ -197,7 +200,7 @@ public class RevenueClient {
 				BigDecimal temAmount=grossRevenueAmount.subtract(WpcTaxAmount);
 				taxAmount=temAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2,RoundingMode.HALF_UP);
 			
-			} if(deductionData.getDeductionCode().equalsIgnoreCase("ET")){
+			}else if(deductionData.getDeductionCode().equalsIgnoreCase("ET")){
 				
 				if(deductionData.getCircle()>0){
 				deductionType=deductionData.getDeductionType();
@@ -205,7 +208,7 @@ public class RevenueClient {
 				deductionValue=deductionData.getDeductionValue();
 				taxAmount=grossRevenueAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
 				}
-			}
+			}else{ }
 			
 			tax=new DeductionTaxesData(deductionCode,deductionValue,deductionType,taxAmount,detailId);
 		taxes.add(tax);
