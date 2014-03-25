@@ -12,6 +12,7 @@ public class OperatorShareData {
 	private BigDecimal endValue;
 	private BigDecimal revenuePercentage;
 	private BigDecimal revenueFlat;
+	private BigDecimal Percentage=BigDecimal.ZERO;;
 
 	public OperatorShareData(Long id, String businessLine,
 			String revenueShareType, Long revenueParamId, BigDecimal startValue,
@@ -58,4 +59,14 @@ public class OperatorShareData {
 		return revenueFlat;
 	}
 
+	public void setPercentage(BigDecimal revenuePercentage) {
+		
+		this.Percentage = revenuePercentage;
+	}
+
+	public BigDecimal getPercentage() {
+		return Percentage;
+	}
+    
+	
 }

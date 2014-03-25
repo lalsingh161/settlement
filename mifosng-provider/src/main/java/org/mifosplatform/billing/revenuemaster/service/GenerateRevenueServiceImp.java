@@ -16,6 +16,7 @@ import org.mifosplatform.billing.revenuemaster.data.DeductionTaxesData;
 import org.mifosplatform.billing.revenuemaster.data.OperatorShareData;
 import org.mifosplatform.billing.revenuemaster.data.RevenueMasterData;
 import org.mifosplatform.billing.revenuemaster.domain.DeductionTax;
+import org.mifosplatform.billing.revenuemaster.exception.NoOPertaorRevenueShareDataFoundException;
 import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,11 +53,11 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	   
 	    
 		List<OperatorShareData> revenueShareDatas=this.revenueReadplatformService.retriveOperatorRevenueShareData(detailDatas.get(0).getClientId()); 
-		/* OperatorShareData revenueShareData=null;
+		 /*OperatorShareData revenueShareData=null;*/
 		
-		if(revenueShareDatas.size()!=0){
-			revenueShareData=revenueShareDatas.get(0);
-		}*/
+		if(revenueShareDatas.size()==0){
+			throw new NoOPertaorRevenueShareDataFoundException();
+		}
 		
 	    Invoice invoice = new Invoice(detailDatas.get(0).getClientId(),new LocalDate().toDate(), invoiceAmount, invoiceAmount, netTaxAmount, "active");
 	    
@@ -72,7 +73,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			if(detailData.getId().compareTo(deductionTax.getDetailId())==0){
 			 detailChargeTaxAmount=detailChargeTaxAmount.add(deductionTax.getTaxAmount());
 			
-			DeductionTax deduction=new DeductionTax(invoice,charge,deductionTax.getDeductionCode(),
+			DeductionTax deduction=new DeductionTax(invoice,charge,detailData.getId(),deductionTax.getDeductionCode(),
 					                                 deductionTax.getDeductionValue(),deductionTax.getTaxAmount());
 			/*InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, deductionTax.getDeductionCode(),
 				                deductionTax.getDeductionValue(), deductionTax.getTaxAmount());
@@ -119,7 +120,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			}
 			  }
 	    
-		DeductionTax deduction=new DeductionTax(invoice,charge,"OPRS",null,netOperatorShareAmount);
+		DeductionTax deduction=new DeductionTax(invoice,charge,new Long(0),"OPRS",revenueShareDatas.get(0).getPercentage(),netOperatorShareAmount);
 	    charge.addDeductionTaxes(deduction);
 	    
 	    netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
@@ -156,13 +157,16 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		        if((a==1||a==0)&&(b==-1||b==0)){
 		           revenueAmountOfIg=detailData.getNetRevenueAmount().multiply(revenueShareData.getRevenuePercentage().divide
 		    			                        (new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
-		     operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);	 
+		     operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);
+		            revenueShareData.setPercentage(revenueShareData.getRevenuePercentage());
+		     
 		     }
 		      }else if(revenueShareData.getRevenueShareType().equalsIgnoreCase("Flat Rate")){
 		    	 
 		    	  revenueAmountOfIg=detailData.getNetRevenueAmount().multiply(revenueShareData.getRevenuePercentage().divide
 	                        (new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
-                operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);	 
+                operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);	
+                revenueShareData.setPercentage(revenueShareData.getRevenuePercentage());
 		     }
 		           
 		     }
@@ -226,19 +230,6 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 
 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 	public Boolean isTaxInclusive(Integer taxInclusive){
 		
 		Boolean isTaxInclusive = false;

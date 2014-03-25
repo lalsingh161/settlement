@@ -118,7 +118,7 @@ public class BillMasterReadPlatformServiceImplementation implements
 		    
 	            sqlBuilder.append(extraCriteria);
 	        
-
+	         sqlBuilder.append(" order by v.transId desc");
 
 	        if (searchTransactionHistory.isLimited()) {
 	            sqlBuilder.append(" limit ").append(searchTransactionHistory.getLimit());
@@ -127,8 +127,7 @@ public class BillMasterReadPlatformServiceImplementation implements
 	        if (searchTransactionHistory.isOffset()) {
 	            sqlBuilder.append(" offset ").append(searchTransactionHistory.getOffset());
 	        }
-		
-
+			        
 			//	return jdbcTemplate.query(sql, rowMapper,new Object[]{id});
 			return this.paginationHelper.fetchPage(this.jdbcTemplate, "SELECT FOUND_ROWS()",sqlBuilder.toString(),
 		            new Object[] {clientId}, financialTransactionsMapper);
