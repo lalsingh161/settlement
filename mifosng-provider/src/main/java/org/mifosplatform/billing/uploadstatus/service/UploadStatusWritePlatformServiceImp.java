@@ -1251,7 +1251,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 			
 		}else if(uploadProcess.equalsIgnoreCase("OperatorUpload")){
-			List<Long> clientIds = new LinkedList<Long>();
+			Set<Long> clientIds = new HashSet<Long>();
 			Integer cellNumber = 13;
 			UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
 			if(uploadStatusForGameEvent.getProcessStatus().equalsIgnoreCase("Processing")){
@@ -1449,7 +1449,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				uploadStatusForGameEvent=null;
 				
 				for(Long cId: clientIds){
-					
+					System.out.println("calling invoice"+cId);
 					 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
 					 final String json = wrapper.getJson();
 						

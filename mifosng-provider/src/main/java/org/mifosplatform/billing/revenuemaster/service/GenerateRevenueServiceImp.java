@@ -73,7 +73,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			if(detailData.getId().compareTo(deductionTax.getDetailId())==0){
 			 detailChargeTaxAmount=detailChargeTaxAmount.add(deductionTax.getTaxAmount());
 			
-			DeductionTax deduction=new DeductionTax(invoice,charge,deductionTax.getDeductionCode(),
+			DeductionTax deduction=new DeductionTax(invoice,charge,detailData.getId(),deductionTax.getDeductionCode(),
 					                                 deductionTax.getDeductionValue(),deductionTax.getTaxAmount());
 			/*InvoiceTax invoiceTax = new InvoiceTax(invoice, charge, deductionTax.getDeductionCode(),
 				                deductionTax.getDeductionValue(), deductionTax.getTaxAmount());
@@ -120,7 +120,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			}
 			  }
 	    
-		DeductionTax deduction=new DeductionTax(invoice,charge,"OPRS",revenueShareDatas.get(0).getPercentage(),netOperatorShareAmount);
+		DeductionTax deduction=new DeductionTax(invoice,charge,new Long(0),"OPRS",revenueShareDatas.get(0).getPercentage(),netOperatorShareAmount);
 	    charge.addDeductionTaxes(deduction);
 	    
 	    netTaxAmount = netTaxAmount.add(netChargeTaxAmount);
