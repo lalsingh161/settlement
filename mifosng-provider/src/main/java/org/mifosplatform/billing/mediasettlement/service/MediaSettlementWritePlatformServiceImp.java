@@ -1251,7 +1251,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 	
 		 	@Transactional
 		 	@Override
-		 	public CommandProcessingResult createRawData(JsonCommand command) {
+		 	public CommandProcessingResult createOperatorData(JsonCommand command) {
 		 		
 		 		context.authenticatedUser();
 		 		OperatorStage rawData = null;

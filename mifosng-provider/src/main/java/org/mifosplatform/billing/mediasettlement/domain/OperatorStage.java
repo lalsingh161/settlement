@@ -22,7 +22,7 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 	private Long clientId;
 	
 	@Column(name="cust_code")
-	private Long clientCode;
+	private String clientCode;
 	
 	
 	
@@ -103,7 +103,7 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 
 
 
-	public OperatorStage(Long custCode, Long clientId,
+	public OperatorStage(String custCode, Long clientId,
 			String activityMonth, String businessLine, String mediaCategory,
 			String playSource, String contentName, String contentProvider,
 			String channelName, String serviceName, BigDecimal endUserPrice,
@@ -128,11 +128,11 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 
 
 
-	public Long getClientCode() {
+	public String getClientCode() {
 		return clientCode;
 	}
 
-	public void setClientCode(Long clientCode) {
+	public void setClientCode(String clientCode) {
 		this.clientCode = clientCode;
 	}
 
@@ -329,7 +329,7 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 		final BigDecimal endUserPrice = command.bigDecimalValueOfParameterNamed("endUserPrice");
 		final Long downloads = command.longValueOfParameterNamed("downloads");
 		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");*/
-		final Long custCode = command.longValueOfParameterNamed("externalId");
+		final String custCode = command.stringValueOfParameterNamed("externalId");
 		final Long clientId = command.longValueOfParameterNamed("clientId");
 		final String activityMonth = command.stringValueOfParameterNamed("activityMonth");
 		final String businessLine = command.stringValueOfParameterNamed("businessLine");

@@ -599,7 +599,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        baseDataValidator.reset().parameter("clientId").value(clientName).notBlank().notExceedingLengthOf(50);
 	        
 	        
-	        final BigDecimal externalId = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("externalId", element);
+	        final String externalId = fromApiJsonHelper.extractStringNamed("externalId", element);
 	        baseDataValidator.reset().parameter("externalId").value(externalId).notBlank().notExceedingLengthOf(50);
 	        
 	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth", element);

@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 	
 		@Override
 		public CommandProcessingResult processCommand(final JsonCommand command) {
-			return mediaSettlementWritePlatformService.createRawData(command);
+			return mediaSettlementWritePlatformService.createOperatorData(command);
 		
 		}
 

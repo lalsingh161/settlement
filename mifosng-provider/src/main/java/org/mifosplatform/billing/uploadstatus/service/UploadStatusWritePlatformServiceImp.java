@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1251,7 +1251,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 			
 		}else if(uploadProcess.equalsIgnoreCase("OperatorUpload")){
-			List<Long> clientIds = new LinkedList<Long>();
+			Set<Long> clientIds = new LinkedHashSet<Long>();
 			Integer cellNumber = 13;
 			UploadStatus uploadStatusForGameEvent = this.uploadStatusRepository.findOne(orderId);
 			if(uploadStatusForGameEvent.getProcessStatus().equalsIgnoreCase("Processing")){
@@ -1291,12 +1291,12 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						 	
 							Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
 
-						 	jsonObject.put("externalId",headerRow.getCell(0).getNumericCellValue());//-
+						 	jsonObject.put("externalId",getCellData(headerRow.getCell(0)));//-
 							//jsonObject.put("clientId",headerRow.getCell(1).getStringCellValue());//-
 						 	jsonObject.put("clientId",clientId);
 						 	jsonObject.put("customerName",headerRow.getCell(1).getStringCellValue());
 						 	
-							clientIds.add(clientId);
+							
 							SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
 							jsonObject.put("activityMonth",formatter.format(headerRow.getCell(2).getDateCellValue()));
 							
@@ -1419,6 +1419,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						
 						if(result!=null){
 					    	//Long rsId = result.resourceId();
+							clientIds.add(clientId);
 					    	errorData.add(new MRNErrorData((long)i, "Success"));
 					    	processRecordCount++;
 					    }
@@ -1437,7 +1438,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						errorData.add(new MRNErrorData((long)i,e.getMessage()));
 					}catch (Exception e) {
 						Throwable cause = e.getCause();
-						errorData.add(new MRNErrorData((long)i, "Error: "+e.getMessage()));
+						errorData.add(new MRNErrorData((long)i, "Error: "+cause.getMessage()));
 					}
 				}
 				uploadStatusForGameEvent.setProcessRecords(processRecordCount);
@@ -1449,7 +1450,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				uploadStatusForGameEvent=null;
 				
 				for(Long cId: clientIds){
-					
+					 System.out.println("Calling invoice: "+cId);
 					 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
 					 final String json = wrapper.getJson();
 						
@@ -1674,15 +1675,15 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			
 		}else if(uploadProcess.equalsIgnoreCase("Advertisement")){
 		
-			Integer cellNumber = 25;
+			Integer cellNumber = 26;
 			UploadStatus uploadStatusForMediaAsset = this.uploadStatusRepository.findOne(orderId);
 			
-		/*	if(uploadStatusForMediaAsset.getProcessStatus().equalsIgnoreCase("Processing")){
+			if(uploadStatusForMediaAsset.getProcessStatus().equalsIgnoreCase("Processing")){
 				return new CommandProcessingResult("2");
 			}else{
 				uploadStatusForMediaAsset.setProcessStatus("Processing");
 				this.uploadStatusRepository.save(uploadStatusForMediaAsset);
-			}*/
+			}
 			
 			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
 			Workbook wb = null;
