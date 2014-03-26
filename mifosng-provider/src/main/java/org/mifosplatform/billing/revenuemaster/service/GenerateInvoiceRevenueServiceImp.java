@@ -23,14 +23,14 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class GenerateRevenueServiceImp implements GenerateInvoiceRevenueService {
+public class GenerateInvoiceRevenueServiceImp implements GenerateInvoiceRevenueService {
 	
 	private final InvoiceRepository invoiceRepository;
 	private final RevenueMasterReadplatformService revenueReadplatformService;
 
 	
 	@Autowired
-	public GenerateRevenueServiceImp(final InvoiceRepository invoiceRepository,final RevenueMasterReadplatformService revenueReadplatformService){
+	public GenerateInvoiceRevenueServiceImp(final InvoiceRepository invoiceRepository,final RevenueMasterReadplatformService revenueReadplatformService){
 		
 		this.invoiceRepository=invoiceRepository;
 		this.revenueReadplatformService =revenueReadplatformService;
