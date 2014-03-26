@@ -1,13 +1,19 @@
  package org.mifosplatform.billing.mediasettlement.domain;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.mifosplatform.infrastructure.core.api.JsonCommand;
 import org.mifosplatform.infrastructure.core.domain.AbstractAuditableCustom;
 import org.mifosplatform.useradministration.domain.AppUser;
@@ -51,8 +57,6 @@ public class InteractiveDetails extends AbstractAuditableCustom<AppUser, Long>{
 	
 	@Column(name = "is_deleted")
 	private char isDeleted='N';
-	
-	
 	
 	
 	public InteractiveDetails(){

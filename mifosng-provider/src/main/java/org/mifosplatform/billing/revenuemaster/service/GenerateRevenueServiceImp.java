@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class GenerateRevenueServiceImp implements GenerateRevenueService {
+public class GenerateRevenueServiceImp implements GenerateInvoiceRevenueService {
 	
 	private final InvoiceRepository invoiceRepository;
 	private final RevenueMasterReadplatformService revenueReadplatformService;
@@ -54,7 +54,6 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	   
 	    
 		List<OperatorShareData> revenueShareDatas=this.revenueReadplatformService.retriveOperatorRevenueShareData(detailDatas.get(0).getClientId()); 
-		 /*OperatorShareData revenueShareData=null;*/
 		
 		if(revenueShareDatas.size()==0){
 			throw new NoOPertaorRevenueShareDataFoundException();
@@ -62,7 +61,6 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 		
 	    Invoice invoice = new Invoice(detailDatas.get(0).getClientId(),new LocalDate().toDate(), invoiceAmount, invoiceAmount, netTaxAmount, "active");
 	    
-	   // System.out.println("chargecode" +detailDatas.get(0).getChargeCode());
 	    BillingOrder charge = new BillingOrder(detailDatas.get(0).getClientId(), detailDatas.get(0).getHeaderId(),new Long(0), detailDatas.get(0).getChargeCode(),detailDatas.get(0).getChargeType(), "None" ,invoiceAmount,
  				discountAmount,	netChargeAmount,new LocalDate().toDate(),new LocalDate().toDate());
 	    
@@ -85,17 +83,23 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			netRevenueAmount=detailData.getGrossRevenue().subtract(detailChargeTaxAmount);
 			detailData.setDetailChargeTaxAmount(detailChargeTaxAmount);
 		    detailData.updateNetRevenueAmount(netRevenueAmount);
-		    //for(OperatorShareData revenuShareData:revenueShareDatas)
-		    operatorShareAmount=this.calculateOperatorShareAmount(revenueShareDatas,detailData.getNetRevenueAmount(),detailData);
+		 
+		    operatorShareAmount=this.calculateOperatorShareAmount(revenueShareDatas,netRevenueAmount,detailData);
 		    
 		    detailData.setOperatorShareAmount(operatorShareAmount);
 		    detailChargeTaxAmount=BigDecimal.ZERO;
 			System.out.println(detailData.getNetRevenueAmount());
 			
-		  DeductionTax deduction=new DeductionTax(invoice,charge,detailData.getId(),revenueShareDatas.get(0).getRevenueShareCode(),
-				                       revenueShareDatas.get(0).getPercentage(),operatorShareAmount);
-
-		  charge.addDeductionTaxes(deduction);
+			for(OperatorShareData  revenueShareData:revenueShareDatas){
+				if(revenueShareData.getPercentage().compareTo(BigDecimal.ZERO)>0){
+				
+			 DeductionTax deduction=new DeductionTax(invoice,charge,detailData.getId(),revenueShareData.getRevenueShareCode(),
+					                     revenueShareData.getPercentage(),operatorShareAmount);	
+			 charge.addDeductionTaxes(deduction);
+			}
+				
+			}
+	
 		}
 	    
 	    
@@ -154,7 +158,7 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 	  BigDecimal operatorShareAmount = BigDecimal.ZERO;
 		   
 		   for(OperatorShareData revenueShareData:revenueShareDatas){   
-		    
+			   BigDecimal percentage = BigDecimal.ZERO;
 		   //here revenueShare percentage depending on downloads	
 			 if(revenueShareData.getRevenueShareCode().equalsIgnoreCase("ops")) {
 			   
@@ -164,24 +168,26 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 			      int b=detailData.getDownloads().compareTo(revenueShareData.getEndValue());
 		    	  
 		        if((a==1||a==0)&&(b==-1||b==0)){
-		           revenueAmountOfIg=detailData.getNetRevenueAmount().multiply(revenueShareData.getRevenuePercentage().divide
+		            revenueAmountOfIg=netRevenueAmount.multiply(revenueShareData.getRevenuePercentage().divide
 		    			                        (new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
-		     operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);
-		            revenueShareData.setPercentage(revenueShareData.getRevenuePercentage());
+		            operatorShareAmount=netRevenueAmount.subtract(revenueAmountOfIg);
+		            percentage=revenueShareData.getRevenuePercentage();
 		     
 		     }
 		      }else if(revenueShareData.getRevenueShareType().equalsIgnoreCase("Flat Rate")){
 		    	 
 		    	  revenueAmountOfIg=detailData.getNetRevenueAmount().multiply(revenueShareData.getRevenuePercentage().divide
 	                        (new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
-                operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);	
-                revenueShareData.setPercentage(revenueShareData.getRevenuePercentage());
+                  operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);
+                  percentage=revenueShareData.getRevenuePercentage();
 		     }
 		           
 		     }else{ }
 			 
+			 revenueShareData.setPercentage(percentage);
 		   }
 		   detailData.setRevenueAmountOfIg(revenueAmountOfIg);
+		  
 		  return  operatorShareAmount; 
 	}
 
@@ -223,10 +229,6 @@ public class GenerateRevenueServiceImp implements GenerateRevenueService {
 						      taxCode = taxMappingRateData.getTaxCode();
 						      taxAmount =taxFlat;
 						     }
-						
-						/*taxPercentage = taxMappingRateData.getRate();
-						taxCode = taxMappingRateData.getTaxCode();
-						taxAmount = price.multiply(taxPercentage.divide(new BigDecimal(100)));*/	
 
 						invoiceTaxCommand = new InvoiceTaxCommand(clientId, null, null,
 								taxCode, null, taxPercentage, taxAmount);

@@ -30,25 +30,25 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RevenueClient {
+public class InvoiceRevenueClient {
 	
 	private RevenueMasterReadplatformService revenueReadplatformService;
 	private PlatformSecurityContext context;
 	private RevenueCommandFromApiJsonDeserializer apiJsonDeserializer;
 	private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService; 
-	private GenerateRevenueService generateRevenueService;
+	private GenerateInvoiceRevenueService generateInvoiceRevenueService;
 	private BillingOrderWritePlatformService billingOrderWritePlatformService;
 	private ClientBalanceReadPlatformService clientBalanceReadPlatformService;
 	
 @Autowired
-	public RevenueClient(final PlatformSecurityContext context,final RevenueCommandFromApiJsonDeserializer apiJsonDeserializer,final RevenueMasterReadplatformService revenueReadplatformService,final GenerateRevenueService generateRevenueService,
+	public InvoiceRevenueClient(final PlatformSecurityContext context,final RevenueCommandFromApiJsonDeserializer apiJsonDeserializer,final RevenueMasterReadplatformService revenueReadplatformService,final GenerateInvoiceRevenueService generateInvoiceRevenueService,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 			final BillingOrderWritePlatformService billingOrderWritePlatformService,
 			final ClientBalanceReadPlatformService clientBalanceReadPlatformService){
 		this.context =context;
 		this.apiJsonDeserializer = apiJsonDeserializer;
 		this.revenueReadplatformService = revenueReadplatformService;
-		this.generateRevenueService = generateRevenueService;
+		this.generateInvoiceRevenueService = generateInvoiceRevenueService;
 		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.billingOrderWritePlatformService = billingOrderWritePlatformService;
 		this.clientBalanceReadPlatformService = clientBalanceReadPlatformService;
@@ -141,7 +141,7 @@ public class RevenueClient {
 			// System.out.println(deductionTaxes);
 		}
 	}
-		Invoice invoice = this.generateRevenueService.generateInvoice(detailDatas,deductionTaxes);
+		Invoice invoice = this.generateInvoiceRevenueService.generateInvoice(detailDatas,deductionTaxes);
 	
 		List<ClientBalanceData> clientBalancesDatas = clientBalanceReadPlatformService.retrieveAllClientBalances(detailDatas.get(0).getClientId());
 		
@@ -192,7 +192,7 @@ public class RevenueClient {
 			    deductionData.setWpcTaxAmount(taxAmount);
 			    WpcTaxAmount=deductionData.getWpcTaxAmount();
 			
-			}else if(deductionData.getDeductionCode().equalsIgnoreCase("ED")/*&&formatter.print(new DateTime()).equalsIgnoreCase(activityMonth)*/){
+			}else if(deductionData.getDeductionCode().equalsIgnoreCase("ED")&&WpcTaxAmount.compareTo(BigDecimal.ZERO)>0){
 				
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();

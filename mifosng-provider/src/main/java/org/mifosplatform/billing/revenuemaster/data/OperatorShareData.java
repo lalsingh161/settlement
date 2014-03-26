@@ -12,7 +12,7 @@ public class OperatorShareData {
 	private BigDecimal endValue;
 	private BigDecimal revenuePercentage;
 	private BigDecimal revenueFlat;
-	private BigDecimal Percentage=BigDecimal.ZERO;;
+	private BigDecimal Percentage=BigDecimal.ZERO;
 
 	public OperatorShareData(Long id, String revenueShareCode,
 			String revenueShareType, Long revenueParamId, BigDecimal startValue,
