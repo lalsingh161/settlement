@@ -71,7 +71,7 @@ import org.mifosplatform.billing.order.exceptions.NoGrnIdFoundException;
 import org.mifosplatform.billing.payments.api.PaymentsApiResource;
 import org.mifosplatform.billing.paymode.data.McodeData;
 import org.mifosplatform.billing.paymode.service.PaymodeReadPlatformService;
-import org.mifosplatform.billing.revenuemaster.service.RevenueClient;
+import org.mifosplatform.billing.revenuemaster.service.InvoiceRevenueClient;
 import org.mifosplatform.billing.uploadstatus.command.UploadStatusCommand;
 import org.mifosplatform.billing.uploadstatus.domain.UploadStatus;
 import org.mifosplatform.billing.uploadstatus.domain.UploadStatusCommandValidator;
@@ -156,7 +156,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	 private final MCodeReadPlatformService mCodeReadPlatformService;
 	 private final BusinessLineReadPlatformService businessLineReadPlatformService;
 	 private final FromJsonHelper fromApiJsonHelper;
-	 private final RevenueClient revenueClient;
+	 private final InvoiceRevenueClient invoiceRevenueClient;
 	
 	@Autowired
 	public UploadStatusWritePlatformServiceImp(
@@ -174,7 +174,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			final MCodeReadPlatformService mCodeReadPlatformService,
 			final BusinessLineReadPlatformService businessLineReadPlatformService,
 			final FromJsonHelper fromApiJsonHelper,
-			final RevenueClient revenueClient) {
+			final InvoiceRevenueClient invoiceRevenueClient) {
 		this.context=context;
 		this.uploadStatusRepository=uploadStatusRepository;
 		this.commandsSourceWritePlatformService=commandsSourceWritePlatformService;
@@ -190,7 +190,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 		this.mCodeReadPlatformService = mCodeReadPlatformService;
 		this.businessLineReadPlatformService = businessLineReadPlatformService;
 		this.fromApiJsonHelper = fromApiJsonHelper;
-		this.revenueClient = revenueClient;
+		this.invoiceRevenueClient = invoiceRevenueClient;
 	}
 	
 	//@Transactional
@@ -1475,7 +1475,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									wrapper.getLoanId(), wrapper.getSavingsId(),
 									wrapper.getCodeId(), wrapper.getSupportedEntityType(),
 									wrapper.getSupportedEntityId(), wrapper.getTransactionId());
-					this.revenueClient.createRevenueInvoice(command);
+					this.invoiceRevenueClient.createRevenueInvoice(command);
 					
 				}
 				clientIds = null;

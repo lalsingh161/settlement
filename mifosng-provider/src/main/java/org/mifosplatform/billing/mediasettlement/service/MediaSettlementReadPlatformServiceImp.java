@@ -185,8 +185,8 @@ public class MediaSettlementReadPlatformServiceImp implements
    	    if (sqlSearch != null) {
    	    	sqlSearch=sqlSearch.trim();
    	    	extraCriteria = " and ( a.start_date like '%"+sqlSearch+"%' OR"
-   	    			+ "(select id from m_code_value where code_value like '%"+sqlSearch+"%') = a.agreement_category OR"
-   	    			+ "(select id from m_code_value where code_value like '%"+sqlSearch+"%') = a.agreement_type )";
+   	    			+ "a.agreement_category IN (select id from m_code_value where code_value like '%"+sqlSearch+"%')  OR"
+   	    			+ "a.agreement_type IN (select id from m_code_value where code_value like '%"+sqlSearch+"%'))";
    	    			//+ "(select id from m_code_value where code_value like '%"+sqlSearch+"%') = f.partner_type )" ;
    	    			
    	    }

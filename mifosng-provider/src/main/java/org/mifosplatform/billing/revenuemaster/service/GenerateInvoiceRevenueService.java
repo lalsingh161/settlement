@@ -7,7 +7,7 @@ import org.mifosplatform.billing.billingorder.domain.Invoice;
 import org.mifosplatform.billing.revenuemaster.data.DeductionTaxesData;
 import org.mifosplatform.billing.revenuemaster.data.RevenueMasterData;
 
-public interface GenerateRevenueService {
+public interface GenerateInvoiceRevenueService {
 
 	public Invoice generateInvoice(List<RevenueMasterData> detailDatas,
 			List<DeductionTaxesData> deductionTaxes);
