@@ -69,6 +69,9 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 
 	@Column(name="cust_name",nullable=false)
 	private String customerName;
+
+	@Column(name="file_name")
+	private String fileName;
 	
 
 	
@@ -107,7 +110,7 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 			String activityMonth, String businessLine, String mediaCategory,
 			String playSource, String contentName, String contentProvider,
 			String channelName, String serviceName, BigDecimal endUserPrice,
-			Long downloads, BigDecimal grossRevenue,String customerName) {
+			Long downloads, BigDecimal grossRevenue,String customerName,String fileName) {
 		this.clientCode = custCode;
 		this.clientId = clientId;
 		this.activityMonth = activityMonth;
@@ -122,6 +125,7 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 		this.downloads = downloads;
 		this.grossRevenue = grossRevenue;
 		this.customerName = customerName;
+		this.fileName = fileName;
 	}
 
 
@@ -343,8 +347,9 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 		final BigDecimal endUserPrice = command.bigDecimalValueOfParameterNamed("endUserPrice");
 		final Long downloads = command.longValueOfParameterNamed("downloads");
 		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");
+		final String fileName = command.stringValueOfParameterNamed("fileName");
 		//return new RawInteractiveHeaderDetail(custCode,custName,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue);
-		return new OperatorStage(custCode,clientId,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,customerName);
+		return new OperatorStage(custCode,clientId,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,customerName,fileName);
 	}
 	
 	

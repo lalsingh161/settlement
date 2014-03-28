@@ -27,8 +27,10 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang.StringUtils;
 import org.mifosplatform.billing.address.data.AddressData;
+import org.mifosplatform.billing.address.data.StateDetails;
 import org.mifosplatform.billing.address.service.AddressReadPlatformService;
 import org.mifosplatform.billing.allocation.service.AllocationReadPlatformService;
+import org.mifosplatform.billing.masterdeduction.service.DeductionMasterReadPlatformService;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -68,13 +70,17 @@ public class ClientsApiResource {
     private final AddressReadPlatformService addressReadPlatformService;
     private final AllocationReadPlatformService allocationReadPlatformService;
     private final GlobalConfigurationRepository configurationRepository;
+    private final DeductionMasterReadPlatformService deductionMasterReadPlatformService; 
 
     @Autowired
     public ClientsApiResource(final PlatformSecurityContext context, final ClientReadPlatformService readPlatformService,
             final OfficeReadPlatformService officeReadPlatformService, final ToApiJsonSerializer<ClientData> toApiJsonSerializer,
             final ToApiJsonSerializer<ClientAccountSummaryCollectionData> clientAccountSummaryToApiJsonSerializer,
             final ApiRequestParameterHelper apiRequestParameterHelper,AddressReadPlatformService addressReadPlatformService,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final AllocationReadPlatformService allocationReadPlatformService,final GlobalConfigurationRepository configurationRepository) {
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,
+            final AllocationReadPlatformService allocationReadPlatformService,
+            final GlobalConfigurationRepository configurationRepository,
+            final DeductionMasterReadPlatformService deductionMasterReadPlatformService) {
         this.context = context;
         this.clientReadPlatformService = readPlatformService;
         this.officeReadPlatformService = officeReadPlatformService;
@@ -85,6 +91,8 @@ public class ClientsApiResource {
         this.addressReadPlatformService=addressReadPlatformService;
         this.allocationReadPlatformService=allocationReadPlatformService;
         this.configurationRepository=configurationRepository;
+        
+        this.deductionMasterReadPlatformService = deductionMasterReadPlatformService;
     }
 
     @GET
@@ -107,9 +115,11 @@ public class ClientsApiResource {
     	 List<String> countryData = this.addressReadPlatformService.retrieveCountryDetails();
          List<String> statesData = this.addressReadPlatformService.retrieveStateDetails();
          List<String> citiesData = this.addressReadPlatformService.retrieveCityDetails();
+         Collection<StateDetails> circleData = deductionMasterReadPlatformService.retrieveAllStateDetails();
          List<EnumOptionData> enumOptionDatas = this.addressReadPlatformService.addressType();
          AddressData data=new AddressData(null,countryData,statesData,citiesData,enumOptionDatas);
          clientData.setAddressTemplate(data);
+         clientData.setCircleData(circleData);
          return clientData;
 	}
 

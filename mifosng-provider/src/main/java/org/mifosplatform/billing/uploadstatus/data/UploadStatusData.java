@@ -15,6 +15,7 @@ public class UploadStatusData {
 	private final boolean flag;
 	private final Long unprocessRecords;
 	private final Long totalRecords;
+	private String fileName;
 	 public static UploadStatusData instance(Long id,String uploadProcess,String uploadFilePath,LocalDate processDate,String processStatus,
 			 Long processRecords,Long unprocessRecords,String errorMessage)
 		{
@@ -39,6 +40,25 @@ public class UploadStatusData {
 	    this.unprocessRecords=unprocessRecords;
 	    this.totalRecords=totalRecords;
 		
+	}
+	
+	public UploadStatusData(Long id,String uploadProcess,String uploadFilePath,LocalDate processDate,String processStatus,Long processRecords,Long unprocessRecords, String errorMessage, Long totalRecords,String fileName)
+	{
+		this.id=id;
+		this.uploadProcess=uploadProcess;
+		this.uploadFilePath=uploadFilePath;
+		this.processDate=processDate;
+		this.processRecords=processRecords;
+		this.processStatus=processStatus;
+		this.errorMessage=errorMessage;
+		if(processStatus!=null){
+	    this.flag=processStatus.equalsIgnoreCase("Processed")?true:false;
+		}else{
+			this.flag=false;
+		}
+	    this.unprocessRecords=unprocessRecords;
+	    this.totalRecords=totalRecords;
+	    this.fileName = fileName;
 	}
 
 

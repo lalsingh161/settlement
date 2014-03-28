@@ -58,7 +58,7 @@ public class PartnerAccountData {
 	private BigDecimal endUserPrice;
 	private BigDecimal downloads;
 	private BigDecimal grossRevenue;
-	private Long externalId;
+	private String externalId;
 	private String contactNum;
 	private String emailId;
 	private Collection<InteractiveHeaderData> interactiveHeaderData;
@@ -110,7 +110,7 @@ public class PartnerAccountData {
 		this.playSourceData = playSourceData;
 	}
 	public PartnerAccountData(Long id,Long partnerType,	String partnerTypeName,String partnerName, String partnerAddress,Long currencyId,String currencyCode,
-			Long externalId,String contactNum,String emailId) {
+			String externalId,String contactNum,String emailId) {
 		this.id = id;
 		this.partnerType=partnerType;
 		this.partnerTypeName = partnerTypeName;
@@ -285,7 +285,7 @@ public class PartnerAccountData {
 		
 	}
 
-	public PartnerAccountData(Long id, Long externalId, String partnerName,
+	public PartnerAccountData(Long id, String externalId, String partnerName,
 			String partnerType, String contactNum, String emailId,
 			String currencyName, String royaltySequence) {
 		// TODO Auto-generated constructor stub

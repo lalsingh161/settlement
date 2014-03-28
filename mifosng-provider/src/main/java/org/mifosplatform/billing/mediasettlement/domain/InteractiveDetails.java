@@ -176,6 +176,18 @@ public class InteractiveDetails extends AbstractAuditableCustom<AppUser, Long>{
 		
 	}
 
+
+	public void setContentName(String contentName) {
+		this.contentName = contentName;
+		
+	}
+
+
+	public void setMediaCategory(Long mediaCategory) {
+		this.mediaCategory = mediaCategory;
+		
+	}
+
 	
 	
 	

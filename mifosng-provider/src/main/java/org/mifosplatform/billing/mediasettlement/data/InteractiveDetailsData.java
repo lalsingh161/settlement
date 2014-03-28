@@ -18,11 +18,18 @@ public class InteractiveDetailsData {
 	
 	
 	private Long downloadsL;
+	private Long id;
+	private String playSourceStr;
+	private String conentProviderStr;
+	private String channelNameStr;
+	private String serviceNameStr;
+	private String mediaCategoryStr;
+	private Long interactiveHeader;
 
 	
 	
 	
-	public InteractiveDetailsData(Long playSource, String contentName,
+	public InteractiveDetailsData(Long id, Long interactiveHeader,Long playSource, String contentName,
 			Long contentProvider, Long channelName, Long serviceName,
 			BigDecimal endUserPrice, BigDecimal downloads,
 			BigDecimal grossRevenue, Long mediaCategory) {
@@ -35,6 +42,8 @@ public class InteractiveDetailsData {
 		this.downloads = downloads;
 		this.grossRevenue = grossRevenue;
 		this.mediaCategory = mediaCategory;
+		this.id = id;
+		this.interactiveHeader = interactiveHeader;
 	}
 
 
@@ -58,6 +67,30 @@ public class InteractiveDetailsData {
 		this.downloadsL = downloads;
 		this.grossRevenue = grossRevenue;
 		
+	}
+
+
+
+
+
+
+
+
+	public InteractiveDetailsData(Long id, String playSource,
+			String contentName, String contentProvider, String channelName,
+			String serviceName, String mediaCategory,
+			BigDecimal endUserPrice, Long downloads, BigDecimal grossRevenue) {
+		 
+		this.id = id;
+		this.playSourceStr = playSource;
+		this.contentName = contentName;
+		this.conentProviderStr = contentProvider;
+		this.channelNameStr = channelName;
+		this.serviceNameStr = serviceName;
+		this.mediaCategoryStr = mediaCategory;
+		this.endUserPrice = endUserPrice;
+		this.downloadsL = downloads;
+		this.grossRevenue = grossRevenue;
 	}
 
 

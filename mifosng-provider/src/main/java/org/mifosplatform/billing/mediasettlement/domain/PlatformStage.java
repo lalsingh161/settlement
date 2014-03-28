@@ -17,7 +17,7 @@ import org.mifosplatform.useradministration.domain.AppUser;
 public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	
 	@Column(name="cust_code")
-	private Long custCode;
+	private String custCode;
 	
 	@Column(name="ba")
 	private String ba;
@@ -61,6 +61,10 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	@Column(name="channel_name")
 	private String channelName;
 	
+	
+	@Column(name="data_upload_date")
+	private Date dataUploadDate = new Date();
+	
 	@Column(name="service_name")
 	private String serviceName;
 	
@@ -94,13 +98,18 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	@Column(name="operator_revenue_amt")
 	private BigDecimal operatorRevenueAmt;
 	
+	@Column(name="file_name")
+	private String  fileName;
+	
+	@Column(name="client_id")
+	private String clientId;
 	
 	public PlatformStage() {
 		
 	}
 	
 	
-	public PlatformStage(final Long custCode, final String ba,
+	public PlatformStage(final String custCode, final String ba,
 			final Long pc, final Long mpm, final String invoiceNumber,
 			final String invoiceDate, final String customerName,
 			final String customerCircle, final String activityMonth,
@@ -111,7 +120,8 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 			final BigDecimal grossRevenue, final BigDecimal wpc,
 			final BigDecimal employeeDeduction, final BigDecimal entTax,
 			final BigDecimal waivers, final BigDecimal netRevenueAfterTax,
-			final String operatorRevShare, final BigDecimal operatorRevenueAmt) {
+			final String operatorRevShare, final BigDecimal operatorRevenueAmt,
+			final String fileName, final String clientId) {
 		
 		this.custCode = custCode;
 		this.ba = ba;
@@ -139,6 +149,8 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 		this.netRevenueAfterTax = netRevenueAfterTax;
 		this.operatorRevShare = operatorRevShare;
 		this.operatorRevenueAmt = operatorRevenueAmt;
+		this.fileName = fileName;
+		this.clientId = clientId;
 			
 
 	}
@@ -289,7 +301,7 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	
 	public static PlatformStage fromJson(JsonCommand command){
 		
-		final Long custCode = command.longValueOfParameterNamed("custCode");
+		final String custCode = command.stringValueOfParameterNamed("custCode");
 		final String ba = command.stringValueOfParameterNamed("ba");
 		final Long pc = command.longValueOfParameterNamed("pc");
 		final Long mpm = command.longValueOfParameterNamed("mpm");
@@ -315,8 +327,10 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 		final BigDecimal netRevenueAfterTax = command.bigDecimalValueOfParameterNamed("netRevenueAfterTax");
 		final String operatorRevShare = command.stringValueOfParameterNamed("operatorRevShare");
 		final BigDecimal operatorRevenueAmt = command.bigDecimalValueOfParameterNamed("operatorRevenueAmt");
+		final String fileName = command.stringValueOfParameterNamed("fileName");
+		final String clientId = command.stringValueOfParameterNamed("clientId");
 		
-		return new PlatformStage(custCode, ba, pc, mpm, invoiceNumber, invoiceDate, customerName, customerCircle, activityMonth, business, type, category, contentName, contentProviderName, channelName, serviceName, eup, downloads, grossRevenue, wpc, employeeDeduction, entTax, waivers, netRevenueAfterTax, operatorRevShare, operatorRevenueAmt);
+		return new PlatformStage(custCode, ba, pc, mpm, invoiceNumber, invoiceDate, customerName, customerCircle, activityMonth, business, type, category, contentName, contentProviderName, channelName, serviceName, eup, downloads, grossRevenue, wpc, employeeDeduction, entTax, waivers, netRevenueAfterTax, operatorRevShare, operatorRevenueAmt,fileName,clientId);
 	}
 	
 	

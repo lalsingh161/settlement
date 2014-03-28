@@ -37,7 +37,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
     
     private final static Set<String> supportedParametersforGameEvent = new HashSet<String>(Arrays.asList("locale","dateFormat",
     		"clientId","circle","externalId","activityMonth","businessLine","mediaCategory","contentName",
-    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate","downloads","grossRevenue","endUserPrice","serviceName","channelName","contentProvider","playSource","customerName"));
+    		"chargeCode","dataUploadedDate","cId","activeData","sourceCurrency","targetCurrency","exchangeRate","startDate","endDate","downloads","grossRevenue","endUserPrice","serviceName","channelName","contentProvider","playSource","customerName","fileName"));
 	
     private final static Set<String> supportedParametersforRevenue = new HashSet<String>(
 			Arrays.asList("locale", "businessLine", "mediaCategory",
@@ -344,6 +344,58 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 		        throwExceptionIfValidationWarningsExist(dataValidationErrors);
 		    }
 		
+		
+		public void validateForUpdateInteractiveDetail(String json) {
+			
+	        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
+	
+	        final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
+	        fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, json, supportedParametersforGameEvent);
+	        final JsonElement element = fromApiJsonHelper.parse(json);
+	        final List<ApiParameterError> dataValidationErrors = new ArrayList<ApiParameterError>();
+	        final DataValidatorBuilder baseDataValidator = new DataValidatorBuilder(dataValidationErrors).resource("media.settlement");
+	        
+	        final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
+	        baseDataValidator.reset().parameter("playSource").value(playSource).notBlank();
+ 	    	
+	        final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
+	        baseDataValidator.reset().parameter("contentName").value(contentName).notBlank();
+	        
+	        
+	        
+	        final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
+	        baseDataValidator.reset().parameter("contentProvider").value(contentProvider).notBlank();
+	       
+	        final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
+	        baseDataValidator.reset().parameter("channelName").value(channelName).notBlank();
+	        
+	        final BigDecimal mediaCategory = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("mediaCategory",element);
+	        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notBlank().notExceedingLengthOf(50);
+	        
+	        final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
+	        baseDataValidator.reset().parameter("serviceName").value(serviceName).notBlank();
+	        
+	        final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
+	        baseDataValidator.reset().parameter("endUserPrice").value(endUserPrice).notBlank();
+	        
+	        final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
+	        baseDataValidator.reset().parameter("grossRevenue").value(grossRevenue).notBlank();
+	        
+	        final Integer downloads = fromApiJsonHelper.extractIntegerWithLocaleNamed("downloads", element);
+	        baseDataValidator.reset().parameter("downloads").value(downloads).notBlank().integerGreaterThanZero();   
+	      		     
+		    // final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", elements);
+		     //baseDataValidator.reset().parameter("sequence").value(sequence).notBlank();
+		     
+		     throwExceptionIfValidationWarningsExist(dataValidationErrors);
+	       
+	    }
+		
+		
+		/*
+		 * 
+		 * */
+		
 		public void validateForCreateGameEvent(String json){
 
 	        if (StringUtils.isBlank(json)) { throw new InvalidJsonException(); }
@@ -600,7 +652,7 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 	        
 	        
 	        final String externalId = fromApiJsonHelper.extractStringNamed("externalId", element);
-	        baseDataValidator.reset().parameter("externalId").value(externalId).notBlank().notExceedingLengthOf(50);
+	        baseDataValidator.reset().parameter("externalId").value(externalId).notBlank().notExceedingLengthOf(12);
 	        
 	        final String activityMonth = fromApiJsonHelper.extractStringNamed("activityMonth", element);
 	        baseDataValidator.reset().parameter("activityMonth").value(activityMonth).notBlank();

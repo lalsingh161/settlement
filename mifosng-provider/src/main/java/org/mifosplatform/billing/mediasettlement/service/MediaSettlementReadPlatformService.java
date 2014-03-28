@@ -151,5 +151,9 @@ public interface MediaSettlementReadPlatformService {
 
 	void executeProcedure();
 
+	Collection<InteractiveDetailsData> retriveInteractiveViewData(Long headerId);
+
+	InteractiveData retrieveInteractiveHeaderViewData(Long headerId);
+
 
 }

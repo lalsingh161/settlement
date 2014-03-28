@@ -22,7 +22,7 @@ public class InteractiveData {
 	private Collection<InteractiveDetailsData> interactiveDetailsData;
 	
 	private Long clientId;
-	private Long externalId;
+	private String externalId;
 	private String activityMonth;
 	private Date dataUploadedDate;
 	private Long businessLine;
@@ -31,6 +31,8 @@ public class InteractiveData {
 	private List<ChargesData> chargeCodeData;
 	private Collection<BusinessLineData> businessLineData;
 	private Collection<MCodeData> mediaCategoryData;
+	private String businessLineStr;
+	private Long id;
 
 	public InteractiveData(
 		Collection<MediaAssetData> mediaData,
@@ -56,7 +58,7 @@ public class InteractiveData {
 		// TODO Auto-generated constructor stub
 	}
 
-	public InteractiveData(Long clientId, Long externalId,
+	public InteractiveData(Long clientId, String externalId,
 			String activityMonth, LocalDate date, Long businessLine,
 			Long chargeCode) {
 		this.clientId = clientId;
@@ -66,6 +68,19 @@ public class InteractiveData {
 		this.businessLine = businessLine;
 
 		this.chargeCode = chargeCode;
+	}
+
+
+
+	public InteractiveData(Long id, Long clientId, String externalId,
+			String activityMonth, LocalDate dataUploadedDate,
+			String businessLine) {
+		this.id = id;
+		this.clientId = clientId;
+		this.externalId = externalId;
+		this.activityMonth = activityMonth;
+		this.dataUploadedDate = null!=dataUploadedDate?dataUploadedDate.toDate():null;
+		this.businessLineStr = businessLine;
 	}
 
 
@@ -136,11 +151,11 @@ public class InteractiveData {
 		this.clientId = clientId;
 	}
 
-	public Long getExternalId() {
+	public String getExternalId() {
 		return externalId;
 	}
 
-	public void setExternalId(Long externalId) {
+	public void setExternalId(String externalId) {
 		this.externalId = externalId;
 	}
 
@@ -187,8 +202,8 @@ public class InteractiveData {
 	public void setChargeCodeData(List<ChargesData> chargeCodeData) {
 		this.chargeCodeData = chargeCodeData;
 	}
-
-	public void setBisinessLineData(Collection<BusinessLineData> businessLineData) {
+	
+	public void setBusinessLineData(Collection<BusinessLineData> businessLineData) {
 		this.businessLineData = businessLineData;		
 	}
 

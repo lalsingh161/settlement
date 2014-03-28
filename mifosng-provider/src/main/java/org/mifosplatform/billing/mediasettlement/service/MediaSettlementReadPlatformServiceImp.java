@@ -9,7 +9,6 @@ import java.util.List;
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.address.data.StateDetails;
 import org.mifosplatform.billing.clientprospect.service.SearchSqlQuery;
-import org.mifosplatform.billing.inventory.data.InventoryItemDetailsData;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementData;
 import org.mifosplatform.billing.mediasettlement.data.DisbursementsData;
 import org.mifosplatform.billing.mediasettlement.data.InteractiveData;
@@ -43,16 +42,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+
+
 @Service
 public class MediaSettlementReadPlatformServiceImp implements
 		MediaSettlementReadPlatformService {
 
 	final private PlatformSecurityContext context;
-	final private AccountPartnerJpaRepository accountPartnerJpaRepository;
 	final private JdbcTemplate jdbcTemplate;
 	final private RevenueOEMSettlementJpaRepository revenueOEMSettlementJpaRepository;
 	final private RevenueSettlementJpaRepository revenueSettlementJpaRepository;
-	final private InteractiveHeaderJpaRepository interactiveHeaderJpaRepository;
 	final private  PaginationHelper<PartnerAccountData> paginationHelper = new PaginationHelper<PartnerAccountData>();
 	final private  PaginationHelper<PartnerAgreementData> paginationHelperAgre = new PaginationHelper<PartnerAgreementData>();
 	@Autowired
@@ -64,11 +63,9 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final RevenueOEMSettlementJpaRepository revenueOEMSettlementJpaRepository,
 			InteractiveHeaderJpaRepository interactiveHeaderJpaRepository) {
 		this.context = context;
-		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.revenueOEMSettlementJpaRepository = revenueOEMSettlementJpaRepository;
 		this.revenueSettlementJpaRepository = revenueSettlementJpaRepository;
-		this.interactiveHeaderJpaRepository = interactiveHeaderJpaRepository;
 	}
 
 	@Override
@@ -129,7 +126,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String partnerTypeName = rs.getString("partnerTypeName");
 			final String currencyCode = rs.getString("currencyCode");
 			final String partnerAddress = rs.getString("partnerAddress");
-			final Long externalId = rs.getLong("externalId");
+			final String externalId = rs.getString("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
 			return new PartnerAccountData(id, partnerType,partnerTypeName,partnerName,partnerAddress,
@@ -155,7 +152,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String partnerName = rs.getString("partnerName");
 			final Long currencyId = rs.getLong("currencyId");
 			final String partnerAddress = rs.getString("partnerAddress");
-			final Long externalId = rs.getLong("externalId");
+			final String externalId = rs.getString("externalId");
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
 			return new PartnerAccountData(id,partnerType,partnerTypeName, partnerName, partnerAddress,
@@ -481,10 +478,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	private static final class MediaSettlementCommandMapper implements
 			RowMapper<MediaSettlementCommand> {
 
-		private final boolean hideLocation;
-
 		public MediaSettlementCommandMapper(final boolean hideLocation) {
-			this.hideLocation = hideLocation;
 		}
 
 		public String schema() {
@@ -502,7 +496,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 		@Override
 		public MediaSettlementCommand mapRow(final ResultSet rs,
-				@SuppressWarnings("unused") final int rowNum)
+				final int rowNum)
 				throws SQLException {
 
 
@@ -1007,7 +1001,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 				throws SQLException {
 			final Long id = rs.getLong("id");
 			final Long clientId = rs.getLong("clientId");
-			final Long externalId = rs.getLong("externalId");
+			final String externalId = rs.getString("externalId");
 			final String businessLineStr = rs.getString("businessLine");
 			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs,
@@ -1036,6 +1030,30 @@ public class MediaSettlementReadPlatformServiceImp implements
 			return new CurrencyData(id, "", code, "", 0, "", "");
 		}
 	}
+	
+	@Override
+	public InteractiveData retrieveInteractiveHeaderViewData(Long headerId) {
+		final String sql = "select id as id, client_id as clientId,client_external_id as externalId," +
+				"activity_month as activityMonth,data_upload_date as dataUploadDate," +
+				" (select int_event_desc from bp_intevent_master where id = business_line) as businessLine " +
+				"from bp_interactive_header where id =?";
+		InteractiveHeaderViewDataMapper mapper = new InteractiveHeaderViewDataMapper();
+		return jdbcTemplate.queryForObject(sql, mapper, new Object[]{headerId});
+	}
+	
+	private final static class InteractiveHeaderViewDataMapper implements RowMapper<InteractiveData>{
+		@Override
+		public InteractiveData mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+			final Long id = rs.getLong("id");
+			final Long clientId = rs.getLong("clientId");
+			final String externalId = rs.getString("externalId");
+			final String activityMonth = rs.getString("activityMonth");
+			final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs, "dataUploadDate");
+			final String businessLine = rs.getString("businessLine");
+			return new InteractiveData(id,clientId,externalId,activityMonth,dataUploadedDate,businessLine);
+		}
+	}
 
 	@Override
 	public InteractiveData retrieveInteractiveHeaderData(
@@ -1055,7 +1073,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 		public InteractiveData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
 			final Long clientId = rs.getLong("clientId");
-			final Long externalId = rs.getLong("externalId");
+			final String externalId = rs.getString("externalId");
 			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadDate = JdbcSupport.getLocalDate(rs, "dataUploadDate");
 			final Long businessLine = rs.getLong("businessLine");
@@ -1066,18 +1084,58 @@ public class MediaSettlementReadPlatformServiceImp implements
 		
 	}
 	
+	@Override
+	public Collection<InteractiveDetailsData> retriveInteractiveViewData(
+			Long headerId) {
+	
+		final String sql = "select itd.id as id," +
+				"(select code_value from m_code_value where id=itd.play_source) as playSource," +
+				"itd.content_name as contentName," +
+				"(select partner_name from bp_account where id=itd.content_provider ) as contentProvider," +
+				"(select partner_name from bp_account where id=itd.channel_name )as channelName," +
+				"(select partner_name from bp_account where id=itd.service_name )as serviceName," +
+				"(select code_value from m_code_value where id=itd.media_category) as mediaCategory," +
+				"itd.end_user_price as endUserPrice," +
+				"itd.downloads as downloads," +
+				"itd.gross_revenue as grossRevenue " +
+				"from bp_interactive_detail itd where itd.interactive_header_id = ?;";
+		
+		InteractiveViewDataMapper mapper  = new InteractiveViewDataMapper(); 
+		return jdbcTemplate.query(sql, mapper, new Object[]{headerId});
+	}
+	
+	private static final class InteractiveViewDataMapper implements RowMapper<InteractiveDetailsData>{
+		@Override
+		public InteractiveDetailsData mapRow(ResultSet rs, int rowNum)
+				throws SQLException {
+			final Long id = rs.getLong("id");
+			final String playSource = rs.getString("playSource");
+			final String contentName = rs.getString("contentName");
+			final String contentProvider = rs.getString("contentProvider");
+			final String channelName = rs.getString("channelName");
+			final String serviceName = rs.getString("serviceName");
+			final String mediaCategory = rs.getString("mediaCategory");
+			final BigDecimal endUserPrice = rs.getBigDecimal("endUserPrice");
+			final Long downloads = rs.getLong("downloads");
+			final BigDecimal grossRevenue = rs.getBigDecimal("grossRevenue");
+			return new InteractiveDetailsData(id,
+					playSource,contentName,
+					contentProvider,channelName,
+					serviceName,mediaCategory,endUserPrice,downloads,grossRevenue);
+		}
+	}
 	
 	@Override
 	public Collection<InteractiveDetailsData> retriveInteractiveDetailsData(
 			Long eventId) {
-		final String sql = "select itd.play_source as playSource,"
+		final String sql = "select itd.id as id, itd.interactive_header_id as interactiveHeader, itd.play_source as playSource,"
 				+ "itd.content_name as contentName,"
 				+ "itd.content_provider as contentProvider,"
 				+ "itd.channel_name as channelName,"
 				+ "itd.service_name as serviceName,"
 				+ "itd.media_category as mediaCategory,"
 				+ "itd.end_user_price as endUserPrice, itd.downloads as downloads, itd.gross_revenue as grossRevenue from bp_interactive_detail "
-				+ "itd where interactive_header_id=?";
+				+ "itd where itd.id=?";
 		InteractiveDetailsMapper mapper = new InteractiveDetailsMapper();
 		return jdbcTemplate.query(sql, mapper,new Object[]{eventId});
 	}
@@ -1087,6 +1145,8 @@ public class MediaSettlementReadPlatformServiceImp implements
 		@Override
 		public InteractiveDetailsData mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
+			final Long id = rs.getLong("id");
+			final Long interactiveHeader = rs.getLong("interactiveHeader");
 			final Long playSource = rs.getLong("playSource");
 			final String contentName = rs.getString("contentName");
 			final Long contentProvider = rs.getLong("contentProvider");
@@ -1096,7 +1156,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final BigDecimal downloads = rs.getBigDecimal("downloads");
 			final BigDecimal grossRevenue = rs.getBigDecimal("grossRevenue");
 			final Long mediaCategory = rs.getLong("mediaCategory");
-			return new InteractiveDetailsData(playSource, contentName,
+			return new InteractiveDetailsData(id,interactiveHeader,playSource, contentName,
 					contentProvider, channelName, serviceName, endUserPrice,
 					downloads, grossRevenue,mediaCategory);
 		}
@@ -1558,7 +1618,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 				throws SQLException {
 			
 			final Long id = rs.getLong("id");
-			final Long externalId = rs.getLong("externalId");
+			final String externalId = rs.getString("externalId");
 			final String partnerName = rs.getString("partnerName");
 			final String partnerType = rs.getString("partnerType");
 			final String contactNum = rs.getString("contactNum");

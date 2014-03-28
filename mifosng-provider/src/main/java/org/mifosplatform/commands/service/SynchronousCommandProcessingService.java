@@ -886,9 +886,11 @@ public class SynchronousCommandProcessingService implements
 						 handler = applicationContext.getBean("createGameEventCommandHandler",NewCommandSourceHandler.class);
 					 }else if(wrapper.isCreateInteractiveDetails()){
 						 handler = applicationContext.getBean("createInteractiveDetailCommandHandler",NewCommandSourceHandler.class);
-					 }else if(wrapper.isEditInteractiveData()){
-						 handler = applicationContext.getBean("updateInteractiveDetailCommandHandler",NewCommandSourceHandler.class);
 					 }
+				 }else if(wrapper.isInteractiveHeader()){
+					 handler = applicationContext.getBean("updateInteractiveHeaderCommandHandler",NewCommandSourceHandler.class);
+				 }else if(wrapper.isInteractiveDetail()){
+					 handler = applicationContext.getBean("updateInteractiveDetailCommandHandler",NewCommandSourceHandler.class);
 				 }else if(wrapper.isCreditDistributionResource()){
 			         if(wrapper.isCreate()) {
 			             handler = applicationContext.getBean("createCreditDistributionCommandHandler",NewCommandSourceHandler.class);

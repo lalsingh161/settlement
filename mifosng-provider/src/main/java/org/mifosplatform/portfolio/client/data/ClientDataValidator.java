@@ -52,11 +52,11 @@ public final class ClientDataValidator {
         
         final Boolean flag=fromApiJsonHelper.extractBooleanNamed("flag", element);
         if(flag==true){
-        final String login = fromApiJsonHelper.extractStringNamed("login", element);
+        /*final String login = fromApiJsonHelper.extractStringNamed("login", element);
         baseDataValidator.reset().parameter("login").value(login).notBlank().notExceedingLengthOf(20);
         
         final String password = fromApiJsonHelper.extractStringNamed("password", element);
-        baseDataValidator.reset().parameter("password").value(password).notBlank().notExceedingLengthOf(60);
+        baseDataValidator.reset().parameter("password").value(password).notBlank().notExceedingLengthOf(60);*/
         }
         
         if (fromApiJsonHelper.parameterExists(ClientApiConstants.accountNoParamName, element)) {

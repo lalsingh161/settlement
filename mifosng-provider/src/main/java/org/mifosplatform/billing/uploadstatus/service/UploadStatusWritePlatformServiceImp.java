@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1264,8 +1265,10 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			Workbook wb = null;
 			Long processRecordCount=0L;
 			Long totalRecordCount=0L;
+			FileInputStream is = null;
 			try {
-				wb = WorkbookFactory.create(new File(fileLocation));
+				is = new FileInputStream(new File(fileLocation));
+				wb = WorkbookFactory.create(is);
 				Sheet interactiveHeaderSheet = wb.getSheetAt(0);
 				
 				//Sheet mediaLocationSheet = wb.getSheetAt(2);
@@ -1289,12 +1292,22 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						 
 						 	totalRecordCount++;
 						 	
-							Long clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
-
+							
+							
 						 	jsonObject.put("externalId",getCellData(headerRow.getCell(0)));//-
 							//jsonObject.put("clientId",headerRow.getCell(1).getStringCellValue());//-
-						 	jsonObject.put("clientId",clientId);
+						 	
 						 	jsonObject.put("customerName",headerRow.getCell(1).getStringCellValue());
+						 	Long clientId = 0L;
+						 	try{
+						 		clientId = mediaSettlementReadPlatformService.retriveClientId(headerRow.getCell(1).getStringCellValue());
+						 	}catch (Exception e) {
+								
+							}finally{	
+								jsonObject.put("clientId",clientId);
+							}
+						 	
+						 	jsonObject.put("fileName",uploadStatusForGameEvent.getFileName());
 						 	
 							
 							SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
@@ -1428,7 +1441,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					}catch(PlatformDataIntegrityException e){
 						errorData.add(new MRNErrorData((long)i, e.getParameterName()+" : "+e.getDefaultUserMessage()));
 					}catch (PlatformApiDataValidationException e) {
-						errorData.add(new MRNErrorData((long)i, e.getErrors().get(0).getParameterName()+" : "+e.getDefaultUserMessage()));
+						errorData.add(new MRNErrorData((long)i, e.getErrors().get(0).getParameterName()+" : "+e.getErrors().get(0).getDefaultUserMessage()));//getDefaultUserMessage()));
 					}catch (NullPointerException e) {
 						errorData.add(new MRNErrorData((long)i, "Error: value cannot be null"));
 					}catch (EOFException e){
@@ -1438,7 +1451,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						errorData.add(new MRNErrorData((long)i,e.getMessage()));
 					}catch (Exception e) {
 						Throwable cause = e.getCause();
-						errorData.add(new MRNErrorData((long)i, "Error: "+cause.getMessage()));
+						errorData.add(new MRNErrorData((long)i, "Error: "+e.getMessage()));
 					}
 				}
 				uploadStatusForGameEvent.setProcessRecords(processRecordCount);
@@ -1471,6 +1484,14 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				e.printStackTrace();
 			} catch (InvalidFormatException e) {
 				e.getStackTrace();
+			}finally{
+				try {
+					if(is!=null)
+						is.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 	
 			
@@ -1492,10 +1513,11 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			Workbook wb = null;
 			Long processRecordCount=0L;
 			Long totalRecordCount=0L;
+			FileInputStream is = null;
 			try {
 
-				
-				wb = WorkbookFactory.create(new File(fileLocation));
+				is = new FileInputStream(new File(fileLocation));
+				wb = WorkbookFactory.create(is);
 				Sheet operatorSheet = wb.getSheetAt(0);
 				int msNumberOfRows =  getNumberOfRows(operatorSheet, 1);
 				System.out.println("Number of rows : "+msNumberOfRows);
@@ -1513,16 +1535,27 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							 throw new EOFException();
 						totalRecordCount++;
 						
+						
 						jsonObject.put("custCode", getCellData(operatorRow.getCell(0)));
 						jsonObject.put("ba",getCellData(operatorRow.getCell(1)));
 						jsonObject.put("pc", getCellData(operatorRow.getCell(2)));
 						jsonObject.put("mpm",getCellData(operatorRow.getCell(3)));
 						jsonObject.put("invoiceNo",getCellData(operatorRow.getCell(4)));
+						jsonObject.put("fileName",uploadStatusForMediaAsset.getFileName());
 						
 						SimpleDateFormat invoiceDateFormater = new SimpleDateFormat("dd MMMM yyyy");
 						jsonObject.put("invoiceDate",invoiceDateFormater.format(operatorRow.getCell(5).getDateCellValue()));
 						
 						jsonObject.put("customerName",getCellData(operatorRow.getCell(6)));
+						Long clientId = 0L;
+						try{
+						 clientId = mediaSettlementReadPlatformService.retriveClientId(operatorRow.getCell(6).getStringCellValue());
+						}catch(Exception e){
+							
+						}finally{
+							jsonObject.put("clientId",clientId);
+						}
+						
 						jsonObject.put("customerCircle",getCellData(operatorRow.getCell(7)));
 						
 						SimpleDateFormat activityMonthFormater = new SimpleDateFormat("MMM yyyy");
@@ -1560,7 +1593,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					}catch(NotaContentProviderException e){
 						 errorData.add(new MRNErrorData((long)i, "Not a content provider"));
 					}catch(EmptyResultDataAccessException e){
-						 errorData.add(new MRNErrorData((long)i, "Content Provider does not exist")); 
+						 errorData.add(new MRNErrorData((long)i, e.getRootCause().getCause().getMessage()));//"Content Provider does not exist")); 
 					}catch(DataIntegrityViolationException dve){
 						errorData.add(new MRNErrorData((long)i, dve.getMessage()));
 					}catch(PlatformDataIntegrityException e){
@@ -1583,6 +1616,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				uploadStatusForMediaAsset.setUnprocessedRecords(totalRecordCount-processRecordCount);
 				uploadStatusForMediaAsset.setTotalRecords(totalRecordCount);
 				writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForMediaAsset,cellNumber);
+				mediaSettlementReadPlatformService.executeProcedure();
 				processRecordCount=0L;totalRecordCount=0L;
 				uploadStatusForMediaAsset=null;
 
@@ -1590,6 +1624,15 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				e.printStackTrace();
 			} catch (InvalidFormatException e) {
 				e.getStackTrace();
+			} finally{
+				try {
+					if(is!=null)
+						is.close();
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}		
 		
 		}else if(uploadProcess.equalsIgnoreCase("MediaGames")){
@@ -1640,7 +1683,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					}catch(NotaContentProviderException e){
 						 errorData.add(new MRNErrorData((long)i, "Not a content provider"));
 					}catch(EmptyResultDataAccessException e){
-						 errorData.add(new MRNErrorData((long)i, "Content Provider does not exist")); 
+						 errorData.add(new MRNErrorData((long)i, e.getRootCause().getCause().getMessage()));//"Content Provider does not exist")); 
 					}catch(DataIntegrityViolationException dve){
 						errorData.add(new MRNErrorData((long)i, dve.getMessage()));
 					}catch(PlatformDataIntegrityException e){
@@ -1673,7 +1716,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			}
 	
 			
-		}else if(uploadProcess.equalsIgnoreCase("Advertisement")){
+		}else if(uploadProcess.equalsIgnoreCase("AdvertisementUpload")){
 		
 			Integer cellNumber = 26;
 			UploadStatus uploadStatusForMediaAsset = this.uploadStatusRepository.findOne(orderId);
@@ -1685,14 +1728,16 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				this.uploadStatusRepository.save(uploadStatusForMediaAsset);
 			}
 			
+			
 			ArrayList<MRNErrorData> errorData = new ArrayList<MRNErrorData>();
 			Workbook wb = null;
 			Long processRecordCount=0L;
 			Long totalRecordCount=0L;
+			FileInputStream is = null;
 			try {
 
-				
-				wb = WorkbookFactory.create(new File(fileLocation));
+				is = new FileInputStream(new File(fileLocation));
+				wb = WorkbookFactory.create(is);
 				Sheet operatorSheet = wb.getSheetAt(0);
 				int msNumberOfRows =  getNumberOfRows(operatorSheet, 1);
 				System.out.println("Number of rows : "+msNumberOfRows);
@@ -1705,20 +1750,35 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						JSONObject jsonObject = new JSONObject();
 		
 								 try {
-									 if(operatorRow.getCell(1).getStringCellValue().equalsIgnoreCase("EOF"))
+									
+									 
+									if(((String)getCellData(operatorRow.getCell(6))).equalsIgnoreCase("EOF"))
 										 throw new EOFException();
+									
 									totalRecordCount++;
+									
+									
 									
 									jsonObject.put("custCode",getCellData(operatorRow.getCell(0)));
 									jsonObject.put("ba",getCellData(operatorRow.getCell(1)));
 									jsonObject.put("pc", getCellData(operatorRow.getCell(2)));
 									jsonObject.put("mpm",getCellData(operatorRow.getCell(3)));
 									jsonObject.put("invoiceNo",getCellData(operatorRow.getCell(4)));
+									jsonObject.put("fileName",uploadStatusForMediaAsset.getFileName());
 									
 									SimpleDateFormat invoiceDateFormater = new SimpleDateFormat("dd MMMM yyyy");
 									jsonObject.put("invoiceDate",invoiceDateFormater.format(operatorRow.getCell(5).getDateCellValue()));
 									
 									jsonObject.put("customerName",getCellData(operatorRow.getCell(6)));
+									Long clientId = 0L;
+									try{
+										clientId = mediaSettlementReadPlatformService.retriveClientId(operatorRow.getCell(6).getStringCellValue());
+									}catch(Exception e){
+										
+									}finally{
+										jsonObject.put("clientId",clientId);
+									}
+									
 									jsonObject.put("customerCircle",getCellData(operatorRow.getCell(7)));
 									
 									SimpleDateFormat activityMonthFormater = new SimpleDateFormat("MMM yyyy");
@@ -1737,9 +1797,11 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									jsonObject.put("eipc",getCellData(operatorRow.getCell(19)));
 									jsonObject.put("income",getCellData(operatorRow.getCell(20)));
 									jsonObject.put("exrtaRate",getCellData(operatorRow.getCell(21)));
-									jsonObject.put("igRevenueAmount",getCellData(operatorRow.getCell(22)));
-									jsonObject.put("cpShareAmount",getCellData(operatorRow.getCell(23)));
-									jsonObject.put("igAfterRoyaltyPayouts",getCellData(operatorRow.getCell(24)));
+									BigDecimal income = new BigDecimal(getCellData(operatorRow.getCell(20))+"");
+									BigDecimal igRevenueAmount = income.multiply(new BigDecimal(getCellData(operatorRow.getCell(21)).toString()));
+									jsonObject.put("igRevenueAmount",igRevenueAmount);//getCellData(operatorRow.getCell(22))
+									/*jsonObject.put("cpShareAmount",getCellData(operatorRow.getCell(23))==null?0:getCellData(operatorRow.getCell(23)));
+									jsonObject.put("igAfterRoyaltyPayouts",getCellData(operatorRow.getCell(24))==null?0:getCellData(operatorRow.getCell(24)));*/
 									jsonObject.put("dateFormat","dd MMMM yyyy");
 									jsonObject.put("locale","en");
 									
@@ -1755,7 +1817,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 								}catch(NotaContentProviderException e){
 									 errorData.add(new MRNErrorData((long)i, "Not a content provider"));
 								}catch(EmptyResultDataAccessException e){
-									 errorData.add(new MRNErrorData((long)i, "Content Provider does not exist")); 
+									 errorData.add(new MRNErrorData((long)i, e.getRootCause().getCause().getMessage()));//"Content Provider does not exist" 
 								}catch(DataIntegrityViolationException dve){
 									errorData.add(new MRNErrorData((long)i, dve.getMessage()));
 								}catch(PlatformDataIntegrityException e){
@@ -1778,6 +1840,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							uploadStatusForMediaAsset.setUnprocessedRecords(totalRecordCount-processRecordCount);
 							uploadStatusForMediaAsset.setTotalRecords(totalRecordCount);
 							writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForMediaAsset,cellNumber);
+							mediaSettlementReadPlatformService.executeProcedure();
 							processRecordCount=0L;totalRecordCount=0L;
 							uploadStatusForMediaAsset=null;
 
@@ -1785,10 +1848,18 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							e.printStackTrace();
 						} catch (InvalidFormatException e) {
 							e.getStackTrace();
+						} finally{
+								try {
+									if(is!=null)
+										is.close();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 						}
 		
 		
-		}else{
+		}else{/*
 		try {
 			File file=new File(filePath);
 			   OPCPackage excelFileToRead=OPCPackage.open(file);
@@ -1923,7 +1994,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
                  jsonobject.put("remarks",  v.elementAt(4).toString());
                  jsonobject.put("locale", "en");
                  jsonobject.put("dateFormat","dd MMMM yyyy");
-                 paymentsApiResource.createPayment(new Double(String.valueOf(v.elementAt(0))).longValue()/*v.elementAt(0).toString())*/, jsonobject.toString());
+                 paymentsApiResource.createPayment(new Double(String.valueOf(v.elementAt(0))).longValue()v.elementAt(0).toString()), jsonobject.toString());
                //  break;
         }
         }
@@ -1983,7 +2054,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	//	this.exception();
 		}
 		
-	}	
+	*/}	
 		
 		
 		// if (order==null || order.getStatus() == 3) {
@@ -2465,8 +2536,13 @@ public synchronized void writeXLSXFileMediaEpgMrn(final String excelFileName, fi
 		fileOut.flush();
 		fileOut.close();
 		 //uploadStatus.update(new LocalDate(),(totalRecords-processRecords!=0)?"ERROR":"COMPLETED",this.processRecords,totalRecords-processRecords,(totalRecords-processRecords!=0)?"ERROR":"SUCCESS",totalRecords);
-		 uploadStatus.setProcessStatus((uploadStatus.getUnprocessedRecords()>0)?"ERROR":"COMPLETED");
-		 uploadStatus.setErrorMessage((uploadStatus.getUnprocessedRecords()>0)?"ERROR":"SUCCESS");
+		 if(uploadStatus.getProcessRecords().longValue() <= 0){
+			 uploadStatus.setProcessStatus("ERROR");
+			 uploadStatus.setErrorMessage("ERROR");
+		 }else{
+			 uploadStatus.setProcessStatus((uploadStatus.getUnprocessedRecords()>0)?"ERROR":"COMPLETED");
+			 uploadStatus.setErrorMessage((uploadStatus.getUnprocessedRecords()>0)?"ERROR":"SUCCESS");
+		 }
 		 uploadStatus.setProcessDate(new LocalDate().toDate());
 		 this.uploadStatusRepository.save(uploadStatus);
 		 uploadStatus = null;
@@ -2511,10 +2587,10 @@ private void writeCSVData(String fileLocation,
 	}
 	
 	protected Integer getNumberOfRows(Sheet sheet, int primaryColumn) {
-        Integer noOfEntries = 1;
+        Integer noOfEntries = 2;
         // getLastRowNum and getPhysicalNumberOfRows showing false values
         // sometimes
-           while (sheet.getRow(noOfEntries) !=null && !sheet.getRow(noOfEntries).getCell(primaryColumn).getStringCellValue().equalsIgnoreCase("EOF")) {
+           while (sheet.getRow(noOfEntries) !=null && sheet.getRow(noOfEntries).getCell(primaryColumn)!=null) {//.getStringCellValue().equalsIgnoreCase("EOF")
                noOfEntries++;
            }
         	

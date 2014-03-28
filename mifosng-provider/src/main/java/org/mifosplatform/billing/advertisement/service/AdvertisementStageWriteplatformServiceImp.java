@@ -43,7 +43,7 @@ public class AdvertisementStageWriteplatformServiceImp implements AdvertisementS
 		
 		try {
 			   context.authenticatedUser();
-			   this.apiJsonDeserializer.validateForCreateAdvertisement(command.json());
+			   //this.apiJsonDeserializer.validateForCreateAdvertisement(command.json());
 			   final Advertisement advertisementData= Advertisement.fromJson(command);
 			   this.advertisementJpaRepository.save(advertisementData);
 		

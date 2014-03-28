@@ -44,7 +44,7 @@ public class PartnerAccount extends AbstractAuditableCustom<AppUser, Long>{
 	private Long currencyId;
 	
 	@Column(name="external_id", nullable=false)
-	private Long externalId;
+	private String externalId;
 	
 	@Column(name="contact_num", nullable=false)
 	private String contactNum;
@@ -107,7 +107,7 @@ public class PartnerAccount extends AbstractAuditableCustom<AppUser, Long>{
 
 
 	public PartnerAccount(Long partnerType,String partnerName, String partnerAddress,
-			Long currencyId, Long externalId, String contactNum,
+			Long currencyId, String externalId, String contactNum,
 			String emailId) {
 		this.partnerType=partnerType;
 		this.partnerName = partnerName;
@@ -126,10 +126,10 @@ public class PartnerAccount extends AbstractAuditableCustom<AppUser, Long>{
 		final String partnerAddress = command.stringValueOfParameterNamed("partnerAddress");
 		/*final Long country=command.longValueOfParameterNamed("country");*/
 		final Long currencyId = command.longValueOfParameterNamed("currencyId");
-		final Integer externalId= command.integerValueOfParameterNamed("externalId");
+		final String externalId= command.stringValueOfParameterNamed("externalId");
 		final String contactNum = command.stringValueOfParameterNamed("contactNum");
 		final String emailId = command.stringValueOfParameterNamed("emailId");
-		return new PartnerAccount(partnerType,partnerName,partnerAddress,currencyId,externalId!=null?externalId.longValue():externalId,contactNum,emailId);
+		return new PartnerAccount(partnerType,partnerName,partnerAddress,currencyId,externalId,contactNum,emailId);
 	}
 
 	public void delete() {
@@ -187,10 +187,10 @@ public class PartnerAccount extends AbstractAuditableCustom<AppUser, Long>{
 	            this.currencyId = newValue;
 	        }
 	        
-	        if (command.isChangeInLongParameterNamed("externalId", this.externalId)) {
-	            final Long newValue = command.longValueOfParameterNamed("externalId");
+	        if (command.isChangeInStringParameterNamed("externalId", this.externalId)) {
+	            final String newValue = command.stringValueOfParameterNamed("externalId");
 	            actualChanges.put("externalId", newValue);
-	            this.externalId =new Long(newValue);
+	            this.externalId =StringUtils.defaultIfEmpty(newValue, null);
 	        }
 	        if (command.isChangeInStringParameterNamed("emailId", this.emailId)) {
 	            final String newValue = command.stringValueOfParameterNamed("emailId");

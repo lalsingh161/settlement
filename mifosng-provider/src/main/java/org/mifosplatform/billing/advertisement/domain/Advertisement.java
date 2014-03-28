@@ -1,6 +1,5 @@
 package org.mifosplatform.billing.advertisement.domain;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -14,10 +13,10 @@ import org.mifosplatform.useradministration.domain.AppUser;
 
 @Entity
 @Table(name="obs_stg_advt")
-public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
+public class Advertisement  extends AbstractAuditableCustom<AppUser, String> {
 	
    @Column(name="cust_code")
-	 private Long customerCode;
+	 private String customerCode;
    
    
    @Column(name="ba")
@@ -25,11 +24,11 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
 
    
     @Column(name="pc")
-	 private Long pc;
+	 private String pc;
    
     
     @Column(name="mpm")
-  	 private Long mpm;
+  	 private String mpm;
     
     
     @Column(name="invoice_no")
@@ -73,15 +72,15 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
     
     
     @Column(name="request")
-	 private Long request;
+	 private String request;
     
     
     @Column(name="impressions")
-  	 private Long impressions;
+  	 private String impressions;
     
     
     @Column(name="clicks")
-  	 private Long clicks;
+  	 private String clicks;
     
     
     @Column(name=" click_through_ratio")
@@ -89,41 +88,49 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
     
     
     @Column(name="eipm")
- 	 private BigDecimal eipm;
+ 	 private String eipm;
     
     
     @Column(name="eipc")
- 	 private BigDecimal eipc;
+ 	 private String eipc;
     
+    @Column(name="data_upload_date")
+    private Date dataUploadDate = new Date();
     
      @Column(name="income")
-	 private BigDecimal  income;
+	 private String  income;
     
      
     @Column(name="ex_rt")
- 	 private BigDecimal exrtaRate;
+ 	 private String exrtaRate;
     
     
      @Column(name="ig_revenueamt")
-	 private BigDecimal  igRevenueAmount;
+	 private String  igRevenueAmount;
     
     
     @Column(name="cp_share_amt")
-	 private BigDecimal  cpShareAmount;
+	 private String  cpShareAmount;
     
     @Column(name="net_ig_rev_after_royalty_payouts")
-	 private BigDecimal  igAfterRoyaltyPayouts;
+	 private String  igAfterRoyaltyPayouts;
+
+    @Column(name="file_name")
+	private String fileName;
+    
+    @Column(name="client_id")
+    private String clientId;
     
     public Advertisement(){
     	
     }
     
     
-	public Advertisement(Long custCode, String ba, Long pc, Long mpm,String invoiceNo, LocalDate invoiceDate, String customerName,
+	public Advertisement(String custCode, String ba, String pc, String mpm,String invoiceNo, LocalDate invoiceDate, String customerName,
 			String customerCircle, String activityMonth, String business,String currency, String category, String contentName,
-			String contentProviderName, Long request, Long impressions,Long clicks, String clickThroughRatio, BigDecimal eipm,
-			BigDecimal eipc, BigDecimal income, BigDecimal exrtaRate,BigDecimal igRevenueAmount, BigDecimal cpShareAmount,
-			BigDecimal igAfterRoyaltyPayouts) {
+			String contentProviderName, String request, String impressions,String clicks, String clickThroughRatio, String eipm,
+			String eipc, String income, String exrtaRate,String igRevenueAmount, String cpShareAmount,
+			String igAfterRoyaltyPayouts, String fileName,String clientId) {
 		
 		this.customerCode = custCode;
 		this.ba = ba;
@@ -150,16 +157,18 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
 		this.igRevenueAmount = igRevenueAmount;
 		this.cpShareAmount = cpShareAmount;
 		this.igAfterRoyaltyPayouts = igAfterRoyaltyPayouts;
+		this.fileName = fileName;
+		this.clientId = clientId;
 
 	}
 
 
 	public static Advertisement fromJson(final JsonCommand command) {
 		
-		final Long custCode = command.longValueOfParameterNamed("custCode");
+		final String custCode = command.stringValueOfParameterNamed("custCode");
 		final String ba = command.stringValueOfParameterNamed("ba");
-		final Long pc = command.longValueOfParameterNamed("pc");
-		final Long mpm = command.longValueOfParameterNamed("mpm");
+		final String pc = command.stringValueOfParameterNamed("pc");
+		final String mpm = command.stringValueOfParameterNamed("mpm");
 		final String invoiceNo = command.stringValueOfParameterNamed("invoiceNo");
 		final LocalDate invoiceDate = command.localDateValueOfParameterNamed("invoiceDate");
 		final String customerName = command.stringValueOfParameterNamed("customerName");
@@ -170,29 +179,31 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
 		final String category = command.stringValueOfParameterNamed("category");
 		final String contentName = command.stringValueOfParameterNamed("contentName");
 		final String contentProviderName = command.stringValueOfParameterNamed("contentProviderName");
-		final Long request = command.longValueOfParameterNamed("request");
-		final Long impressions = command.longValueOfParameterNamed("impressions");
-		final Long clicks = command.longValueOfParameterNamed("clicks");
+		final String request = command.stringValueOfParameterNamed("request");
+		final String impressions = command.stringValueOfParameterNamed("impressions");
+		final String clicks = command.stringValueOfParameterNamed("clicks");
 		final String clickThroughRatio = command.stringValueOfParameterNamed("clickThroughRatio");
-		final BigDecimal eipm = command.bigDecimalValueOfParameterNamed("eipm");
-		final BigDecimal eipc = command.bigDecimalValueOfParameterNamed("eipc");
-		final BigDecimal income = command.bigDecimalValueOfParameterNamed("income");
-		final BigDecimal exrtaRate = command.bigDecimalValueOfParameterNamed("exrtaRate");
-		final BigDecimal igRevenueAmount = command.bigDecimalValueOfParameterNamed("igRevenueAmount");
-		final BigDecimal cpShareAmount = command.bigDecimalValueOfParameterNamed("cpShareAmount");
-		final BigDecimal igAfterRoyaltyPayouts = command.bigDecimalValueOfParameterNamed("igAfterRoyaltyPayouts");
+		final String eipm = command.stringValueOfParameterNamed("eipm");
+		final String eipc = command.stringValueOfParameterNamed("eipc");
+		final String income = command.stringValueOfParameterNamed("income");
+		final String exrtaRate = command.stringValueOfParameterNamed("exrtaRate");
+		final String igRevenueAmount = command.stringValueOfParameterNamed("igRevenueAmount");
+		/*final String cpShareAmount = command.stringValueOfParameterNamed("cpShareAmount");
+		final String igAfterRoyaltyPayouts = command.stringValueOfParameterNamed("igAfterRoyaltyPayouts");*/
+		final String fileName  = command.stringValueOfParameterNamed("fileName");
+		final String clientId = command.stringValueOfParameterNamed("clientId");
 		
 		return new Advertisement(custCode,ba,pc,mpm,invoiceNo,invoiceDate,customerName,customerCircle,activityMonth,business,currency,category,contentName,contentProviderName,
-				request,impressions,clicks,clickThroughRatio,eipm,eipc,income,exrtaRate,igRevenueAmount,cpShareAmount,igAfterRoyaltyPayouts);
+				request,impressions,clicks,clickThroughRatio,eipm,eipc,income,exrtaRate,igRevenueAmount,/*cpShareAmount*/null,null/*igAfterRoyaltyPayouts*/,fileName,clientId);
 	}
 
 
-	public Long getCustomerCode() {
+	public String getCustomerCode() {
 		return customerCode;
 	}
 
 
-	public void setCustomerCode(Long customerCode) {
+	public void setCustomerCode(String customerCode) {
 		this.customerCode = customerCode;
 	}
 
@@ -206,22 +217,22 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
 	}
 
 
-	public Long getPc() {
+	public String getPc() {
 		return pc;
 	}
 
 
-	public void setPc(Long pc) {
+	public void setPc(String pc) {
 		this.pc = pc;
 	}
 
 
-	public Long getMpm() {
+	public String getMpm() {
 		return mpm;
 	}
 
 
-	public void setMpm(Long mpm) {
+	public void setMpm(String mpm) {
 		this.mpm = mpm;
 	}
 
@@ -326,32 +337,32 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
 	}
 
 
-	public Long getRequest() {
+	public String getRequest() {
 		return request;
 	}
 
 
-	public void setRequest(Long request) {
+	public void setRequest(String request) {
 		this.request = request;
 	}
 
 
-	public Long getImpressions() {
+	public String getImpressions() {
 		return impressions;
 	}
 
 
-	public void setImpressions(Long impressions) {
+	public void setImpressions(String impressions) {
 		this.impressions = impressions;
 	}
 
 
-	public Long getClicks() {
+	public String getClicks() {
 		return clicks;
 	}
 
 
-	public void setClicks(Long clicks) {
+	public void setClicks(String clicks) {
 		this.clicks = clicks;
 	}
 
@@ -366,72 +377,72 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, Long> {
 	}
 
 
-	public BigDecimal getEipm() {
+	public String getEipm() {
 		return eipm;
 	}
 
 
-	public void setEipm(BigDecimal eipm) {
+	public void setEipm(String eipm) {
 		this.eipm = eipm;
 	}
 
 
-	public BigDecimal getEipc() {
+	public String getEipc() {
 		return eipc;
 	}
 
 
-	public void setEipc(BigDecimal eipc) {
+	public void setEipc(String eipc) {
 		this.eipc = eipc;
 	}
 
 
-	public BigDecimal getIncome() {
+	public String getIncome() {
 		return income;
 	}
 
 
-	public void setIncome(BigDecimal income) {
+	public void setIncome(String income) {
 		this.income = income;
 	}
 
 
-	public BigDecimal getExrtaRate() {
+	public String getExrtaRate() {
 		return exrtaRate;
 	}
 
 
-	public void setExrtaRate(BigDecimal exrtaRate) {
+	public void setExrtaRate(String exrtaRate) {
 		this.exrtaRate = exrtaRate;
 	}
 
 
-	public BigDecimal getIgRevenueAmount() {
+	public String getIgRevenueAmount() {
 		return igRevenueAmount;
 	}
 
 
-	public void setIgRevenueAmount(BigDecimal igRevenueAmount) {
+	public void setIgRevenueAmount(String igRevenueAmount) {
 		this.igRevenueAmount = igRevenueAmount;
 	}
 
 
-	public BigDecimal getCpShareAmount() {
+	public String getCpShareAmount() {
 		return cpShareAmount;
 	}
 
 
-	public void setCpShareAmount(BigDecimal cpShareAmount) {
+	public void setCpShareAmount(String cpShareAmount) {
 		this.cpShareAmount = cpShareAmount;
 	}
 
 
-	public BigDecimal getIgAfterRoyaltyPayouts() {
+	public String getIgAfterRoyaltyPayouts() {
 		return igAfterRoyaltyPayouts;
 	}
 
 
-	public void setIgAfterRoyaltyPayouts(BigDecimal igAfterRoyaltyPayouts) {
+	public void setIgAfterRoyaltyPayouts(String igAfterRoyaltyPayouts) {
 		this.igAfterRoyaltyPayouts = igAfterRoyaltyPayouts;
 	}
    

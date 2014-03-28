@@ -1126,7 +1126,7 @@ public class CommandWrapper {
 		return this.entityName.equalsIgnoreCase("GAMEEVENT")
 				|| this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT");
 	}
-
+	
 	public boolean isCreateGameEvent() {
 		return this.entityName.equalsIgnoreCase("GAMEEVENT")
 				&& this.actionName.equalsIgnoreCase("CREATE");
@@ -1167,9 +1167,21 @@ public class CommandWrapper {
     }
 
 
-	public boolean isEditInteractiveData() {
-		return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
+	public boolean isEditInteractiveHeaderData() {
+		return this.entityName.equalsIgnoreCase("INTERACTIVEHEADER")
 				&& this.actionName.equalsIgnoreCase("EDIT");
+	}
+	
+	public boolean isEditInteractiveDetailData() {
+		return this.entityName.equalsIgnoreCase("INTERACTIVEDETAIL")
+				&& this.actionName.equalsIgnoreCase("EDIT");
+	}
+	
+	public boolean isInteractiveHeader(){
+		return this.entityName.equalsIgnoreCase("INTERACTIVEHEADER");
+	}
+	public boolean isInteractiveDetail(){
+		return this.entityName.equalsIgnoreCase("INTERACTIVEDETAIL");
 	}
 
 	public boolean isCurrencyRateResource() {

@@ -47,7 +47,7 @@ public class InteractiveHeaderHandler {
 				InteractiveHeader h = getCurrentHeader();
 				add(h,d.getDetailData());
 			}else{
-				hData = new InteractiveHeader(d.getHeaderData().getClientId(), d.getHeaderData().getClientCode(), d.getHeaderData().getBusinessLineL(), null,d.getHeaderData().getDataUploadedDate(),d.getHeaderData().getActivityMonth());
+				//hData = new InteractiveHeader(d.getHeaderData().getClientId(), d.getHeaderData().getClientCode(), d.getHeaderData().getBusinessLineL(), null,d.getHeaderData().getDataUploadedDate(),d.getHeaderData().getActivityMonth());
 				add(hData, d.getDetailData());
 				header.add(hData);
 			}
