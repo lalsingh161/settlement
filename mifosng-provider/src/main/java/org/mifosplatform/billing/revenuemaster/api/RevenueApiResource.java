@@ -9,7 +9,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.mifosplatform.billing.revenuemaster.data.RevenueMasterData;
-import org.mifosplatform.billing.revenuemaster.service.RevenueClient;
+import org.mifosplatform.billing.revenuemaster.service.InvoiceRevenueClient;
 import org.mifosplatform.commands.domain.CommandWrapper;
 import org.mifosplatform.commands.service.CommandWrapperBuilder;
 import org.mifosplatform.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -38,18 +38,20 @@ public class RevenueApiResource {
     private final DefaultToApiJsonSerializer<RevenueMasterData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final RevenueClient revenueClient;
+    private final InvoiceRevenueClient invoiceRevenueClient;
     private final FromJsonHelper fromApiJsonHelper;
+    
+    
 	@Autowired
 	RevenueApiResource(final PlatformSecurityContext context, 
             final DefaultToApiJsonSerializer<RevenueMasterData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper,
-            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final RevenueClient revenueClient,final FromJsonHelper fromApiJsonHelper){
+            final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService,final InvoiceRevenueClient invoiceRevenueClient,final FromJsonHelper fromApiJsonHelper){
 		
 		this.context = context;
         this.toApiJsonSerializer = toApiJsonSerializer;
         this.apiRequestParameterHelper = apiRequestParameterHelper;
         this.commandsSourceWritePlatformService = commandsSourceWritePlatformService;
-		this.revenueClient=revenueClient;
+		this.invoiceRevenueClient=invoiceRevenueClient;
 		this.fromApiJsonHelper=fromApiJsonHelper;
 	}
 	
@@ -71,7 +73,7 @@ public class RevenueApiResource {
 						wrapper.getLoanId(), wrapper.getSavingsId(),
 						wrapper.getCodeId(), wrapper.getSupportedEntityType(),
 						wrapper.getSupportedEntityId(), wrapper.getTransactionId());
-		this.revenueClient.createRevenueInvoice(command); 
+		this.invoiceRevenueClient.createRevenueInvoice(command); 
 		return this.toApiJsonSerializer.serialize(result);
 	}
 }
