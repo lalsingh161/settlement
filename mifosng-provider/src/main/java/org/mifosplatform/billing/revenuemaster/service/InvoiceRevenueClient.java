@@ -84,17 +84,17 @@ public class InvoiceRevenueClient {
 		{
 		   for(GenerateInteractiveHeaderData headerData:headerDatas)
 			{
-			if(headerData.getBusinessLine().equalsIgnoreCase("Mobile")){
+			if(isBusinessLineMobile(headerData)){
 				 detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
-				 if(detailDatas!=null)
+				 if(detailDatas.size()!=0)
 				 {
 				 invoiceAmount=this.interactivedetailDeductions(detailDatas,deductionDatas);
 		      	}else{
 				throw new NoInteractiveHeadersFoundException(headerData.getId());
 			    }
-			}else if(headerData.getBusinessLine().equalsIgnoreCase("Advertisement")){
+			}else if(isBusinessLineAdver(headerData)){
 				detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
-				if(detailDatas!=null)
+				if(detailDatas.size()!=0)
 				{
 					invoiceAmount =  this.interactivedetailDeductions(detailDatas,deductionDatas);		
 				}else {
@@ -183,12 +183,15 @@ public class InvoiceRevenueClient {
 			BigDecimal taxAmount=BigDecimal.ZERO;
 			//deductionCode=deductionData.getDeductionCode();
 	
-			if(deductionData.getDeductionCode().equalsIgnoreCase("wpc"))
-			{   
+			
+			if(isDeductionCodeWpc(deductionData)){
+			
+			/*if(deductionData.getDeductionCode().equalsIgnoreCase("wpc"))
+			{   */
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();
 			    deductionValue=deductionData.getDeductionValue();
-			    taxAmount=grossRevenueAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2,RoundingMode.HALF_UP);
+			    taxAmount=grossRevenueAmount.multiply(deductionValue.divide(new BigDecimal(100))).setScale(2,RoundingMode.HALF_UP);
 			    deductionData.setWpcTaxAmount(taxAmount);
 			    WpcTaxAmount=deductionData.getWpcTaxAmount();
 			
@@ -216,4 +219,29 @@ public class InvoiceRevenueClient {
 		return taxes;
 
 	}
+
+	public boolean isDeductionCodeWpc(DeductionData deductionData) {
+		    boolean deductionCode=false;
+		   if(deductionData.getDeductionCode().equalsIgnoreCase("wpc")) {
+			   deductionCode=true;
+		   }
+		return deductionCode;
+	}
+	
+	public boolean isBusinessLineMobile(GenerateInteractiveHeaderData headerData) {
+		boolean businessLine=false;
+		if(headerData.getBusinessLine().equalsIgnoreCase("Mobile")){
+			businessLine=true;
+		}
+		return businessLine;
+	}
+	
+	public boolean isBusinessLineAdver(GenerateInteractiveHeaderData headerData) {
+		boolean businessLine=false;
+		if(headerData.getBusinessLine().equalsIgnoreCase("Advertisement")){
+			businessLine=true;
+		}
+		return businessLine;
+	}
+	
 }
