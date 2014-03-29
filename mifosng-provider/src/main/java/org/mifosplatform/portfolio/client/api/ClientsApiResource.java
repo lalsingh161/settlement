@@ -151,15 +151,19 @@ public class ClientsApiResource {
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         ClientData clientData = this.clientReadPlatformService.retrieveOne(clientId);
-      
+        Collection<StateDetails> circleData = deductionMasterReadPlatformService.retrieveAllStateDetails();
+        
+        
         if (settings.isTemplate()) {
             final List<OfficeData> allowedOffices = new ArrayList<OfficeData>(officeReadPlatformService.retrieveAllOfficesForDropdown());
             final Collection<ClientCategoryData> categoryDatas=this.clientReadPlatformService.retrieveClientCategories();
             List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
             clientData = ClientData.templateOnTop(clientData, allowedOffices,categoryDatas,allocationDetailsDatas);
+            clientData.setCircleData(circleData);
         }else{
         	 List<String> allocationDetailsDatas=this.allocationReadPlatformService.retrieveHardWareDetails(clientId);
              clientData = ClientData.templateOnTop(clientData, null,null,allocationDetailsDatas);
+             clientData.setCircleData(circleData);
         }
 
         return this.toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);

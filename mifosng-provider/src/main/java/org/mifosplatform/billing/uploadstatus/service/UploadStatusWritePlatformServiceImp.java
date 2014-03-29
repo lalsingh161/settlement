@@ -30,7 +30,6 @@ import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -1497,7 +1496,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 			
 		}else if(uploadProcess.equalsIgnoreCase("PlatformUpload")){
 			
-			
+			Set<Long> clientIds = new LinkedHashSet<Long>();
 
 			Integer cellNumber = 27;
 			UploadStatus uploadStatusForMediaAsset = this.uploadStatusRepository.findOne(orderId);
@@ -1589,6 +1588,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					    	//Long rsId = result.resourceId();
 					    	errorData.add(new MRNErrorData((long)i, "Success"));
 					    	processRecordCount++;
+					    	clientIds.add(clientId);
 					    }
 					}catch(NotaContentProviderException e){
 						 errorData.add(new MRNErrorData((long)i, "Not a content provider"));
@@ -1617,6 +1617,25 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				uploadStatusForMediaAsset.setTotalRecords(totalRecordCount);
 				writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForMediaAsset,cellNumber);
 				mediaSettlementReadPlatformService.executeProcedure();
+				
+				for(Long cId: clientIds){
+					 System.out.println("Calling invoice: "+cId);
+					 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
+					 final String json = wrapper.getJson();
+						
+						final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
+							final JsonCommand command = JsonCommand.from(json, parsedCommand,
+									this.fromApiJsonHelper, wrapper.getEntityName(),
+									wrapper.getEntityId(), wrapper.getSubentityId(),
+									wrapper.getGroupId(), wrapper.getClientId(),
+									wrapper.getLoanId(), wrapper.getSavingsId(),
+									wrapper.getCodeId(), wrapper.getSupportedEntityType(),
+									wrapper.getSupportedEntityId(), wrapper.getTransactionId());
+					this.invoiceRevenueClient.createRevenueInvoice(command);
+					
+				}
+				clientIds = null;
+				
 				processRecordCount=0L;totalRecordCount=0L;
 				uploadStatusForMediaAsset=null;
 
@@ -1717,7 +1736,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 	
 			
 		}else if(uploadProcess.equalsIgnoreCase("AdvertisementUpload")){
-		
+			Set<Long> clientIds = new LinkedHashSet<Long>();
 			Integer cellNumber = 26;
 			UploadStatus uploadStatusForMediaAsset = this.uploadStatusRepository.findOne(orderId);
 			
@@ -1813,6 +1832,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 								    	//Long rsId = result.resourceId();
 								    	errorData.add(new MRNErrorData((long)i, "Success"));
 								    	processRecordCount++;
+								    	clientIds.add(clientId);
 								    }
 								}catch(NotaContentProviderException e){
 									 errorData.add(new MRNErrorData((long)i, "Not a content provider"));
@@ -1841,6 +1861,25 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 							uploadStatusForMediaAsset.setTotalRecords(totalRecordCount);
 							writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForMediaAsset,cellNumber);
 							mediaSettlementReadPlatformService.executeProcedure();
+							
+							for(Long cId: clientIds){
+								 System.out.println("Calling invoice: "+cId);
+								 final CommandWrapper wrapper = new CommandWrapperBuilder().createRevenueInvoice(cId).withJson("{}").build();
+								 final String json = wrapper.getJson();
+									
+									final JsonElement parsedCommand = this.fromApiJsonHelper.parse(json);
+										final JsonCommand command = JsonCommand.from(json, parsedCommand,
+												this.fromApiJsonHelper, wrapper.getEntityName(),
+												wrapper.getEntityId(), wrapper.getSubentityId(),
+												wrapper.getGroupId(), wrapper.getClientId(),
+												wrapper.getLoanId(), wrapper.getSavingsId(),
+												wrapper.getCodeId(), wrapper.getSupportedEntityType(),
+												wrapper.getSupportedEntityId(), wrapper.getTransactionId());
+								this.invoiceRevenueClient.createRevenueInvoice(command);
+								
+							}
+							clientIds = null;
+							
 							processRecordCount=0L;totalRecordCount=0L;
 							uploadStatusForMediaAsset=null;
 
