@@ -1254,7 +1254,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 		
 		 		try{
 		 			
-		 			fromApiJsonDeserializer.validateForRawData(command.json());
+		 			//fromApiJsonDeserializer.validateForRawData(command.json());
 		 			rawData = OperatorStage.fromJson(command);
 		 			rawInteractiveHeaderDetailJpaRepository.saveAndFlush(rawData);
 		 			
