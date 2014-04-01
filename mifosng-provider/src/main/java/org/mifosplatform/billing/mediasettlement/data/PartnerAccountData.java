@@ -317,7 +317,6 @@ public class PartnerAccountData {
 	}
 	
 	
-
 	public Collection<MCodeData> getPartnerType() {
 		return partnerTypeData;
 	}
