@@ -2140,5 +2140,35 @@ public class CommandWrapperBuilder {
 		return this;
 	}
 
+	public CommandWrapperBuilder createPlatformStageData() {
+		this.actionName = "CREATE";
+		this.entityName = "PLATFORMSTAGE";
+		this.entityId = null;
+		this.href = "uploadstatus/";
+		return this;
+	}
+	public CommandWrapperBuilder createAdvertiseStageData() {
+		
+		this.actionName = "CREATE";
+		this.entityName = "ADVERTISEMENT";
+		this.entityId = null;
+		this.href = "advertisement";
+		return this;
+	}
+
+	public CommandWrapperBuilder updateInteractiveHeaderData(Long headerId) {
+		this.actionName = "UPDATE";
+		this.entityName = "INTERACTIVEHEADER";
+		this.entityId = headerId;
+		this.href = "mediasettlement/editinteractiveheader/"+headerId;
+		return this;
+	}
+	public CommandWrapperBuilder updateInteractiveDetailData(Long detailId) {
+		this.actionName = "UPDATE";
+		this.entityName = "INTERACTIVEDETAIL";
+		this.entityId = detailId;
+		this.href = "mediasettlement/editinteractivedetail/"+detailId;
+		return this;
+	}
 	
 }

@@ -1126,7 +1126,7 @@ public class CommandWrapper {
 		return this.entityName.equalsIgnoreCase("GAMEEVENT")
 				|| this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT");
 	}
-
+	
 	public boolean isCreateGameEvent() {
 		return this.entityName.equalsIgnoreCase("GAMEEVENT")
 				&& this.actionName.equalsIgnoreCase("CREATE");
@@ -1167,9 +1167,21 @@ public class CommandWrapper {
     }
 
 
-	public boolean isEditInteractiveData() {
-		return this.entityName.equalsIgnoreCase("INTERACTIVEGAMEEVENT")
+	public boolean isEditInteractiveHeaderData() {
+		return this.entityName.equalsIgnoreCase("INTERACTIVEHEADER")
 				&& this.actionName.equalsIgnoreCase("EDIT");
+	}
+	
+	public boolean isEditInteractiveDetailData() {
+		return this.entityName.equalsIgnoreCase("INTERACTIVEDETAIL")
+				&& this.actionName.equalsIgnoreCase("EDIT");
+	}
+	
+	public boolean isInteractiveHeader(){
+		return this.entityName.equalsIgnoreCase("INTERACTIVEHEADER");
+	}
+	public boolean isInteractiveDetail(){
+		return this.entityName.equalsIgnoreCase("INTERACTIVEDETAIL");
 	}
 
 	public boolean isCurrencyRateResource() {
@@ -1218,8 +1230,23 @@ public class CommandWrapper {
 	public boolean isRawData(){
 		return this.entityName.equalsIgnoreCase("RAWDATA");
 	}
+	
 	public boolean isCreateRawData(){
 		return this.entityName.equalsIgnoreCase("RAWDATA") && this.actionName.equalsIgnoreCase("CREATE");
+	}
+	public boolean isPlatformStageData(){
+		return this.entityName.equalsIgnoreCase("PLATFORMSTAGE");
+	}
+	
+	public boolean isCreatePlatformStage(){
+		return this.entityName.equalsIgnoreCase("PLATFORMSTAGE") && this.actionName.equalsIgnoreCase("CREATE");
+	}
+	public boolean isAdvertisementResource(){
+		return this.entityName.equalsIgnoreCase("ADVERTISEMENT");
+	}
+	
+	public boolean isCreateAdvertisementStageData(){
+		return this.entityName.equalsIgnoreCase("ADVERTISEMENT") && this.actionName.equalsIgnoreCase("CREATE");
 	}
 }
 

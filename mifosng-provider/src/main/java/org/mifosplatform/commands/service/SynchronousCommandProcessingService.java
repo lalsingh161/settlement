@@ -886,9 +886,11 @@ public class SynchronousCommandProcessingService implements
 						 handler = applicationContext.getBean("createGameEventCommandHandler",NewCommandSourceHandler.class);
 					 }else if(wrapper.isCreateInteractiveDetails()){
 						 handler = applicationContext.getBean("createInteractiveDetailCommandHandler",NewCommandSourceHandler.class);
-					 }else if(wrapper.isEditInteractiveData()){
-						 handler = applicationContext.getBean("updateInteractiveDetailCommandHandler",NewCommandSourceHandler.class);
 					 }
+				 }else if(wrapper.isInteractiveHeader()){
+					 handler = applicationContext.getBean("updateInteractiveHeaderCommandHandler",NewCommandSourceHandler.class);
+				 }else if(wrapper.isInteractiveDetail()){
+					 handler = applicationContext.getBean("updateInteractiveDetailCommandHandler",NewCommandSourceHandler.class);
 				 }else if(wrapper.isCreditDistributionResource()){
 			         if(wrapper.isCreate()) {
 			             handler = applicationContext.getBean("createCreditDistributionCommandHandler",NewCommandSourceHandler.class);
@@ -897,6 +899,10 @@ public class SynchronousCommandProcessingService implements
 					if(wrapper.isCreateRawData()){
 						handler = applicationContext.getBean("createRawDataCommandHandler", NewCommandSourceHandler.class);
 					}
+			    }else if(wrapper.isPlatformStageData()){
+			    	if(wrapper.isCreatePlatformStage()){
+			    		handler = applicationContext.getBean("createPlatformStageCommandHandler",NewCommandSourceHandler.class);
+			    	}
 			    }else if(wrapper.isInvoiceRevenue()){
 						 if(wrapper.isCreateRevenueInvoice()){
 							 handler = applicationContext.getBean("createRevenueInvoiceCommandHandler",NewCommandSourceHandler.class);	
@@ -909,6 +915,10 @@ public class SynchronousCommandProcessingService implements
 						 }else if(wrapper.isDeleteCurrencyRate()){
 							 handler = applicationContext.getBean("deleteCurrencyRateCommandHandler",NewCommandSourceHandler.class); 
 						 } 
+				}else if(wrapper.isAdvertisementResource()){
+	                     if(wrapper.isCreateAdvertisementStageData()){			 
+	                    	 handler = applicationContext.getBean("createAdvertisementStageCommandHandler",NewCommandSourceHandler.class); 
+	                     } 
 				}else {
 			               throw new UnsupportedCommandException(wrapper.commandName());
 		              }

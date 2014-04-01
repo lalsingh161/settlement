@@ -6,6 +6,7 @@ import org.mifosplatform.billing.revenuemaster.data.DeductionData;
 import org.mifosplatform.billing.revenuemaster.data.GenerateInteractiveHeaderData;
 import org.mifosplatform.billing.revenuemaster.data.OperatorShareData;
 import org.mifosplatform.billing.revenuemaster.data.RevenueMasterData;
+import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 
 public interface RevenueMasterReadplatformService {
 
@@ -16,5 +17,11 @@ public interface RevenueMasterReadplatformService {
 	List<DeductionData> retriveOperatorDeductionData(Long entityId);
 
 	List<OperatorShareData> retriveOperatorRevenueShareData(Long clientId);
+
+	List<TaxMappingRateData> retrieveTaxMappingDate(Long clientId,
+			String chargeCode);
+
+	List<TaxMappingRateData> retrieveDefaultTaxMappingDate(Long clientId,
+			String chargeCode);
 
 }

@@ -40,6 +40,11 @@ public class DeductionTax extends AbstractPersistable<Long>{
 	@JoinColumn(name = "invoice_id", insertable = true, updatable = true, nullable = true, unique = true)
 	private Invoice invoice;
 
+	
+	@Column(name = "detail_id")
+	private Long detailId;
+
+	
 	@Column(name = "ded_code")
 	private String deductionCode;
 /*
@@ -60,12 +65,13 @@ public class DeductionTax extends AbstractPersistable<Long>{
 		
 	}
 	
-	public DeductionTax(final Invoice invoice, final BillingOrder charge,
+	public DeductionTax(final Invoice invoice, final BillingOrder charge,final Long detailId,
 			final String deductionCode, final BigDecimal deductionValue,
 			 final BigDecimal deductionTaxAmount) {
 
 		this.charge = charge;
 		this.invoice = invoice;
+		this.detailId = detailId;
 		this.deductionCode = deductionCode;
 		this.deductionPercentage = deductionValue;
 		this.deductionTaxAmount = deductionTaxAmount;
@@ -122,6 +128,10 @@ public class DeductionTax extends AbstractPersistable<Long>{
 	public void update(BillingOrder charge) {
 		
 		this.charge=charge;
+	}
+
+	public Long getDetailId() {
+		return detailId;
 	}
 	
 

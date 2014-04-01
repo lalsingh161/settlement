@@ -27,7 +27,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	private Long clientId;
 	
 	@Column(name="client_external_id")
-	private Long externalId;
+	private String externalId;
 	
 	
 	@Column(name="activity_month")
@@ -60,7 +60,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	}
 	
 	
-	public InteractiveHeader(Long clientId, Long externalId,Long businessLine, Long chargeCode, LocalDate dataUploadedDate,String activityMonth) {
+	public InteractiveHeader(Long clientId, String externalId,Long businessLine, Long chargeCode, LocalDate dataUploadedDate,String activityMonth) {
 
 		
 		this.clientId = clientId;
@@ -73,7 +73,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		this.dataUploadedDate = (null==dataUploadedDate)?new Date():dataUploadedDate.toDate();
 	}
 
-	public InteractiveHeader(Long clientId, Long clientCode,
+	public InteractiveHeader(Long clientId, String clientCode,
 			 Long businessLineL, Long chargeCode,
 			Date dataUploadedDate,String activityMonth) {
 		
@@ -97,7 +97,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	public static InteractiveHeader fromJson(JsonCommand command){
 		
 		Long clientId = command.longValueOfParameterNamed("clientId");
-		Long externalId = command.longValueOfParameterNamed("externalId");
+		String externalId = command.stringValueOfParameterNamed("externalId");
 		String activityMonth = command.stringValueOfParameterNamed("activityMonth");
 		Long businessLine = command.longValueOfParameterNamed("businessLine");
 		Long chargeCode = command.longValueOfParameterNamed("chargeCode");
@@ -124,12 +124,12 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public Long getExternalId() {
+	public String getExternalId() {
 		return externalId;
 	}
 
 
-	public void setExternalId(Long externalId) {
+	public void setExternalId(String externalId) {
 		this.externalId = externalId;
 	}
 

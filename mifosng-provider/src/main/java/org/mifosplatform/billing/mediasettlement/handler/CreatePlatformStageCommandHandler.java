@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 	@Service
-	public class  UpdateInteractiveDetailCommandHandler implements NewCommandSourceHandler{
+	public class  CreatePlatformStageCommandHandler implements NewCommandSourceHandler{
 
 		final private MediaSettlementWritePlatformService mediaSettlementWritePlatformService;
 		
 		@Autowired
-		public UpdateInteractiveDetailCommandHandler(final MediaSettlementWritePlatformService mediaSettlementWritePlatformService ) {
+		public CreatePlatformStageCommandHandler(final MediaSettlementWritePlatformService mediaSettlementWritePlatformService ) {
 			this.mediaSettlementWritePlatformService = mediaSettlementWritePlatformService;
 		}
 	
 		@Override
 		public CommandProcessingResult processCommand(final JsonCommand command) {
-			return mediaSettlementWritePlatformService.updateInteractiveDetailData(command.entityId(), command);
+			return mediaSettlementWritePlatformService.createPlatformStageData(command);
 		
 		}
 

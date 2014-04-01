@@ -32,6 +32,8 @@ import org.mifosplatform.billing.mediasettlement.domain.PartnerGame;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetails;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameDetailsJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.PartnerGameJpaRepository;
+import org.mifosplatform.billing.mediasettlement.domain.PlatformStage;
+import org.mifosplatform.billing.mediasettlement.domain.PlatformStageJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMaster;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueMasterJpaRepository;
 import org.mifosplatform.billing.mediasettlement.domain.RevenueOEMSettlement;
@@ -74,7 +76,6 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 
 	final private AccountPartnerJpaRepository accountPartnerJpaRepository;
 	final private OperatorDeductionJpaRepository operatorDeductionJpaRepository;
-	final private PartnerGameDetailsJpaRepository partnerGameDetailsJpaRepository;
 	final private PlatformSecurityContext context;
 	final private MediaSettlementCommandFromApiJsonDeserializer fromApiJsonDeserializer;
 	final private FromJsonHelper fromApiJsonHelper;
@@ -84,17 +85,15 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 	final private RevenueOEMSettlementJpaRepository revenueOEMSettlementJpaRepository;
 	final private PartnerAgreementRepository partnerAgreementRepository;
 	final private PartnerAgreementDetailRepository partnerAgreementDetailRepository;
-	final private ChannelPartnerMappingJpaRepository channelPartnerJpaRepository;
 	final private SettlementSequenceJpaRepository settlementSequenceJpaRepository;
 	final private ClientRepository clientRepository;
 	final private InteractiveHeaderJpaRepository interactiveHeaderJpaRepository;
-	final private InteractiveDetailsJpaRepository interactiveDetailsJpaRepository;	
 	final private RevenueMasterJpaRepository revenueMasterJpaRepository;
 	final private CurrencyRateJpaRepository currencyRateJpaRepository;
-	final private TransactionHistoryWritePlatformService transactionHistoryWritePlatformService;
 	final private OperatorStageDetailJpaRepository rawInteractiveHeaderDetailJpaRepository;
 	final private OperatorStageDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService;
-	
+	final private PlatformStageJpaRepository platformStageJpaRepository;
+	final private InteractiveDetailsJpaRepository interactiveDetailsJpaRepository;
 	private final static Logger logger = (Logger) LoggerFactory.getLogger(MediaSettlementWritePlatformServiceImp.class);
 	
 	@Autowired
@@ -119,30 +118,29 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			final  CurrencyRateJpaRepository currencyRateJpaRepository,
 			final TransactionHistoryWritePlatformService transactionHistoryWritePlatformService,
 			final OperatorStageDetailJpaRepository rawInteractiveHeaderDetailJpaRepository,
-			final OperatorStageDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService) {
+			final OperatorStageDetailReadPlatformService rawInteractiveHeaderDetailReadPlatformService,
+			final PlatformStageJpaRepository platformStageJpaRepository) {
 
 		this.context = context;
 		this.accountPartnerJpaRepository = accountPartnerJpaRepository;
 		this.fromApiJsonDeserializer = apiJsonDeserializer;
 		this.partnerGameJpaRepository = partnerGameJpaRepository;
 		this.fromApiJsonHelper = fromApiJsonHelper;
-		this.partnerGameDetailsJpaRepository = partnerGameDetailsJpaRepository;
 		this.mediaSettlementReadPlatformService = mediaSettlementReadPlatformService;
 		this.revenueSettlementJpaRepository = revenueSettlementJpaRepository;
 		this.partnerAgreementRepository = partnerAgreementRepository;
 		this.revenueOEMSettlementJpaRepository = revenueOEMSettlementJpaRepository;
-		this.channelPartnerJpaRepository = channelPartnerMappingJpaRepository;
 		this.operatorDeductionJpaRepository = operatorDeductionJpaRepository;
 		this.settlementSequenceJpaRepository = settlementSequenceJpaRepository;
 		this.clientRepository = clientReposritory;
 		this.interactiveHeaderJpaRepository = interactiveHeaderJpaRepository;
-		this.interactiveDetailsJpaRepository = interactiveDetailsJpaRepository;
 		this.revenueMasterJpaRepository = revenueMasterJpaRepository;
 		this.partnerAgreementDetailRepository=partnerAgreementDetailRepository;
 		this.currencyRateJpaRepository = currencyRateJpaRepository;
-		this.transactionHistoryWritePlatformService = transactionHistoryWritePlatformService;
 		this.rawInteractiveHeaderDetailJpaRepository = rawInteractiveHeaderDetailJpaRepository;
 		this.rawInteractiveHeaderDetailReadPlatformService = rawInteractiveHeaderDetailReadPlatformService;
+		this.platformStageJpaRepository = platformStageJpaRepository;
+		this.interactiveDetailsJpaRepository = interactiveDetailsJpaRepository;
 
 	}
 	
@@ -293,7 +291,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		RevenueOEMSettlement revenueOEMSettlement = null;
 		/*revenueSettlementJpaRepository.deleteAll();
 		revenueOEMSettlementJpaRepository.deleteAll();*/
-		String g = command.stringValueOfParameterNamed("game");
+		
 		BigDecimal gamePrice = command.bigDecimalValueOfParameterNamed("gamePrice");
 				/*if(g==null){
 					throw new PlatformDataIntegrityException("No Game Defined", "No Game Defined","game","No Game Defined");
@@ -699,7 +697,7 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			
 			Map<String, Object> actualChanges = operatorDeduction.update(command);
 			if(!actualChanges.isEmpty()){
-				OperatorDeduction d = operatorDeductionJpaRepository.save(operatorDeduction);
+				operatorDeductionJpaRepository.save(operatorDeduction);
 			}
 			
 			return new CommandProcessingResultBuilder().withEntityId(operatorDeduction.getId()).build();
@@ -822,7 +820,6 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		    	 Long partnerData = fromApiJsonHelper.extractLongNamed("partnerAccountId", jsonelement); 
 		    	 int n=4;
 		    	 Long se=1L;
-		    	 int j=0;
 		    	 if(pad.contains(partnerData)){
 	    	     for(int i=1;i<4;i++){
 	    			 String activeFlag="Y";	
@@ -1016,7 +1013,6 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 			public CommandProcessingResult updatePAmediaCatregory(JsonCommand command) {
 				
 				context.authenticatedUser();
-				PartnerAgreement master=null;
 				PartnerAgreementDetail detail= null;
 				
 				try{
@@ -1115,62 +1111,67 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 
 	 	 @Transactional
 	 	 @Override
-	 	public CommandProcessingResult updateInteractiveData(Long entityId,
+	 	public CommandProcessingResult updateInteractiveDetailData(Long detailId,
 	 			JsonCommand command) {
-	 		 
-	 		InteractiveHeader headerOld = null, headerNew = null;
+	 		 context.authenticatedUser();
+	 		 InteractiveDetails details = null;
+	 		//InteractiveHeader headerOld = null, headerNew = null;
 	 		
 	 		try{
-	 			fromApiJsonDeserializer.validateForCreateGameEvent(command.json());
-	 			headerOld = interactiveHeaderJpaRepository.findOne(entityId);
+	 			details = interactiveDetailsJpaRepository.findOne(detailId);
+	 			fromApiJsonDeserializer.validateForUpdateInteractiveDetail(command.json());//validateForCreateGameEvent
+	 			//headerOld = interactiveHeaderJpaRepository.findOne(entityId);
 	 			
-	 			headerNew = InteractiveHeader.fromJson(command);
+	 			//headerNew = InteractiveHeader.fromJson(command);
 	 			
 	 			//clientId,externalId,activityMonth,businessLine,mediaCategory,chargeCode,dataUploadedDate
 	 			
-	 			headerOld.getInteractiveDetailData().clear();
+	 			//headerOld.getInteractiveDetailData().clear();
 	 			
-	 			headerOld.setClientId(headerNew.getClientId());
-	 			headerOld.setExternalId(headerNew.getExternalId());
-	 			headerOld.setBusinessLine(headerNew.getBusinessLine());
-	 			headerOld.setActivityMonth(headerNew.getActivityMonth());
-	 			headerOld.setChargeCode(headerNew.getChargeCode());
-	 			headerOld.setDataUploadedDate(headerNew.getDataUploadedDate());
+	 			//headerOld.setClientId(headerNew.getClientId());
+	 			//headerOld.setExternalId(headerNew.getExternalId());
+	 			//headerOld.setBusinessLine(headerNew.getBusinessLine());
+	 			//headerOld.setActivityMonth(headerNew.getActivityMonth());
+	 			//headerOld.setChargeCode(headerNew.getChargeCode());
+	 			//headerOld.setDataUploadedDate(headerNew.getDataUploadedDate());
 	 			
 	 			
 	 			
-	 			final JsonArray interactiveDataArray = command.arrayOfParameterNamed("activeData").getAsJsonArray();
-			    for(int i=0; i<interactiveDataArray.size();i++){
-			    	String currentData = interactiveDataArray.get(i).toString();
-			    	final JsonElement element = fromApiJsonHelper.parse(currentData);
-			    //	final Long eventId = fromApiJsonHelper.extractLongNamed("eventId", element);
-				     final Long playSource = fromApiJsonHelper.extractLongNamed("playSource", element);
-				     final String contentName = fromApiJsonHelper.extractStringNamed("contentName", element);
-				     final Long contentProvider = fromApiJsonHelper.extractLongNamed("contentProvider", element);
-				     final Long channelName = fromApiJsonHelper.extractLongNamed("channelName", element);
-				     final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory", element);
-				     final Long serviceName = fromApiJsonHelper.extractLongNamed("serviceName", element);
-				     final BigDecimal endUserPrice = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("endUserPrice", element);
-				     final BigDecimal grossRevenue = fromApiJsonHelper.extractBigDecimalWithLocaleNamed("grossRevenue", element);
-				     final Long downloads = fromApiJsonHelper.extractLongNamed("downloads", element);
-				     
-				     //final Long sequence = fromApiJsonHelper.extractLongNamed("sequence", element);
-				     
-				     InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads,mediaCategory);
-				     headerOld.add(interactiveDetailData);
-			    }
-				
-			    interactiveHeaderJpaRepository.save(headerOld);
+	 			//final JsonArray interactiveDataArray = command.arrayOfParameterNamed("activeData").getAsJsonArray();
+			    //for(int i=0; i<interactiveDataArray.size();i++){
+			    	 //String currentData = interactiveDataArray.get(i).toString();
+			    	 //final JsonElement element = fromApiJsonHelper.parse(currentData);
 	 			
+			    	 final Long eventId = command.longValueOfParameterNamed("eventId");
+				     final Long playSource = command.longValueOfParameterNamed("playSource");
+				     final String contentName = command.stringValueOfParameterNamed("contentName");
+				     final Long contentProvider = command.longValueOfParameterNamed("contentProvider");
+				     final Long channelName = command.longValueOfParameterNamed("channelName");
+				     final Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");
+				     final Long serviceName = command.longValueOfParameterNamed("serviceName");
+				     final BigDecimal endUserPrice = command.bigDecimalValueOfParameterNamed("endUserPrice");
+				     final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");
+				     final Long downloads = command.longValueOfParameterNamed("downloads");
+				     details.setPlaySource(playSource);
+				     details.setContentName(contentName);
+				     details.setContentProvider(contentProvider);
+				     details.setChannelName(channelName);
+				     details.setMediaCategory(mediaCategory);
+				     details.setServiceName(serviceName);
+				     details.setEndUserPrice(endUserPrice);
+				     details.setGrossRevenue(grossRevenue);
+				     details.setDownloads(downloads);
+				     //InteractiveDetails interactiveDetailData= InteractiveDetails.fromJson(playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,grossRevenue,downloads,mediaCategory);
+				interactiveDetailsJpaRepository.save(details);
 	 			
 	 			
 	 		}catch(DataIntegrityViolationException dev){
-	 			handleDataIntegrityIssue(dev);
+	 			handleCodeDataIntegrityIssues(command, dev);
 	 			return CommandProcessingResult.empty();
 	 		}
 	 		
 	 		
-	 		return new CommandProcessingResultBuilder().withEntityId(headerOld.getId()).build();
+	 		return new CommandProcessingResultBuilder().withEntityId(detailId).build();
 	 	}
 		 	@Transactional
 			@Override
@@ -1246,14 +1247,14 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 	
 		 	@Transactional
 		 	@Override
-		 	public CommandProcessingResult createRawData(JsonCommand command) {
+		 	public CommandProcessingResult createOperatorData(JsonCommand command) {
 		 		
 		 		context.authenticatedUser();
 		 		OperatorStage rawData = null;
 		 		
 		 		try{
 		 			
-		 			fromApiJsonDeserializer.validateForRawData(command.json());
+		 			//fromApiJsonDeserializer.validateForRawData(command.json());
 		 			rawData = OperatorStage.fromJson(command);
 		 			rawInteractiveHeaderDetailJpaRepository.saveAndFlush(rawData);
 		 			
@@ -1272,6 +1273,49 @@ public class MediaSettlementWritePlatformServiceImp implements MediaSettlementWr
 		 		interactiveHeaderJpaRepository.save(headerData);
 		 		//System.out.println(rawData);
 		 		
+		 	}
+		 	
+		 	@Override
+		 	public CommandProcessingResult createPlatformStageData(JsonCommand command) {
+		 		PlatformStage entity = null;
+		 		context.authenticatedUser();
+		 		try{
+		 			
+		 			entity = PlatformStage.fromJson(command);
+		 			platformStageJpaRepository.save(entity);
+		 		}catch(DataIntegrityViolationException dve){
+		 			handleCodeDataIntegrityIssues(command, dve);
+		 		}
+		 		return new CommandProcessingResultBuilder().withEntityId(entity.getId()).build();
+		 	}
+		 	
+		 	
+		 	
+		 	
+		 	@Override
+		 	public CommandProcessingResult updateInteractiveHeaderData(Long headerId,
+		 			JsonCommand command) {
+		 		InteractiveHeader header = null;
+		 		context.authenticatedUser();
+		 		
+		 		try{
+		 			
+		 			header = interactiveHeaderJpaRepository.findOne(headerId);
+		 			header.setClientId(command.longValueOfParameterNamed("clientId"));
+		 			header.setExternalId(command.stringValueOfParameterNamed("externalId"));
+		 			header.setActivityMonth(command.stringValueOfParameterNamed("activityMonth"));
+		 			LocalDate d = command.localDateValueOfParameterNamed("dataUploadedDate");
+		 			if(d!=null){
+		 				header.setDataUploadedDate(d.toDate());
+		 			}
+		 			header.setBusinessLine(command.longValueOfParameterNamed("businessLine"));
+		 			interactiveHeaderJpaRepository.save(header);
+		 			
+		 		}catch(DataIntegrityViolationException dve){
+		 			handleCodeDataIntegrityIssues(command, dve);
+		 		}
+		 		
+		 		return new CommandProcessingResultBuilder().withEntityId(headerId).build();
 		 	}
 
 }

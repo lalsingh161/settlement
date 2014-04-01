@@ -15,6 +15,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.LocalDate;
 import org.mifosplatform.billing.address.data.AddressData;
+import org.mifosplatform.billing.address.data.StateDetails;
 import org.mifosplatform.billing.mcodevalues.data.MCodeData;
 import org.mifosplatform.infrastructure.configuration.domain.GlobalConfigurationProperty;
 import org.mifosplatform.infrastructure.core.data.EnumOptionData;
@@ -74,6 +75,7 @@ final public class ClientData implements Comparable<ClientData> {
     private GlobalConfigurationProperty configurationProperty;
 	private  final String currency;
 	private Collection<MCodeData> royaltyType;
+	private Collection<StateDetails> circleData;
     public static ClientData template(final Long officeId, final LocalDate joinedDate, final Collection<OfficeData> officeOptions, Collection<ClientCategoryData> categoryDatas) {
         return new ClientData(null, null, officeId, null, null, null, null, null, null, null, null, joinedDate, null, officeOptions, null,
         		categoryDatas,null,null,null, null, null, null, null, null, null, null,null,null,null/*,null,null*/);
@@ -264,6 +266,11 @@ final public class ClientData implements Comparable<ClientData> {
 
 	public void setRoyaltyType(Collection<MCodeData> royaltyType) {
 		this.royaltyType = royaltyType;
+		
+	}
+
+	public void setCircleData(Collection<StateDetails> circleData) {
+		this.circleData = circleData;
 		
 	}
 	

@@ -27,7 +27,7 @@ public class InteractiveHeaderData {
 	/*private String mediaCategory;*/
 	private String chargeCode;
 	private Long id;
-	private Long externalId;
+	private String externalId;
 	private Long businessLineL;
 	/*private Long mediaCategoryL;*/
 	private Long chargeCodeL;
@@ -55,7 +55,7 @@ public class InteractiveHeaderData {
 		
 	}
 
-	public InteractiveHeaderData(Long id,Long clientId, Long externalId,
+	public InteractiveHeaderData(Long id,Long clientId, String externalId,
 			String businessLineStr, String activityMonth, LocalDate dataUploadedDate,
 			String chargeCodeStr) {
 		this.id = id;
@@ -68,7 +68,7 @@ public class InteractiveHeaderData {
 		this.chargeCode = chargeCodeStr;
 	}
 
-	public InteractiveHeaderData(Long clientId, Long externalId,
+	public InteractiveHeaderData(Long clientId, String externalId,
 			String activityMonth, Date date, Long businessLine,
 			/*Long mediaCategory,*/ Long chargeCode) {
 		this.clientId = clientId;
@@ -143,7 +143,7 @@ public class InteractiveHeaderData {
 		return id;
 	}
 
-	public Long getExternalId() {
+	public String getExternalId() {
 		return externalId;
 	}
 
@@ -215,7 +215,7 @@ public class InteractiveHeaderData {
 		this.id = id;
 	}
 
-	public void setExternalId(Long externalId) {
+	public void setExternalId(String externalId) {
 		this.externalId = externalId;
 	}
 

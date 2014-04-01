@@ -22,7 +22,7 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 	private Long clientId;
 	
 	@Column(name="cust_code")
-	private Long clientCode;
+	private String clientCode;
 	
 	
 	
@@ -34,26 +34,26 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 	private Date dataUploadedDate = new Date();
 	
 	@Column(name="business_line")
-	private Long businessLine;
+	private String businessLine;
 	
 	@Column(name="media_category")
-	private Long mediaCategory;
+	private String mediaCategory;
 	
 	
 	@Column(name="play_source", nullable=false)
-	private Long playSource;
+	private String playSource;
 	
 	@Column(name="content_name", nullable=false)
 	private String contentName;
 	
 	@Column(name="content_provider", nullable=false)
-	private Long contentProvider;
+	private String contentProvider;
 
 	@Column(name="channel_name", nullable=false)
-	private Long channelName;
+	private String channelName;
 	
 	@Column(name="service_name", nullable=false)
-	private Long serviceName;
+	private String serviceName;
 
 	@Column(name="end_user_price", nullable=false)
 	private BigDecimal endUserPrice;
@@ -69,6 +69,9 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 
 	@Column(name="cust_name",nullable=false)
 	private String customerName;
+
+	@Column(name="file_name")
+	private String fileName;
 	
 
 	
@@ -103,11 +106,11 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 
 
 
-	public OperatorStage(Long custCode, Long clientId,
-			String activityMonth, Long businessLine, Long mediaCategory,
-			Long playSource, String contentName, Long contentProvider,
-			Long channelName, Long serviceName, BigDecimal endUserPrice,
-			Long downloads, BigDecimal grossRevenue,String customerName) {
+	public OperatorStage(String custCode, Long clientId,
+			String activityMonth, String businessLine, String mediaCategory,
+			String playSource, String contentName, String contentProvider,
+			String channelName, String serviceName, BigDecimal endUserPrice,
+			Long downloads, BigDecimal grossRevenue,String customerName,String fileName) {
 		this.clientCode = custCode;
 		this.clientId = clientId;
 		this.activityMonth = activityMonth;
@@ -122,17 +125,18 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 		this.downloads = downloads;
 		this.grossRevenue = grossRevenue;
 		this.customerName = customerName;
+		this.fileName = fileName;
 	}
 
 
 
 
 
-	public Long getClientCode() {
+	public String getClientCode() {
 		return clientCode;
 	}
 
-	public void setClientCode(Long clientCode) {
+	public void setClientCode(String clientCode) {
 		this.clientCode = clientCode;
 	}
 
@@ -230,74 +234,86 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 	}
 
 
-	public Long getBusinessLine() {
+	public String getBusinessLine() {
 		return businessLine;
 	}
 
 
 
-	public void setBusinessLine(Long businessLine) {
-		this.businessLine = businessLine;
-	}
-
-
-
-	public Long getMediaCategory() {
+	public String getMediaCategory() {
 		return mediaCategory;
 	}
 
 
 
-	public void setMediaCategory(Long mediaCategory) {
-		this.mediaCategory = mediaCategory;
-	}
-
-
-
-	public Long getPlaySource() {
+	public String getPlaySource() {
 		return playSource;
 	}
 
 
 
-	public void setPlaySource(Long playSource) {
-		this.playSource = playSource;
-	}
-
-
-
-	public Long getContentProvider() {
+	public String getContentProvider() {
 		return contentProvider;
 	}
 
 
 
-	public void setContentProvider(Long contentProvider) {
-		this.contentProvider = contentProvider;
-	}
-
-
-
-	public Long getChannelName() {
+	public String getChannelName() {
 		return channelName;
 	}
 
 
 
-	public void setChannelName(Long channelName) {
-		this.channelName = channelName;
-	}
-
-
-
-	public Long getServiceName() {
+	public String getServiceName() {
 		return serviceName;
 	}
 
 
 
-	public void setServiceName(Long serviceName) {
+	public String getCustomerName() {
+		return customerName;
+	}
+
+
+
+	public void setBusinessLine(String businessLine) {
+		this.businessLine = businessLine;
+	}
+
+
+
+	public void setMediaCategory(String mediaCategory) {
+		this.mediaCategory = mediaCategory;
+	}
+
+
+
+	public void setPlaySource(String playSource) {
+		this.playSource = playSource;
+	}
+
+
+
+	public void setContentProvider(String contentProvider) {
+		this.contentProvider = contentProvider;
+	}
+
+
+
+	public void setChannelName(String channelName) {
+		this.channelName = channelName;
+	}
+
+
+
+	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
+	}
+
+
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
 	}
 
 
@@ -317,22 +333,23 @@ public class OperatorStage extends AbstractAuditableCustom<AppUser, Long>{
 		final BigDecimal endUserPrice = command.bigDecimalValueOfParameterNamed("endUserPrice");
 		final Long downloads = command.longValueOfParameterNamed("downloads");
 		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");*/
-		final Long custCode = command.longValueOfParameterNamed("externalId");
+		final String custCode = command.stringValueOfParameterNamed("externalId");
 		final Long clientId = command.longValueOfParameterNamed("clientId");
 		final String activityMonth = command.stringValueOfParameterNamed("activityMonth");
-		final Long businessLine = command.longValueOfParameterNamed("businessLine");
-		final Long mediaCategory = command.longValueOfParameterNamed("mediaCategory");
+		final String businessLine = command.stringValueOfParameterNamed("businessLine");
+		final String mediaCategory = command.stringValueOfParameterNamed("mediaCategory");
 		final String customerName = command.stringValueOfParameterNamed("customerName");
-		final Long playSource = command.longValueOfParameterNamed("playSource"); 
+		final String playSource = command.stringValueOfParameterNamed("playSource"); 
 		final String contentName = command.stringValueOfParameterNamed("contentName");
-		final Long contentProvider = command.longValueOfParameterNamed("contentProvider");
-		final Long channelName = command.longValueOfParameterNamed("channelName");
-		final Long serviceName = command.longValueOfParameterNamed("serviceName");
+		final String contentProvider = command.stringValueOfParameterNamed("contentProvider");
+		final String channelName = command.stringValueOfParameterNamed("channelName");
+		final String serviceName = command.stringValueOfParameterNamed("serviceName");
 		final BigDecimal endUserPrice = command.bigDecimalValueOfParameterNamed("endUserPrice");
 		final Long downloads = command.longValueOfParameterNamed("downloads");
 		final BigDecimal grossRevenue = command.bigDecimalValueOfParameterNamed("grossRevenue");
+		final String fileName = command.stringValueOfParameterNamed("fileName");
 		//return new RawInteractiveHeaderDetail(custCode,custName,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue);
-		return new OperatorStage(custCode,clientId,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,customerName);
+		return new OperatorStage(custCode,clientId,activityMonth,businessLine,mediaCategory,playSource,contentName,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,customerName,fileName);
 	}
 	
 	

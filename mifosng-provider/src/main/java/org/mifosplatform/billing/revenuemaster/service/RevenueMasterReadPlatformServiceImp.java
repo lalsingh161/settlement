@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.joda.time.LocalDate;
@@ -11,10 +12,12 @@ import org.mifosplatform.billing.revenuemaster.data.DeductionData;
 import org.mifosplatform.billing.revenuemaster.data.GenerateInteractiveHeaderData;
 import org.mifosplatform.billing.revenuemaster.data.OperatorShareData;
 import org.mifosplatform.billing.revenuemaster.data.RevenueMasterData;
+import org.mifosplatform.billing.taxmaster.data.TaxMappingRateData;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.service.TenantAwareRoutingDataSource;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -43,7 +46,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 			return jdbcTemplate.query(sql, mapper, new Object[]{clientId});
 		}
 		
-		final private static class HeaderDataMapper implements RowMapper<GenerateInteractiveHeaderData>{
+		 private final static class HeaderDataMapper implements RowMapper<GenerateInteractiveHeaderData>{
 			@Override
 			public GenerateInteractiveHeaderData mapRow(ResultSet rs, int rowNum)
 					throws SQLException {
@@ -72,11 +75,10 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 						return jdbcTemplate.query(sql, mapper, new Object[]{id}) ;
 					}
 					
-					private final static class InteractiveDetailMapper implements
-					RowMapper<RevenueMasterData> {
+		     private final static class InteractiveDetailMapper implements RowMapper<RevenueMasterData> {
 						
-					   @Override
-					    public RevenueMasterData mapRow(ResultSet rs, int rowNum) throws SQLException {
+		      @Override
+               public RevenueMasterData mapRow(ResultSet rs, int rowNum) throws SQLException {
 						 final Long id=rs.getLong("id");  
 						 final Long headerId=rs.getLong("headerId");
 					     final String activityMonth = rs.getString("activityMonth");
@@ -96,17 +98,17 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 					
 					}
 
-					@Override
-					public List<DeductionData> retriveOperatorDeductionData(
+		@Override
+		public List<DeductionData> retriveOperatorDeductionData(
 							Long clientId) {
 							final String sql = "select od.id as id ,od.client_id as clientId, od.ded_code as deductionCode, od.ded_value as deductionValue , (select code_value from m_code_value  where id = dc.ded_type) as deductionType,dc.circle as circle from bp_operator_deduction od,bp_deduction_codes dc where client_id = ? and od.ded_code=dc.ded_code and dc.is_deleted='N' order by id";
 							DeductionMapper mapper = new DeductionMapper();
 							return jdbcTemplate.query(sql,mapper,new Object[]{clientId});
 						}
-						 private final static class DeductionMapper implements RowMapper<DeductionData>{
+				 private final static class DeductionMapper implements RowMapper<DeductionData>{
 							
-							@Override
-							public DeductionData mapRow(ResultSet rs, int rowNum)
+					@Override
+					public DeductionData mapRow(ResultSet rs, int rowNum)
 									throws SQLException {
 								final Long id = rs.getLong("id");
 								final Long clientId = rs.getLong("clientId");
@@ -118,8 +120,8 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 							}
 						}
 
-						@Override
-						public List<OperatorShareData> retriveOperatorRevenueShareData(
+		@Override
+		public List<OperatorShareData> retriveOperatorRevenueShareData(
 								Long clientId) {
 							final String sql="select rm.id as id ,(select ded_code from bp_deduction_codes where id=rm.revenue_share_code) as revenueShareCode,(select code_value from m_code_value where id=rm.revenue_share_type) as revenueShareType,rp.id as revenueParamId, rp.start_value as startValue,rp.end_value as endValue,rp.percentage as revenuePercentage,rp.flat as revenueFlat from bp_revenue_share_master rm,bp_revenue_share_params rp where rm.id=rp.revenue_share_master_id and rm.client_id=?";
 							OperatorShareMapper mapper=new OperatorShareMapper();
@@ -144,9 +146,60 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 									return new OperatorShareData(id,revenueShareCode, revenueShareType, revenueParamId,startValue,endValue,revenuePercentage,revenueFlat);
 								}
 							}
+
+		@Override
+		public List<TaxMappingRateData> retrieveTaxMappingDate(Long clientId,String chargeCode) {
+			
+								try{
+								TaxMappingMapper taxMappingMapper = new TaxMappingMapper();
+								String sql = "select" + taxMappingMapper.taxMappingSchema()
+										+ " AND CA.client_id = ?  AND tm.charge_code =? AND pd.state_id =S.id";
+								return this.jdbcTemplate.query(sql, taxMappingMapper,
+										new Object[] { clientId,chargeCode });
+							}catch(EmptyResultDataAccessException accessException){
+							       return null;	
+							}
+							}
+					private static final class TaxMappingMapper implements RowMapper<TaxMappingRateData> {
+
+								@Override
+								public TaxMappingRateData mapRow(ResultSet rs, int rowNum)
+										throws SQLException {
+
+									Long id = rs.getLong("id");
+									String chargeCode = rs.getString("chargeCode");
+									String taxCode = rs.getString("taxCode");
+									Date startDate = rs.getDate("startDate");
+									BigDecimal rate = rs.getBigDecimal("rate");
+									String taxType= rs.getString("type");
+
+									return new TaxMappingRateData(id, chargeCode, taxCode, startDate,rate,taxType);
+								}
+
+								public String taxMappingSchema() {
+
+									return " tm.id AS id,tm.charge_code AS chargeCode,tm.tax_code AS taxCode,tm.start_date AS startDate,tm.type AS type,tm.rate AS rate" +
+											" FROM b_state S,b_tax_mapping_rate tm,b_priceregion_detail pd,b_priceregion_master prm,b_client_address CA WHERE  pd.priceregion_id = tm.tax_region_id" +
+											" AND prm.id = pd.priceregion_id   AND CA.state = S.state_name";
+								}
+
+							}
 						
-						
-					}
+     		@Override
+     		public List<TaxMappingRateData> retrieveDefaultTaxMappingDate(Long clientId, String chargeCode) {
+
+     			try{
+     			
+     			TaxMappingMapper taxMappingMapper = new TaxMappingMapper();
+     			String sql = "select" + taxMappingMapper.taxMappingSchema()
+     					+ " AND CA.client_id = ?  AND tm.charge_code =? AND pd.state_id =0";
+     			return this.jdbcTemplate.query(sql, taxMappingMapper,new Object[] { clientId,chargeCode });
+     			
+     		}catch(EmptyResultDataAccessException accessException){
+     		       return null;	
+     		}
+     		}									
+	}
 
 			
 		

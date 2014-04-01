@@ -5,19 +5,20 @@ import java.math.BigDecimal;
 public class OperatorShareData {
 
 	private Long id;
-	private String businessLine;
+	private String revenueShareCode;
 	private String revenueShareType;
 	private Long revenueParamId;
 	private BigDecimal startValue;
 	private BigDecimal endValue;
 	private BigDecimal revenuePercentage;
 	private BigDecimal revenueFlat;
+	private BigDecimal Percentage=BigDecimal.ZERO;
 
-	public OperatorShareData(Long id, String businessLine,
+	public OperatorShareData(Long id, String revenueShareCode,
 			String revenueShareType, Long revenueParamId, BigDecimal startValue,
 			BigDecimal endValue, BigDecimal revenuePercentage, BigDecimal revenueFlat) {
 		this.id = id;
-		this.businessLine = businessLine;
+		this.revenueShareCode = revenueShareCode;
 		this.revenueShareType = revenueShareType;
 		this.revenueParamId = revenueParamId;
 		this.startValue = startValue;
@@ -30,8 +31,8 @@ public class OperatorShareData {
 		return id;
 	}
 
-	public String getBusinessLine() {
-		return businessLine;
+	public String getRevenueShareCode() {
+		return revenueShareCode;
 	}
 
 	public String getRevenueShareType() {
@@ -58,4 +59,14 @@ public class OperatorShareData {
 		return revenueFlat;
 	}
 
+	public void setPercentage(BigDecimal revenuePercentage) {
+		
+		this.Percentage = revenuePercentage;
+	}
+
+	public BigDecimal getPercentage() {
+		return Percentage;
+	}
+    
+	
 }
