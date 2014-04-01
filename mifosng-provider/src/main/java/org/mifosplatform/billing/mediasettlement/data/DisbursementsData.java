@@ -29,6 +29,7 @@ public class DisbursementsData {
 	private BigDecimal netAmount;
 	private String partnerName;
 	private Long mediaCategory;
+	private  String status;
 	
 	List<DisbursementsData> distributionData;
 	
@@ -54,13 +55,12 @@ public class DisbursementsData {
 			 LocalDate invoiceDate,
 			 Long mediaCategory,
 			 BigDecimal partnerTypeId,
-			 String amountSharable,
+			 String status,
 			 Long  sequence,
 			 String playSource,
 			 String partnerName,
 			 String royaltyType,
 			 String partnerType,
-			 BigDecimal commPercent,
 			 BigDecimal royaltyAmount,
 			 BigDecimal netAmount ){
 		
@@ -74,13 +74,12 @@ public class DisbursementsData {
 		this.invoiceDate=invoiceDate.toDate();
 		this.mediaCategory=mediaCategory;
 		this.partnerTypeId=partnerTypeId;
-		this.amountSharable=amountSharable;
+		this.status=status;
 		this.sequence=sequence;
 		this.playSource=playSource;
 		this.partnerName=partnerName;
 		this.royaltyType=royaltyType;
 		this.partnerType=partnerType;
-		this.commPercent=commPercent;
 		this.royaltyAmount=royaltyAmount;
 		this.netAmount=netAmount;
 		
@@ -256,6 +255,14 @@ public class DisbursementsData {
 
 	public void setCommPercent(BigDecimal commPercent) {
 		this.commPercent = commPercent;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 

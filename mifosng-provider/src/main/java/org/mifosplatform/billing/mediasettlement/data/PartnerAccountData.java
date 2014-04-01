@@ -300,6 +300,23 @@ public class PartnerAccountData {
 		this.royaltySequence=royaltySequence;
 		
 	}
+	
+	public PartnerAccountData( String partnerAddress,Long id,Long externalId,String partnerName,String partnerType, String contactNum,
+			String emailId,String currencyName ) {
+		// TODO Auto-generated constructor stub
+		
+		this.id=id;
+		this.externalId=externalId;
+		this.partnerName=partnerName;
+		this.partnerTypeName=partnerType;
+		this.contactNum=contactNum;
+		this.emailId=emailId;
+		this.currencyName=currencyName;
+		this.partnerAddress=partnerAddress;
+		
+	}
+	
+	
 
 	public Collection<MCodeData> getPartnerType() {
 		return partnerTypeData;
