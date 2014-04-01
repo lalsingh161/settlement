@@ -301,7 +301,7 @@ public class PartnerAccountData {
 		
 	}
 	
-	public PartnerAccountData( String partnerAddress,Long id,Long externalId,String partnerName,String partnerType, String contactNum,
+	public PartnerAccountData( String partnerAddress,Long id,String externalId,String partnerName,String partnerType, String contactNum,
 			String emailId,String currencyName ) {
 		// TODO Auto-generated constructor stub
 		
