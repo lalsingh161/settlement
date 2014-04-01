@@ -818,7 +818,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	public void retrieveProcedureforSettlementData() {
 		// TODO Auto-generated method stub
 
-		jdbcTemplate.update("call proc_settle_stg()", new Object[] {});
+		jdbcTemplate.update("call proc_settle()", new Object[] {});
 
 	}
 	
@@ -1235,9 +1235,9 @@ public class MediaSettlementReadPlatformServiceImp implements
 			String codeName) {
 
 		/*final String sql = "select pa.id as partnerId ,pa.partner_name as partnerName from bp_account pa where pa.partner_type=(select id from m_code_value where code_value = ? and code_id=(select id from m_code where code_name= ?))";*/
-		final String sql = "select pa.id as partnerId, pa.partner_name as partnerName from bp_account pa "+
+		final String sql = "select distinct pa.id as partnerId, pa.partner_name as partnerName from bp_account pa "+
 				"inner join bp_agreement a ON a.partner_account_id = pa.id "+
-				"inner join bp_agreement_dtl ad ON ad.agmt_id = a.id where ad.partner_type = "+
+				"inner join bp_agreement_dtl ad ON ad.agmt_id = a.id where pa.partner_type = "+
 				"(select id from m_code_value where code_value=? and code_id = "+
 				"(select id from m_code where code_name=?)) and pa.is_deleted='N' "+
 				"and a.is_deleted='N'";
