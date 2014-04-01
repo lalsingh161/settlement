@@ -1449,7 +1449,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					}catch (IllegalStateException e) {
 						errorData.add(new MRNErrorData((long)i,e.getMessage()));
 					}catch (Exception e) {
-						Throwable cause = e.getCause();
+						
 						errorData.add(new MRNErrorData((long)i, "Error: "+e.getMessage()));
 					}
 				}
@@ -1458,8 +1458,6 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 				uploadStatusForGameEvent.setTotalRecords(totalRecordCount);
 				writeXLSXFileMediaEpgMrn(fileLocation, errorData,uploadStatusForGameEvent,cellNumber);
 				mediaSettlementReadPlatformService.executeProcedure();
-				processRecordCount=0L;totalRecordCount=0L;
-				uploadStatusForGameEvent=null;
 				
 				for(Long cId: clientIds){
 					 System.out.println("Calling invoice: "+cId);
@@ -1478,7 +1476,9 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 					
 				}
 				clientIds = null;
-
+				processRecordCount=0L;totalRecordCount=0L;
+				uploadStatusForGameEvent=null;
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (InvalidFormatException e) {
@@ -1898,7 +1898,9 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						}
 		
 		
-		}else{/*
+		}else{
+			throw new PlatformDataIntegrityException("no process specified", "no process specified", "uploadProcess", "no process specified");
+			/*
 		try {
 			File file=new File(filePath);
 			   OPCPackage excelFileToRead=OPCPackage.open(file);
