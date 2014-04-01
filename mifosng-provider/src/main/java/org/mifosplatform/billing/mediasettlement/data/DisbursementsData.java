@@ -28,8 +28,10 @@ public class DisbursementsData {
 	private BigDecimal royaltyAmount;
 	private BigDecimal netAmount;
 	private String partnerName;
-	private Long mediaCategory;
+	private String mediaCategory;
 	private  String status;
+	private  String royaltyShare;
+	private  String currency;
 	
 	List<DisbursementsData> distributionData;
 	
@@ -53,16 +55,16 @@ public class DisbursementsData {
 			 String invoiceId,
 			 BigDecimal invoiceAmount,
 			 LocalDate invoiceDate,
-			 Long mediaCategory,
+			 String mediaCategory,
 			 BigDecimal partnerTypeId,
 			 String status,
 			 Long  sequence,
 			 String playSource,
 			 String partnerName,
-			 String royaltyType,
+			 String royaltyShare,
 			 String partnerType,
 			 BigDecimal royaltyAmount,
-			 BigDecimal netAmount ){
+			 String currency ){
 		
 
 		this.branch=branch;
@@ -78,15 +80,30 @@ public class DisbursementsData {
 		this.sequence=sequence;
 		this.playSource=playSource;
 		this.partnerName=partnerName;
-		this.royaltyType=royaltyType;
+		this.royaltyShare=royaltyShare;
 		this.partnerType=partnerType;
 		this.royaltyAmount=royaltyAmount;
-		this.netAmount=netAmount;
+		this.currency=currency;
 		
 	}
 	
 	
-	
+
+	public String getRoyaltyShare() {
+		return royaltyShare;
+	}
+
+	public void setRoyaltyShare(String royaltyShare) {
+		this.royaltyShare = royaltyShare;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
 
 	public String getBranch() {
 		return branch;
@@ -122,11 +139,11 @@ public class DisbursementsData {
 	}
 
 
-	public Long getMediaCategory() {
+	public String getMediaCategory() {
 		return mediaCategory;
 	}
 
-	public void setMediaCategory(Long mediaCategory) {
+	public void setMediaCategory(String mediaCategory) {
 		this.mediaCategory = mediaCategory;
 	}
 
