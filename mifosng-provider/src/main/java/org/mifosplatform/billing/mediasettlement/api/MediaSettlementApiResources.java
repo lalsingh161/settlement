@@ -524,10 +524,10 @@ public class MediaSettlementApiResources {
 		String fileName=partnerAgreement.getFileName();
 		File file = new File(partnerAgreement.getAgmtLocation());
 		ResponseBuilder response = Response.ok(file);
-		response.header("Content-Disposition", "attachment; filename=\""+ fileName + "\"");
-//		response.header("Content-Type", "application/vnd.ms-excel");
-        /*response.header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");*/
-        response.header("Content-Type", "application/vnd.text");
+		response.header("ContentDisposition", "attachment; filename=\""+ fileName + "\"");
+//		response.header("ContentType", "application/vnd.msexcel");
+        /*response.header("ContentType", "application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet");*/
+        response.header("ContentType", "application/vnd.text");
 		return response.build();
 	}
        
@@ -578,7 +578,7 @@ public class MediaSettlementApiResources {
     @Consumes({ MediaType.MULTIPART_FORM_DATA })
     @Produces({ MediaType.APPLICATION_JSON })
     public String createUploadFile(@PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId,
-    		@HeaderParam("Content-Length") Long fileSize, @FormDataParam("file") InputStream inputStream,
+    		@HeaderParam("ContentLength") Long fileSize, @FormDataParam("file") InputStream inputStream,
             @FormDataParam("file") FormDataContentDisposition fileDetails, @FormDataParam("file") FormDataBodyPart bodyPart,
             @FormDataParam("partnerAccountId") Long partnerAccountId){
     	
@@ -605,7 +605,7 @@ public class MediaSettlementApiResources {
     @Consumes({ MediaType.MULTIPART_FORM_DATA })
     @Produces({ MediaType.APPLICATION_JSON })
     public String updateDocument(@PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId,
-            @PathParam("documentId") final Long documentId, @HeaderParam("Content-Length") Long fileSize, @FormDataParam("file") InputStream inputStream,
+            @PathParam("documentId") final Long documentId, @HeaderParam("ContentLength") Long fileSize, @FormDataParam("file") InputStream inputStream,
             @FormDataParam("file") FormDataContentDisposition fileDetails, @FormDataParam("file") FormDataBodyPart bodyPart,
             @FormDataParam("partnerAccountId") Long partnerAccountId, @FormDataParam("agreementType") Long agreementType,
             @FormDataParam("agreementCategory") Long agreementCategory, @FormDataParam("royaltyType") Long royaltyType,
@@ -1112,18 +1112,93 @@ public class MediaSettlementApiResources {
     
  }
  
- @GET
- @Path("{id}/partnerAccountView")
- @Consumes({ MediaType.APPLICATION_JSON })
- @Produces({ MediaType.APPLICATION_JSON })
- public String getPartnerAccountView(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
- 	
-	PartnerAccountData viewPartnerAccount = mediaSettlementReadPlatformService.retrievePartnerAccountView(id);
- 	 
- 	return toApiJsonSerializer.serialize(viewPartnerAccount);
-    
- }
- 
+	 @GET
+	 @Path("{id}/partnerAccountView")
+	 @Consumes({ MediaType.APPLICATION_JSON })
+	 @Produces({ MediaType.APPLICATION_JSON })
+	 public String getPartnerAccountView(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
+	 	
+		PartnerAccountData viewPartnerAccount = mediaSettlementReadPlatformService.retrievePartnerAccountView(id);
+	 	 
+	 	return toApiJsonSerializer.serialize(viewPartnerAccount);
+	    
+	 }
+
+     @GET
+     @Path("/editinteractiveheader/{eventId}")
+     @Produces({MediaType.APPLICATION_JSON})
+     @Consumes({MediaType.APPLICATION_JSON})
+     public String retriveInteractiveHeaderEdit(@Context final UriInfo uriInfo, @PathParam("eventId") final Long headerId){
+     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissionsForGamePartner);
+     	InteractiveData interactiveData = this.mediaSettlementReadPlatformService.retrieveInteractiveHeaderData(headerId);
+     	Collection<BusinessLineData> businessLineData = this.businessLineReadPlatformService.getBusinessLineData();
+     	interactiveData.setBusinessLineData(businessLineData);
+     	return toApiJsonSerializer.serialize(interactiveData);
+     }
+
+     
+
+     @GET
+     @Path("/editinteractivedetail/{eventId}")
+     @Produces({MediaType.APPLICATION_JSON})
+     @Consumes({MediaType.APPLICATION_JSON})
+     public String retriveInteractiveDetailEdit(@Context final UriInfo uriInfo, @PathParam("eventId") final Long detailId){
+
+     	 context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissionsForGamePartner);	
+     	 Collection<InteractiveDetailsData> interactiveDetailsData = this.mediaSettlementReadPlatformService.retriveInteractiveDetailsData(detailId);
+      	 Collection<MCodeData> mediaCategoryData = this.mCodeReadPlatformService.getCodeValue("Media Category");
+       	 Collection<MCodeData> playSourceData = mCodeReadPlatformService.getCodeValue("Play Source");
+       	 Collection<PartnerAccountData> contentData=this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Content Provider","Partner Type");    	 
+       	 Collection<PartnerAccountData> channelData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Channel","Partner Type");
+       	 Collection<PartnerAccountData> serviceData = this.mediaSettlementReadPlatformService.retrieveAllPartnerType("Service","Partner Type");      	 
+
+       	 InteractiveData interactiveData = new InteractiveData();
+		 interactiveData.setInteractiveDetailsData(interactiveDetailsData);
+		 interactiveData.setPlaySourceData(playSourceData);
+		 interactiveData.setContentData(contentData);
+		 interactiveData.setChannelData(channelData);
+		 interactiveData.setServiceData(serviceData);
+		 interactiveData.setMediaCategoryData(mediaCategoryData);
+       	 return toApiJsonSerializer.serialize(interactiveData);
+     }
+
+     
+
+     @PUT
+     @Path("/editinteractiveheader/{eventId}")
+     @Produces({MediaType.APPLICATION_JSON})
+     @Consumes({MediaType.APPLICATION_JSON})
+     public String updateInteractiveHeaderData(final String jsonRequestBody, @PathParam("eventId") final Long headerId){
+     	context.authenticatedUser().validateHasPermissionTo("INTERACTIVEHEADER");
+     	CommandWrapper commandRequest = new CommandWrapperBuilder().updateInteractiveHeaderData(headerId).withJson(jsonRequestBody).build();
+     	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+     	return toApiJsonSerializer.serialize(result);
+     }
+
+     
+
+     @PUT
+     @Path("/editinteractivedetail/{eventId}")
+     @Produces({MediaType.APPLICATION_JSON})
+     @Consumes({MediaType.APPLICATION_JSON})
+     public String updateInteractiveDetailData(final String jsonRequestBody, @PathParam("eventId") final Long detailId){
+     	context.authenticatedUser().validateHasPermissionTo("INTERACTIVEDETAIL");
+     	CommandWrapper commandRequest = new CommandWrapperBuilder().updateInteractiveDetailData(detailId).withJson(jsonRequestBody).build();
+     	CommandProcessingResult result = commandsSourceWritePlatformService.logCommandSource(commandRequest);
+     	return toApiJsonSerializer.serialize(result);
+     }
+     
+     @GET
+     @Path("/viewinteractive/{eventId}")
+     @Produces({MediaType.APPLICATION_JSON})
+     @Consumes({MediaType.APPLICATION_JSON})
+     public String retriveInteractiveViewData(@Context UriInfo uriInfo, @PathParam("eventId") final Long headerId){
+     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissionsForGamePartner);
+     	InteractiveData interactiveData = this.mediaSettlementReadPlatformService.retrieveInteractiveHeaderViewData(headerId);
+     	Collection<InteractiveDetailsData> interactiveDetailsData = this.mediaSettlementReadPlatformService.retriveInteractiveViewData(headerId);
+     	interactiveData.setInteractiveDetailsData(interactiveDetailsData);
+     	return toApiJsonSerializer.serialize(interactiveData);
+   	}
 
 }
 
