@@ -496,7 +496,7 @@ public class MediaSettlementApiResources {
     }
     
     /*
-     * Lala singh code. Agreement
+     * Lal singh code. Agreement
      * 
      * */
     @GET

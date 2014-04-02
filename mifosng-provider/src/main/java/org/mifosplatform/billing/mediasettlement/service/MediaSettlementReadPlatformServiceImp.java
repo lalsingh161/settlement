@@ -688,12 +688,15 @@ public class MediaSettlementReadPlatformServiceImp implements
 	public List<DisbursementsData> retrieveAllDisbursementsDataDetails(
 			Long month, String partnerName, Long partnerTypeId) {
 		context.authenticatedUser();
-		final String sql = "SELECT branch as branch,city as city,state as state ,client as client, invoiceId as invoiceId,"
+		/*final String sql = "SELECT branch as branch,city as city,state as state ,client as client, invoiceId as invoiceId,"
 				+ "invoiceAmount as invoiceAmount,invoiceDate as invoiceDate,Media_Category as mediaCategory,partnerTypeId as partnerTypeId,"
 				+ "amountSharable as amountSharable,sequence as sequence,playSource as playSource ,partnerName as partnerName,"
 				+ "royaltyType as royaltyType,	partnerType as partnerType,commPercent as commPercent,"
 				+ "royaltyAmount as royaltyAmount ,netAmount as netAmount FROM  bp_settle_vw s WHERE MONTH(invoiceDate)=? and "
 				+ "partnerName=? and partnerTypeId = ?";
+		*/
+		
+		final String sql="select branch as branch,city as city,state as state,client as client,playsource as playSource,mediacategory as mediaCategory,partner_name  as partnerName,partner_type as partnerTypeId,partnerType as partnerType,invoice_id as invoiceId,invoice_date as invoiceDate,invoice_amount as invoiceAmount,sequence as sequence,royalty_share as royaltyShare,royalty_amt as royaltyAmount,currency as currency,status as status FROM  bp_settle_vw s WHERE MONTH(invoice_date)=? and partner_name=? and partner_type = ?";
 
 		DistributionDataMapper mapper = new DistributionDataMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { month,
@@ -715,26 +718,23 @@ public class MediaSettlementReadPlatformServiceImp implements
 					.getBigDecimalDefaultToZeroIfNull(rs, "invoiceAmount");
 			final LocalDate invoiceDate = JdbcSupport.getLocalDate(rs,
 					"invoiceDate");
-			final Long mediaCategory = rs.getLong("mediaCategory");
+			final String mediaCategory = rs.getString("mediaCategory");
 			final BigDecimal partnerTypeId = rs.getBigDecimal("partnerTypeId");
-			final String amountSharable = rs.getString("amountSharable");
+			final String status = rs.getString("status");
 			final Long sequence = rs.getLong("sequence");
 			final String playSource = rs.getString("playSource");
 			final String partnerName = rs.getString("partnerName");
-			final String royaltyType = rs.getString("royaltyType");
+			final String royaltyShare = rs.getString("royaltyShare");
 			final String partnerType = rs.getString("partnerType");
-			final BigDecimal commPercent = JdbcSupport
-					.getBigDecimalDefaultToZeroIfNull(rs, "commPercent");
 			final BigDecimal royaltyAmount = JdbcSupport
 					.getBigDecimalDefaultToZeroIfNull(rs, "royaltyAmount");
-			final BigDecimal netAmount = JdbcSupport
-					.getBigDecimalDefaultToZeroIfNull(rs, "netAmount");
+			final String currency = rs.getString("currency");
 
 			return new DisbursementsData(branch, city, state, client,
 					invoiceId, invoiceAmount, invoiceDate, mediaCategory,
-					partnerTypeId, amountSharable, sequence, playSource,
-					partnerName, royaltyType, partnerType, commPercent,
-					royaltyAmount, netAmount);
+					partnerTypeId, status, sequence, playSource,
+					partnerName, royaltyShare, partnerType, 
+					royaltyAmount, currency);
 		}
 	}
 
@@ -818,7 +818,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 	public void retrieveProcedureforSettlementData() {
 		// TODO Auto-generated method stub
 
-		jdbcTemplate.update("call proc_settle_stg()", new Object[] {});
+		jdbcTemplate.update("call proc_settle()", new Object[] {});
 
 	}
 	
@@ -1235,9 +1235,9 @@ public class MediaSettlementReadPlatformServiceImp implements
 			String codeName) {
 
 		/*final String sql = "select pa.id as partnerId ,pa.partner_name as partnerName from bp_account pa where pa.partner_type=(select id from m_code_value where code_value = ? and code_id=(select id from m_code where code_name= ?))";*/
-		final String sql = "select pa.id as partnerId, pa.partner_name as partnerName from bp_account pa "+
+		final String sql = "select distinct pa.id as partnerId, pa.partner_name as partnerName from bp_account pa "+
 				"inner join bp_agreement a ON a.partner_account_id = pa.id "+
-				"inner join bp_agreement_dtl ad ON ad.agmt_id = a.id where ad.partner_type = "+
+				"inner join bp_agreement_dtl ad ON ad.agmt_id = a.id where pa.partner_type = "+
 				"(select id from m_code_value where code_value=? and code_id = "+
 				"(select id from m_code where code_name=?)) and pa.is_deleted='N' "+
 				"and a.is_deleted='N'";
@@ -1624,10 +1624,10 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String contactNum = rs.getString("contactNum");
 			final String emailId = rs.getString("emailId");
 			final String currencyName = rs.getString("currencyName");
-			final String royaltySequence = rs.getString("contactNum");
+			final String partnerAddress = rs.getString("partnerAddress");
 			
 			
-			return new PartnerAccountData(id,externalId,partnerName,partnerType,contactNum,emailId,currencyName,royaltySequence);
+			return new PartnerAccountData(partnerAddress,id,externalId,partnerName,partnerType,contactNum,emailId,currencyName );
 		
 			}
 		}	
