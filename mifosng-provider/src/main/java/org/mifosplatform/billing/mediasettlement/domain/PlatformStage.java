@@ -98,8 +98,8 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 	@Column(name="operator_revenue_amt")
 	private BigDecimal operatorRevenueAmt;
 	
-	@Column(name="file_name")
-	private String  fileName;
+	@Column(name="file_id")
+	private String  fileId;
 	
 	@Column(name="client_id")
 	private String clientId;
@@ -121,7 +121,7 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 			final BigDecimal employeeDeduction, final BigDecimal entTax,
 			final BigDecimal waivers, final BigDecimal netRevenueAfterTax,
 			final String operatorRevShare, final BigDecimal operatorRevenueAmt,
-			final String fileName, final String clientId) {
+			final String fileId, final String clientId) {
 		
 		this.custCode = custCode;
 		this.ba = ba;
@@ -149,7 +149,7 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 		this.netRevenueAfterTax = netRevenueAfterTax;
 		this.operatorRevShare = operatorRevShare;
 		this.operatorRevenueAmt = operatorRevenueAmt;
-		this.fileName = fileName;
+		this.fileId = fileId;
 		this.clientId = clientId;
 			
 
@@ -327,10 +327,10 @@ public class PlatformStage extends AbstractAuditableCustom<AppUser, Long>{
 		final BigDecimal netRevenueAfterTax = command.bigDecimalValueOfParameterNamed("netRevenueAfterTax");
 		final String operatorRevShare = command.stringValueOfParameterNamed("operatorRevShare");
 		final BigDecimal operatorRevenueAmt = command.bigDecimalValueOfParameterNamed("operatorRevenueAmt");
-		final String fileName = command.stringValueOfParameterNamed("fileName");
+		final String fileId = command.stringValueOfParameterNamed("fileName");
 		final String clientId = command.stringValueOfParameterNamed("clientId");
 		
-		return new PlatformStage(custCode, ba, pc, mpm, invoiceNumber, invoiceDate, customerName, customerCircle, activityMonth, business, type, category, contentName, contentProviderName, channelName, serviceName, eup, downloads, grossRevenue, wpc, employeeDeduction, entTax, waivers, netRevenueAfterTax, operatorRevShare, operatorRevenueAmt,fileName,clientId);
+		return new PlatformStage(custCode, ba, pc, mpm, invoiceNumber, invoiceDate, customerName, customerCircle, activityMonth, business, type, category, contentName, contentProviderName, channelName, serviceName, eup, downloads, grossRevenue, wpc, employeeDeduction, entTax, waivers, netRevenueAfterTax, operatorRevShare, operatorRevenueAmt,fileId,clientId);
 	}
 	
 	

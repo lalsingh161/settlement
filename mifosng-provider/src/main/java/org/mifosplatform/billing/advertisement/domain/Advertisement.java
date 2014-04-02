@@ -115,8 +115,8 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, String> {
     @Column(name="net_ig_rev_after_royalty_payouts")
 	 private String  igAfterRoyaltyPayouts;
 
-    @Column(name="file_name")
-	private String fileName;
+    @Column(name="file_id")
+	private String fileId;
     
     @Column(name="client_id")
     private String clientId;
@@ -130,7 +130,7 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, String> {
 			String customerCircle, String activityMonth, String business,String currency, String category, String contentName,
 			String contentProviderName, String request, String impressions,String clicks, String clickThroughRatio, String eipm,
 			String eipc, String income, String exrtaRate,String igRevenueAmount, String cpShareAmount,
-			String igAfterRoyaltyPayouts, String fileName,String clientId) {
+			String igAfterRoyaltyPayouts, String fileId,String clientId) {
 		
 		this.customerCode = custCode;
 		this.ba = ba;
@@ -157,7 +157,7 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, String> {
 		this.igRevenueAmount = igRevenueAmount;
 		this.cpShareAmount = cpShareAmount;
 		this.igAfterRoyaltyPayouts = igAfterRoyaltyPayouts;
-		this.fileName = fileName;
+		this.fileId = fileId;
 		this.clientId = clientId;
 
 	}
@@ -190,11 +190,11 @@ public class Advertisement  extends AbstractAuditableCustom<AppUser, String> {
 		final String igRevenueAmount = command.stringValueOfParameterNamed("igRevenueAmount");
 		/*final String cpShareAmount = command.stringValueOfParameterNamed("cpShareAmount");
 		final String igAfterRoyaltyPayouts = command.stringValueOfParameterNamed("igAfterRoyaltyPayouts");*/
-		final String fileName  = command.stringValueOfParameterNamed("fileName");
+		final String fileId  = command.stringValueOfParameterNamed("fileName");
 		final String clientId = command.stringValueOfParameterNamed("clientId");
 		
 		return new Advertisement(custCode,ba,pc,mpm,invoiceNo,invoiceDate,customerName,customerCircle,activityMonth,business,currency,category,contentName,contentProviderName,
-				request,impressions,clicks,clickThroughRatio,eipm,eipc,income,exrtaRate,igRevenueAmount,/*cpShareAmount*/null,null/*igAfterRoyaltyPayouts*/,fileName,clientId);
+				request,impressions,clicks,clickThroughRatio,eipm,eipc,income,exrtaRate,igRevenueAmount,/*cpShareAmount*/null,null/*igAfterRoyaltyPayouts*/,fileId,clientId);
 	}
 
 

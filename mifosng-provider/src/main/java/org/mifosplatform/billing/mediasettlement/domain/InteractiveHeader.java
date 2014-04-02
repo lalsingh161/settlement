@@ -9,6 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -34,7 +36,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 	private String activityMonth;
 	
 	
-	
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="data_upload_date")
 	private Date dataUploadedDate = new Date();
 	
@@ -70,7 +72,7 @@ public class InteractiveHeader extends AbstractAuditableCustom<AppUser, Long>{
 		this.activityMonth = activityMonth;
 		
 		this.chargeCode = chargeCode;
-		this.dataUploadedDate = (null==dataUploadedDate)?new Date():dataUploadedDate.toDate();
+		this.dataUploadedDate = new Date();// (null==dataUploadedDate)?new Date():dataUploadedDate.toDate();
 	}
 
 	public InteractiveHeader(Long clientId, String clientCode,
