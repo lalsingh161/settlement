@@ -12,8 +12,7 @@ public class DateAndTime {
         LocalDate date=new LocalDate();
         DateTimeFormatter formatter = DateTimeFormat.forPattern("MMMM yyyy");
         String formattedDate = formatter.print(date);
-	    
-        	 System.out.println(formattedDate); 
+	    System.out.println(formattedDate); 
 
     }
     
