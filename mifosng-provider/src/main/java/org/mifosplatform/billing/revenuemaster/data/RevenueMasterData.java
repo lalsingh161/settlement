@@ -23,7 +23,6 @@ public class RevenueMasterData {
 	private BigDecimal revenueAmountOfIg=BigDecimal.ZERO;
 
 	public RevenueMasterData(Long id,Long headerId,String activityMonth,
-			String contentProvider, String channelName, String serviceName,
 			BigDecimal endUserPrice, BigDecimal downloads,
 			BigDecimal grossRevenue,String chargeCode,String chargeType,Integer taxInclusive,Long clientId) {
 		this.id=id;
@@ -42,9 +41,6 @@ public class RevenueMasterData {
 		return id;
 	}
 	
-	public String getChannelName() {
-		return channelName;
-	}
 
 	public BigDecimal getEndUserPrice() {
 		return endUserPrice;
@@ -108,9 +104,6 @@ public class RevenueMasterData {
 		return activityMonth;
 	}
 
-	public String getServiceName() {
-		return serviceName;
-	}
 
 	public BigDecimal getOperatorShareAmount() {
 		return operatorShareAmount;

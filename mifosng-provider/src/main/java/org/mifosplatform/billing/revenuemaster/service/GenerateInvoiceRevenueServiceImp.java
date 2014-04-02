@@ -154,7 +154,7 @@ public class GenerateInvoiceRevenueServiceImp implements GenerateInvoiceRevenueS
 	
 	public BigDecimal calculateOperatorShareAmount(List<OperatorShareData> revenueShareDatas, BigDecimal netRevenueAmount, RevenueMasterData detailData) {
 		
-	  BigDecimal revenueAmountOfIg=BigDecimal.ZERO;
+	//  BigDecimal revenueAmountOfIg=BigDecimal.ZERO;
 	  BigDecimal operatorShareAmount = BigDecimal.ZERO;
 		   
 		   for(OperatorShareData revenueShareData:revenueShareDatas){   
@@ -168,17 +168,17 @@ public class GenerateInvoiceRevenueServiceImp implements GenerateInvoiceRevenueS
 			      int b=detailData.getDownloads().compareTo(revenueShareData.getEndValue());
 		    	  
 		        if((a==1||a==0)&&(b==-1||b==0)){
-		            revenueAmountOfIg=netRevenueAmount.multiply(revenueShareData.getRevenuePercentage().divide
+		        	operatorShareAmount=netRevenueAmount.multiply(revenueShareData.getRevenuePercentage().divide
 		    			                        (new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
-		            operatorShareAmount=netRevenueAmount.subtract(revenueAmountOfIg);
+		           // =netRevenueAmount.subtract(revenueAmountOfIg);
 		            percentage=revenueShareData.getRevenuePercentage();
 		     
 		     }
 		      }else if(revenueShareData.getRevenueShareType().equalsIgnoreCase("Flat Rate")){
 		    	 
-		    	  revenueAmountOfIg=detailData.getNetRevenueAmount().multiply(revenueShareData.getRevenuePercentage().divide
+		    	  operatorShareAmount=detailData.getNetRevenueAmount().multiply(revenueShareData.getRevenuePercentage().divide
 	                        (new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
-                  operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);
+                //  operatorShareAmount=detailData.getNetRevenueAmount().subtract(revenueAmountOfIg);
                   percentage=revenueShareData.getRevenuePercentage();
 		     }
 		           
@@ -186,7 +186,7 @@ public class GenerateInvoiceRevenueServiceImp implements GenerateInvoiceRevenueS
 			 
 			 revenueShareData.setPercentage(percentage);
 		   }
-		   detailData.setRevenueAmountOfIg(revenueAmountOfIg);
+		   //detailData.setRevenueAmountOfIg(revenueAmountOfIg);
 		  
 		  return  operatorShareAmount; 
 	}
