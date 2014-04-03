@@ -64,9 +64,6 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 		@Override
 		public List<RevenueMasterData> retriveAllinteractiveDetails(Long id) {
 			final String sql="select itd.id as id ,itd.interactive_header_id as headerId,ih.activity_month as activityMonth,"+
-											"(select partner_name from bp_account where id = itd.content_provider) as contentProvider,"+
-											"(select partner_name from bp_account where id = itd.channel_name) as channelName,"+
-											"(select partner_name from bp_account where id = itd.service_name) as serviceName,"+
 											"itd.end_user_price as endUserPrice, itd.downloads as downloads, itd.gross_revenue as grossRevenue,ih.client_id as clientId,im.charge_code  as chargeCode,"+
                                             "cc.charge_type as chargeType,cc.tax_inclusive as taxInclusive from bp_interactive_detail itd, "+
 										   "bp_interactive_header ih, bp_intevent_master im,b_charge_codes cc where ih.id=itd.interactive_header_id and im.id=ih.business_line and cc.charge_code=im.charge_code  and itd.interactive_header_id=?";
@@ -82,10 +79,10 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 						 final Long id=rs.getLong("id");  
 						 final Long headerId=rs.getLong("headerId");
 					     final String activityMonth = rs.getString("activityMonth");
-					    /* final String contentName = rs.getString("contentName");*/
+					    /* final String contentName = rs.getString("contentName");
 					     final String contentProvider = rs.getString("contentProvider");
 					     final String channelName = rs.getString("channelName");
-					     final String serviceName = rs.getString("serviceName");
+					     final String serviceName = rs.getString("serviceName");*/
 					     final BigDecimal endUserPrice = rs.getBigDecimal("endUserPrice");
 					     final BigDecimal downloads = rs.getBigDecimal("downloads");
 					     final BigDecimal grossRevenue = rs.getBigDecimal("grossRevenue");
@@ -93,7 +90,7 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 						 final String chargeType = rs.getString("chargeType");
 						 final Integer taxInclusive = rs.getInt("taxInclusive");
 						 final Long clientId = rs.getLong("clientId");
-						return new RevenueMasterData(id,headerId,activityMonth,contentProvider,channelName,serviceName,endUserPrice,downloads,grossRevenue,chargeCode,chargeType,taxInclusive,clientId);
+						return new RevenueMasterData(id,headerId,activityMonth,endUserPrice,downloads,grossRevenue,chargeCode,chargeType,taxInclusive,clientId);
 					   }
 					
 					}

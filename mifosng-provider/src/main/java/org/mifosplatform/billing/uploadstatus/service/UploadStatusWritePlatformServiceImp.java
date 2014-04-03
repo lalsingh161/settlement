@@ -1306,7 +1306,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 								jsonObject.put("clientId",clientId);
 							}
 						 	
-						 	jsonObject.put("fileName",uploadStatusForGameEvent.getFileName());
+						 	jsonObject.put("fileName",uploadStatusForGameEvent.getId().toString());
 						 	
 							
 							SimpleDateFormat formatter = new SimpleDateFormat("MMM yyyy");
@@ -1540,7 +1540,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 						jsonObject.put("pc", getCellData(operatorRow.getCell(2)));
 						jsonObject.put("mpm",getCellData(operatorRow.getCell(3)));
 						jsonObject.put("invoiceNo",getCellData(operatorRow.getCell(4)));
-						jsonObject.put("fileName",uploadStatusForMediaAsset.getFileName());
+						jsonObject.put("fileName",uploadStatusForMediaAsset.getId().toString());
 						
 						SimpleDateFormat invoiceDateFormater = new SimpleDateFormat("dd MMMM yyyy");
 						jsonObject.put("invoiceDate",invoiceDateFormater.format(operatorRow.getCell(5).getDateCellValue()));
@@ -1783,7 +1783,7 @@ public class UploadStatusWritePlatformServiceImp implements UploadStatusWritePla
 									jsonObject.put("pc", getCellData(operatorRow.getCell(2)));
 									jsonObject.put("mpm",getCellData(operatorRow.getCell(3)));
 									jsonObject.put("invoiceNo",getCellData(operatorRow.getCell(4)));
-									jsonObject.put("fileName",uploadStatusForMediaAsset.getFileName());
+									jsonObject.put("fileName",uploadStatusForMediaAsset.getId().toString());
 									
 									SimpleDateFormat invoiceDateFormater = new SimpleDateFormat("dd MMMM yyyy");
 									jsonObject.put("invoiceDate",invoiceDateFormater.format(operatorRow.getCell(5).getDateCellValue()));
