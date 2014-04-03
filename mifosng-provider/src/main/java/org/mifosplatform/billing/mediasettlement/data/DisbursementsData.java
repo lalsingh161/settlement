@@ -34,6 +34,7 @@ public class DisbursementsData {
 	private  String currency;
 	
 	List<DisbursementsData> distributionData;
+	private String activityMonth;
 	
 	public DisbursementsData(){
 		
@@ -43,8 +44,9 @@ public class DisbursementsData {
 		this.distributionData = distributionData;
 	}
 	
-	public DisbursementsData(String partnerName){
+	public DisbursementsData(String partnerName,String activityMonth){
 		this.partnerName=partnerName;
+		this.activityMonth=activityMonth;
 	}
 	
 	public DisbursementsData(

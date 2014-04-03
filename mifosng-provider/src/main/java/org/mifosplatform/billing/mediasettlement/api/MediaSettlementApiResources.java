@@ -683,7 +683,7 @@ public class MediaSettlementApiResources {
     @Path("/disbursements")
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public String getDistributionDetails(@Context final UriInfo uriInfo, @QueryParam("month") final Long month,
+    public String getDistributionDetails(@Context final UriInfo uriInfo, @QueryParam("month") final String month,
     		@QueryParam("partnerName") final String partnerName, @QueryParam("partnertypeId") final Long partnerTypeId){
     	
     	List<DisbursementsData> disbursementsData = mediaSettlementReadPlatformService.retrieveAllDisbursementsDataDetails( month, partnerName, partnerTypeId);
@@ -703,6 +703,20 @@ public class MediaSettlementApiResources {
     	List<DisbursementsData> partnerNameDate = mediaSettlementReadPlatformService.retrieveAllPartnerName(partnerType,mediaCategory);
     	
     	return toApiJsonSerializer.serialize(partnerNameDate);
+    	
+    }
+    
+    @GET
+    @Path("/activityMonth")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public String retrieveDisbursementDates(@Context final UriInfo uriInfo, @QueryParam("partnertype") final Long partnerType,@QueryParam("partnerName") final String partnerName){
+    	
+    	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
+    	
+    	List<DisbursementsData> DisbursementDates = mediaSettlementReadPlatformService.retrieveAllDisbursementDates(partnerType,partnerName);
+    	
+    	return toApiJsonSerializer.serialize(DisbursementDates);
     	
     }
     
