@@ -9,11 +9,11 @@ public class DeductionData {
 	private String deductionCode;
 	private Long id;
 	private String deductionType;
-	private Integer circle;
+	private String circle;
 	private BigDecimal wpcTaxAmount;
 
 	public DeductionData(Long id, Long clientId, String deductionCode,
-			BigDecimal deductionValue,String deductionType,Integer circle) {
+			BigDecimal deductionValue,String deductionType,String circle) {
 	     this.id=id; 
 		this.clientId = clientId;
 		this.deductionValue = deductionValue;
@@ -58,7 +58,7 @@ public class DeductionData {
 		return deductionType;
 	}
 
-	public Integer getCircle() {
+	public String getCircle() {
 		return circle;
 	}
 

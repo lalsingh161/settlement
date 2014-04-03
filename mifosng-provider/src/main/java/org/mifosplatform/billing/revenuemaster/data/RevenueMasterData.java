@@ -21,10 +21,12 @@ public class RevenueMasterData {
 	private BigDecimal detailChargeTaxAmount=BigDecimal.ZERO;
 	private BigDecimal operatorShareAmount=BigDecimal.ZERO;
 	private BigDecimal revenueAmountOfIg=BigDecimal.ZERO;
+	private String clientType;
+	private BigDecimal platformShareAmount=BigDecimal.ZERO;;
 
 	public RevenueMasterData(Long id,Long headerId,String activityMonth,
 			BigDecimal endUserPrice, BigDecimal downloads,
-			BigDecimal grossRevenue,String chargeCode,String chargeType,Integer taxInclusive,Long clientId) {
+			BigDecimal grossRevenue,String chargeCode,String chargeType,Integer taxInclusive,Long clientId,String clientType) {
 		this.id=id;
 		this.headerId=headerId;
 		this.activityMonth=activityMonth;
@@ -35,6 +37,7 @@ public class RevenueMasterData {
 		this.chargeType = chargeType;
 		this.taxInclusive = taxInclusive;
 		this.clientId = clientId;
+		this.clientType = clientType;
 	}
 
 	public Long getId() {
@@ -116,6 +119,23 @@ public class RevenueMasterData {
 
 	public BigDecimal getRevenueAmountOfIg() {
 		return revenueAmountOfIg;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public String getClientType() {
+		return clientType;
+	}
+
+	public void setplatformShareAmount(BigDecimal platformShareAmount) {
+	
+		this.platformShareAmount = platformShareAmount;
+	}
+
+	public BigDecimal getPlatformShareAmount() {
+		return platformShareAmount;
 	}
 	
 }

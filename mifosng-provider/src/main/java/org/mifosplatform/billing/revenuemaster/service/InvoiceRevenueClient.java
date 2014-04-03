@@ -203,14 +203,12 @@ public class InvoiceRevenueClient {
 				BigDecimal temAmount=grossRevenueAmount.subtract(WpcTaxAmount);
 				taxAmount=temAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2,RoundingMode.HALF_UP);
 			
-			}else if(deductionData.getDeductionCode().equalsIgnoreCase("ET")){
-				
-				if(deductionData.getCircle()>0){
+			}else if(isDeductionCodeEt(deductionData)&&deductionData.getCircle().equalsIgnoreCase("MP")){
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();
 				deductionValue=deductionData.getDeductionValue();
 				taxAmount=grossRevenueAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
-				}
+				
 			}else{ }
 			
 			tax=new DeductionTaxesData(deductionCode,deductionValue,deductionType,taxAmount,detailId);
@@ -226,6 +224,14 @@ public class InvoiceRevenueClient {
 			   deductionCode=true;
 		   }
 		return deductionCode;
+	}
+	
+	public boolean isDeductionCodeEt(DeductionData deductionData) {
+	    boolean deductionCode=false;
+	   if(deductionData.getDeductionCode().equalsIgnoreCase("ET")) {
+		   deductionCode=true;
+	   }
+	return deductionCode;
 	}
 	
 	public boolean isBusinessLineMobile(GenerateInteractiveHeaderData headerData) {
