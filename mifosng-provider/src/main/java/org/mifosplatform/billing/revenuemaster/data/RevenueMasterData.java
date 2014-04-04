@@ -6,9 +6,6 @@ public class RevenueMasterData {
 	
 	private Long id;
 	private String activityMonth;
-	private String contentProvider;
-	private String channelName;
-	private String serviceName;
 	private BigDecimal endUserPrice;
 	private BigDecimal downloads;
 	private BigDecimal grossRevenue;
@@ -17,12 +14,14 @@ public class RevenueMasterData {
 	private String chargeType;
 	private Integer taxInclusive;
 	private Long clientId;
+	private String clientType;
+	private String revenueShareCode;
 	private BigDecimal netRevenueAmount=BigDecimal.ZERO;
 	private BigDecimal detailChargeTaxAmount=BigDecimal.ZERO;
 	private BigDecimal operatorShareAmount=BigDecimal.ZERO;
-	private BigDecimal revenueAmountOfIg=BigDecimal.ZERO;
-	private String clientType;
-	private BigDecimal platformShareAmount=BigDecimal.ZERO;;
+	private BigDecimal revenuePercentage=BigDecimal.ZERO;
+	private BigDecimal platformShareAmount=BigDecimal.ZERO;
+	
 
 	public RevenueMasterData(Long id,Long headerId,String activityMonth,
 			BigDecimal endUserPrice, BigDecimal downloads,
@@ -44,7 +43,6 @@ public class RevenueMasterData {
 		return id;
 	}
 	
-
 	public BigDecimal getEndUserPrice() {
 		return endUserPrice;
 	}
@@ -85,7 +83,7 @@ public class RevenueMasterData {
 		this.netRevenueAmount = netRevenueAmount;
 	}*/
 
-	public void updateNetRevenueAmount(BigDecimal netRevenueAmount) {
+	public void setNetRevenueAmount(BigDecimal netRevenueAmount) {
 		
 		this.netRevenueAmount=this.netRevenueAmount.add(netRevenueAmount);
 						}
@@ -112,19 +110,6 @@ public class RevenueMasterData {
 		return operatorShareAmount;
 	}
 
-	public void setRevenueAmountOfIg(BigDecimal revenueAmountOfIg) {
-	
-		this.revenueAmountOfIg =revenueAmountOfIg;
-	}
-
-	public BigDecimal getRevenueAmountOfIg() {
-		return revenueAmountOfIg;
-	}
-
-	public String getServiceName() {
-		return serviceName;
-	}
-
 	public String getClientType() {
 		return clientType;
 	}
@@ -137,5 +122,25 @@ public class RevenueMasterData {
 	public BigDecimal getPlatformShareAmount() {
 		return platformShareAmount;
 	}
+
+	public BigDecimal getRevenuePercentage() {
+		return revenuePercentage;
+	}
+
+	public void setRevenuePercentage(BigDecimal revenuePercentage) {
+		this.revenuePercentage = revenuePercentage;
+	}
+
+	public void setRevenueShareCode(String revenueShareCode) {
+		this.revenueShareCode = revenueShareCode;
+		
+	}
+	
+	public String getRevenueShareCode() {
+		return revenueShareCode;
+	}
+	
+	
+	
 	
 }

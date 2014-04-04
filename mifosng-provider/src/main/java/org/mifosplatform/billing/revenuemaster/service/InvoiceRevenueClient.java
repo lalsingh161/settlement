@@ -100,17 +100,7 @@ public class InvoiceRevenueClient {
 				}else {
 					throw new NoInteractiveHeadersFoundException(headerData.getId());
 				}
-		
-			}/*else if(headerData.getMediaCategory().equalsIgnoreCase("Non Gam Wall Paper")){
-				detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
-				if(detailDatas!=null)
-				{
-					invoiceAmount =  this.interactivedetailDeductions(detailDatas,deductionDatas);		
-				}else {
-					throw new NoInteractiveHeadersFoundException(headerData.getId());
-				}
-				}*/
-			
+			}			
 			}
 	
 	   }else{
@@ -122,9 +112,10 @@ public class InvoiceRevenueClient {
 
 	public BigDecimal interactivedetailDeductions(List<RevenueMasterData> detailDatas,
 			List<DeductionData> deductionDatas) {
+		
 		List<DeductionTaxesData> deductionTaxes=new ArrayList<DeductionTaxesData>();
 		List<DeductionTaxesData> deductionTax=new ArrayList<DeductionTaxesData>();
-		BigDecimal grossRevenueAmount=null;
+		  BigDecimal grossRevenueAmount=null;
 		  BigDecimal invoiceAmount=BigDecimal.ZERO;
 		//BigDecimal totalRevenueAmount=BigDecimal.ZERO;
 		if(detailDatas !=null)

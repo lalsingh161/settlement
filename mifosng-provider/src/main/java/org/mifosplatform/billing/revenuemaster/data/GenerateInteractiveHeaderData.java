@@ -6,9 +6,7 @@ public class GenerateInteractiveHeaderData {
 	
 	private Long id;
 	private Long clientId;
-	private Long externalId;
 	private String businessLine;
-	private String mediaCategory;
 	private String activityMonth;
 
 	public GenerateInteractiveHeaderData(Long id, Long clientId,
