@@ -73,6 +73,7 @@ public class PartnerAccountData {
 	private String partnerTypeName;
 	private String currencyName;
 	private String royaltySequence;
+	private Collection<DisbursementsData> clients;
 
 	public PartnerAccountData(Collection<MCodeData> partnerType,
 			Collection<MCodeData> mediaCategory, List<PartnerAccountData> countryData) {
@@ -83,11 +84,12 @@ public class PartnerAccountData {
 	}
 	
 	public PartnerAccountData(Collection<MCodeData> partnerType,
-			Collection<MCodeData> mediaCategory,Collection<CurrencyData> currencyCodes) {
+			Collection<MCodeData> mediaCategory,Collection<CurrencyData> currencyCodes,Collection<DisbursementsData> clients) {
 		
 		this.partnerTypeData = partnerType;
 		this.mediaCategoryData = mediaCategory;
 		this.currencyCodes = currencyCodes;
+		this.clients=clients;
 	}
 	
 	

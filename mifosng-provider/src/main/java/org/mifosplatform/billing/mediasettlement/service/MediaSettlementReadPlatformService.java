@@ -72,11 +72,15 @@ public interface MediaSettlementReadPlatformService {
 	Collection<PartnerGameData> retriveAllContentProviderGames(Long partnerId);
 
 	
-	List<DisbursementsData> retrieveAllDisbursementsDataDetails(String month,String partnerName,Long partnerTypeId);
+	List<DisbursementsData> retrieveAllDisbursementsDataDetails(String month,String partnerName,Long partnerTypeId, Long mediaCategory, String client);
 
-	List<DisbursementsData> retrieveAllPartnerName(Long partnerType,Long mediaCategory);
+	List<DisbursementsData> retrieveAllPartnerName(Long partnerType,Long mediaCategory,String client);
 	
-	List<DisbursementsData> retrieveAllDisbursementDates(Long partnerType,String partnerName);
+	List<DisbursementsData> retrieveAllDisbursementDates(Long partnerType,String partnerName,String client);
+	
+	List<DisbursementsData> retrieveAllDisbursementMediaCategory(String client);
+	
+	Collection<DisbursementsData> retrieveClientsForDisbursement();
 
 	Long getPartnerId(String stringCellValue);
 	

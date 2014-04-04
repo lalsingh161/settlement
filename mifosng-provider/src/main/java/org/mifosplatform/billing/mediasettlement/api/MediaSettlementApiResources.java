@@ -153,9 +153,10 @@ public class MediaSettlementApiResources {
     	Collection<MCodeData> partnerType = mCodeReadPlatformService.getCodeValue("Partner Type");
     	Collection<MCodeData> mediaCategory = mCodeReadPlatformService.getCodeValue("Media Category");
     	Collection<CurrencyData> currencyCodes = this.mediaSettlementReadPlatformService.retrieveCurrency();
+    	Collection<DisbursementsData> clients = this.mediaSettlementReadPlatformService.retrieveClientsForDisbursement();
     	
     	/*List<PartnerAccountData> countryData = this.mediaSettlementReadPlatformService.retrieveCountryDetails();*/
-    	PartnerAccountData accountData = new PartnerAccountData(partnerType,mediaCategory,currencyCodes);
+    	PartnerAccountData accountData = new PartnerAccountData(partnerType,mediaCategory,currencyCodes,clients);
     	return toApiJsonSerializer.serialize(accountData);
     }
     
@@ -698,9 +699,10 @@ public class MediaSettlementApiResources {
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
     public String getDistributionDetails(@Context final UriInfo uriInfo, @QueryParam("month") final String month,
-    		@QueryParam("partnerName") final String partnerName, @QueryParam("partnertypeId") final Long partnerTypeId){
+    		@QueryParam("partnerName") final String partnerName, @QueryParam("partnertypeId") final Long partnerTypeId,
+    		@QueryParam("mediaCategory") final Long mediaCategory,@QueryParam("client") final String client){
     	
-    	List<DisbursementsData> disbursementsData = mediaSettlementReadPlatformService.retrieveAllDisbursementsDataDetails( month, partnerName, partnerTypeId);
+    	List<DisbursementsData> disbursementsData = mediaSettlementReadPlatformService.retrieveAllDisbursementsDataDetails( month, partnerName, partnerTypeId,mediaCategory,client);
     	DisbursementsData dData = new DisbursementsData(disbursementsData);
     	return toApiJsonSerializer.serialize(dData);
     }
@@ -710,11 +712,11 @@ public class MediaSettlementApiResources {
     @Path("/partnername")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public String retrieveCategoryAndPartnerType(@Context final UriInfo uriInfo, @QueryParam("partnertype") final Long partnerType,@QueryParam("mediaCategory") final Long mediaCategory){
+    public String retrieveCategoryAndPartnerType(@Context final UriInfo uriInfo, @QueryParam("partnertype") final Long partnerType,@QueryParam("mediaCategory") final Long mediaCategory,@QueryParam("client") final String client){
     	
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	
-    	List<DisbursementsData> partnerNameDate = mediaSettlementReadPlatformService.retrieveAllPartnerName(partnerType,mediaCategory);
+    	List<DisbursementsData> partnerNameDate = mediaSettlementReadPlatformService.retrieveAllPartnerName(partnerType,mediaCategory,client);
     	
     	return toApiJsonSerializer.serialize(partnerNameDate);
     	
@@ -724,13 +726,27 @@ public class MediaSettlementApiResources {
     @Path("/activityMonth")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public String retrieveDisbursementDates(@Context final UriInfo uriInfo, @QueryParam("partnertype") final Long partnerType,@QueryParam("partnerName") final String partnerName){
+    public String retrieveDisbursementDates(@Context final UriInfo uriInfo, @QueryParam("partnertype") final Long partnerType,@QueryParam("partnerName") final String partnerName,@QueryParam("client") final String client){
     	
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	
-    	List<DisbursementsData> DisbursementDates = mediaSettlementReadPlatformService.retrieveAllDisbursementDates(partnerType,partnerName);
+    	List<DisbursementsData> DisbursementDates = mediaSettlementReadPlatformService.retrieveAllDisbursementDates(partnerType,partnerName,client);
     	
     	return toApiJsonSerializer.serialize(DisbursementDates);
+    	
+    }
+    
+    @GET
+    @Path("/mediacategory")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public String retrieveDisbursementMediaCategory(@Context final UriInfo uriInfo, @QueryParam("client") final String client){
+    	
+    	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
+    	
+    	List<DisbursementsData> mediaCategoryData = mediaSettlementReadPlatformService.retrieveAllDisbursementMediaCategory(client);
+    	
+    	return toApiJsonSerializer.serialize(mediaCategoryData);
     	
     }
     
@@ -1024,7 +1040,7 @@ public class MediaSettlementApiResources {
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	Collection<CurrencyData> currencyCodes = this.mediaSettlementReadPlatformService.retrieveCurrency();
     	/*List<PartnerAccountData> countryData = this.mediaSettlementReadPlatformService.retrieveCountryDetails();*/
-    	PartnerAccountData accountData = new PartnerAccountData(null,null,currencyCodes);
+    	PartnerAccountData accountData = new PartnerAccountData(null,null,currencyCodes,null);
     	return toApiJsonSerializer.serialize(accountData);
     }
  

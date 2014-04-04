@@ -35,6 +35,7 @@ public class DisbursementsData {
 	
 	List<DisbursementsData> distributionData;
 	private String activityMonth;
+	private Long mediaCategoryId;
 	
 	public DisbursementsData(){
 		
@@ -47,6 +48,15 @@ public class DisbursementsData {
 	public DisbursementsData(String partnerName,String activityMonth){
 		this.partnerName=partnerName;
 		this.activityMonth=activityMonth;
+	}
+	
+	public DisbursementsData(String client){
+		this.client=client;
+	}
+	
+	public DisbursementsData(Long mediaCategoryId,String mediaCategory){
+		this.mediaCategory=mediaCategory;
+		this.mediaCategoryId=mediaCategoryId;
 	}
 	
 	public DisbursementsData(
