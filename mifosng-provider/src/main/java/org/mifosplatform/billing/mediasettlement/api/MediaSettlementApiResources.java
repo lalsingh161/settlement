@@ -151,12 +151,12 @@ public class MediaSettlementApiResources {
     public String getPartnerAccountTemplate(@Context final UriInfo uriInfo){
     	context.authenticatedUser().validateHasPermissionTo(resourceNameForPermissions);
     	Collection<MCodeData> partnerType = mCodeReadPlatformService.getCodeValue("Partner Type");
-    	Collection<MCodeData> mediaCategory = mCodeReadPlatformService.getCodeValue("Media Category");
+//    	Collection<MCodeData> mediaCategory = mCodeReadPlatformService.getCodeValue("Media Category");
     	Collection<CurrencyData> currencyCodes = this.mediaSettlementReadPlatformService.retrieveCurrency();
     	Collection<DisbursementsData> clients = this.mediaSettlementReadPlatformService.retrieveClientsForDisbursement();
     	
     	/*List<PartnerAccountData> countryData = this.mediaSettlementReadPlatformService.retrieveCountryDetails();*/
-    	PartnerAccountData accountData = new PartnerAccountData(partnerType,mediaCategory,currencyCodes,clients);
+    	PartnerAccountData accountData = new PartnerAccountData(partnerType,null,currencyCodes,clients);
     	return toApiJsonSerializer.serialize(accountData);
     }
     
