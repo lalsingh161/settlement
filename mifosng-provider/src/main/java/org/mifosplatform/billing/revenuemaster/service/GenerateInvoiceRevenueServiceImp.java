@@ -243,6 +243,7 @@ public class GenerateInvoiceRevenueServiceImp implements GenerateInvoiceRevenueS
 	                                  (new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
                 //  operatorShareAmount=detailData.getNetRevenueAmount().subtract(operatorShareAmount);
                  // percentage=revenueShareData.getRevenuePercentage();
+		    	  detailData.setRevenueShareCode(revenueShareData.getRevenueShareCode());
                   detailData.setRevenuePercentage(revenueShareData.getRevenuePercentage());
 		     }
 		           
