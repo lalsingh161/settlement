@@ -16,7 +16,7 @@ public class DisbursementsData {
 	private String client;
 	private String invoiceId;
 	private BigDecimal invoiceAmount;
-	private Date invoiceDate;
+	private LocalDate invoiceDate;
 	private String videoGame;
 	private BigDecimal partnerTypeId;
 	private String amountSharable;
@@ -85,7 +85,7 @@ public class DisbursementsData {
 		this.client=client;
 		this.invoiceId=invoiceId;
 		this.invoiceAmount=invoiceAmount;
-		this.invoiceDate=invoiceDate.toDate();
+		this.invoiceDate=invoiceDate;
 		this.mediaCategory=mediaCategory;
 		this.partnerTypeId=partnerTypeId;
 		this.status=status;
@@ -138,7 +138,7 @@ public class DisbursementsData {
 		return invoiceAmount;
 	}
 
-	public Date getInvoiceDate() {
+	public LocalDate getInvoiceDate() {
 		return invoiceDate;
 	}
 
@@ -210,7 +210,7 @@ public class DisbursementsData {
 		this.invoiceAmount = invoiceAmount;
 	}
 
-	public void setInvoiceDate(Date invoiceDate) {
+	public void setInvoiceDate(LocalDate invoiceDate) {
 		this.invoiceDate = invoiceDate;
 	}
 

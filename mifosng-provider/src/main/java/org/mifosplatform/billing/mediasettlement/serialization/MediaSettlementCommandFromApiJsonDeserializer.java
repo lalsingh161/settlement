@@ -282,6 +282,9 @@ public class MediaSettlementCommandFromApiJsonDeserializer {
 
         final JsonElement element = fromApiJsonHelper.parse(json);
         
+
+        final Long mediaCategory = fromApiJsonHelper.extractLongNamed("mediaCategory", element);
+        baseDataValidator.reset().parameter("mediaCategory").value(mediaCategory).notNull();
         
         final Long partnerType1 = fromApiJsonHelper.extractLongNamed("partnerType1", element);
         baseDataValidator.reset().parameter("partnerType1").value(partnerType1).notNull();
