@@ -41,7 +41,8 @@ public class RevenueMasterReadPlatformServiceImp implements RevenueMasterReadpla
 	@Override
 	public List<GenerateInteractiveHeaderData> retriveInteractiveHeaderDetails(Long clientId){
 			final String sql = "select ih.id as id, ih.client_id as clientId,ih.activity_month as activityMonth," +
-					"im.int_event_code as businessLine from bp_interactive_header ih,bp_intevent_master im where ih.business_line=im.id and ih.client_id=? and ih.is_deleted = 'N' order by ih.id asc";
+					"im.int_event_code as businessLine from bp_interactive_header ih,bp_intevent_master im where ih.business_line=im.id  and ih.file_id=(select max(file_id) from bp_interactive_header ih2) " +
+					"and ih.client_id=? and ih.is_deleted = 'N' order by ih.id asc";
 			HeaderDataMapper mapper = new HeaderDataMapper();
 			return jdbcTemplate.query(sql, mapper, new Object[]{clientId});
 		}

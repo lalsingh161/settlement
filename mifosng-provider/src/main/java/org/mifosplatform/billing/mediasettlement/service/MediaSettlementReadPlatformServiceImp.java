@@ -184,8 +184,8 @@ public class MediaSettlementReadPlatformServiceImp implements
         String extraCriteria = "";
    	    if (sqlSearch != null) {
    	    	sqlSearch=sqlSearch.trim();
-   	    	extraCriteria = " and ( a.start_date like '%"+sqlSearch+"%' OR"
-   	    			+ "a.agreement_category IN (select id from m_code_value where code_value like '%"+sqlSearch+"%')  OR"
+   	    	extraCriteria = " and ( a.start_date like '%"+sqlSearch+"%' OR "
+   	    			+ "a.agreement_category IN (select id from m_code_value where code_value like '%"+sqlSearch+"%') OR "
    	    			+ "a.agreement_type IN (select id from m_code_value where code_value like '%"+sqlSearch+"%'))";
    	    			//+ "(select id from m_code_value where code_value like '%"+sqlSearch+"%') = f.partner_type )" ;
    	    			
@@ -1006,6 +1006,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 			final String activityMonth = rs.getString("activityMonth");
 			final LocalDate dataUploadedDate = JdbcSupport.getLocalDate(rs,
 					"dataUploadedDate");
+			System.out.println(rs.getDate("dataUploadedDate"));
 			/*final String mediaCategoryStr = rs.getString("mediaCategory");*/
 			final String chargeCodeStr = rs.getString("chargeCode");
 			return new InteractiveHeaderData(id, clientId, externalId,
