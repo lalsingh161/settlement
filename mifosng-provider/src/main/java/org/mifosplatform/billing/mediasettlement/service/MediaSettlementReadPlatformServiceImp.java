@@ -686,7 +686,7 @@ public class MediaSettlementReadPlatformServiceImp implements
 
 	@Override
 	public List<DisbursementsData> retrieveAllDisbursementsDataDetails(
-			Long month, String partnerName, Long partnerTypeId) {
+			String month, String partnerName, Long partnerTypeId,Long mediaCategory, String client) {
 		context.authenticatedUser();
 		/*final String sql = "SELECT branch as branch,city as city,state as state ,client as client, invoiceId as invoiceId,"
 				+ "invoiceAmount as invoiceAmount,invoiceDate as invoiceDate,Media_Category as mediaCategory,partnerTypeId as partnerTypeId,"
@@ -696,11 +696,11 @@ public class MediaSettlementReadPlatformServiceImp implements
 				+ "partnerName=? and partnerTypeId = ?";
 		*/
 		
-		final String sql="select branch as branch,city as city,state as state,client as client,playsource as playSource,mediacategory as mediaCategory,partner_name  as partnerName,partner_type as partnerTypeId,partnerType as partnerType,invoice_id as invoiceId,invoice_date as invoiceDate,invoice_amount as invoiceAmount,sequence as sequence,royalty_share as royaltyShare,royalty_amt as royaltyAmount,currency as currency,status as status FROM  bp_settle_vw s WHERE MONTH(invoice_date)=? and partner_name=? and partner_type = ?";
+		final String sql="select branch as branch,city as city,state as state,client as client,playsource as playSource,mediacategory as mediaCategory,partner_name  as partnerName,partner_type as partnerTypeId,partnerType as partnerType,invoice_id as invoiceId,invoice_date as invoiceDate,invoice_amount as invoiceAmount,sequence as sequence,royalty_share as royaltyShare,royalty_amt as royaltyAmount,currency as currency,status as status FROM  bp_settle_vw s WHERE activity_month=? and partner_name=? and partner_type = ? and media_category=? and client=?";
 
 		DistributionDataMapper mapper = new DistributionDataMapper();
 		return jdbcTemplate.query(sql, mapper, new Object[] { month,
-				partnerName, partnerTypeId });
+				partnerName, partnerTypeId,mediaCategory,client });
 	}
 
 	private static final class DistributionDataMapper implements
@@ -742,11 +742,11 @@ public class MediaSettlementReadPlatformServiceImp implements
 	
 		@Override 
 	  public List<DisbursementsData> retrieveAllPartnerName(Long
-	  partnerType, Long mediaCategory) { // TODO Auto-generated method stub
+	  partnerType, Long mediaCategory,String client) { // TODO Auto-generated method stub
 	  context.authenticatedUser(); final String sql =
-	  " SELECT DISTINCT a.partner_name as partnerName FROM bp_account a, bp_agreement_dtl g WHERE g.partner_type =? AND g.media_category =? and a.is_deleted='N' AND a.id = g.partner_account_id"
+	  " select DISTINCT partner_name as partnerName from bp_settle_vw where partner_type=? and  media_category=? and client=?"
 	  ; PartnerNameMapper mapper = new PartnerNameMapper(); return
-	  jdbcTemplate.query(sql, mapper,new Object[]{partnerType,mediaCategory} );
+	  jdbcTemplate.query(sql, mapper,new Object[]{partnerType,mediaCategory,client} );
 	  
 	  }
 	  
@@ -759,9 +759,76 @@ public class MediaSettlementReadPlatformServiceImp implements
 	  final String partnerName = rs.getString("partnerName");
 	  
 	  
-	  return new DisbursementsData(partnerName); } }
+	  return new DisbursementsData(partnerName,null); } }
 
-	 
+
+	@Override 
+	  public List<DisbursementsData> retrieveAllDisbursementDates(Long
+	  partnerType, String partnerName,String client) { // TODO Auto-generated method stub
+	  context.authenticatedUser(); final String sql =
+	  " select DISTINCT activity_month as activityMonth FROM  bp_settle_vw s WHERE  partner_type=? and partner_name = ? and client=?"
+	  ; DisbursementDatesMapper mapper = new DisbursementDatesMapper(); return
+	  jdbcTemplate.query(sql, mapper,new Object[]{partnerType,partnerName,client} );
+	  
+	  }
+	  
+	  private static final class DisbursementDatesMapper implements
+	  RowMapper<DisbursementsData>{
+	  
+	  @Override public DisbursementsData mapRow(ResultSet rs, int rowNum)
+	  throws SQLException {
+	  
+	  final String activityMonth = rs.getString("activityMonth");
+	  final String partnerName=null;
+	  
+	  return new DisbursementsData(partnerName,activityMonth); } }
+	  
+	  
+	  @Override 
+	  public List<DisbursementsData> retrieveClientsForDisbursement() { 
+		  // TODO Auto-generated method stub
+	  context.authenticatedUser(); final String sql =
+	  " select DISTINCT client as client FROM  bp_settle_vw "
+	  ; DisbursementClientsMapper mapper = new DisbursementClientsMapper(); return
+	  jdbcTemplate.query(sql, mapper,new Object[]{} );
+	  
+	  }
+	  
+	  private static final class DisbursementClientsMapper implements
+	  RowMapper<DisbursementsData>{
+	  
+	  @Override public DisbursementsData mapRow(ResultSet rs, int rowNum)
+	  throws SQLException {
+	  
+	  final String client = rs.getString("client");
+	  
+	  
+	  return new DisbursementsData(client); } }
+	  
+	  @Override 
+	  public List<DisbursementsData> retrieveAllDisbursementMediaCategory(String client) { 
+		  // TODO Auto-generated method stub
+	  context.authenticatedUser(); final String sql =
+	  " select DISTINCT media_category as mediaCategoryId,  mediacategory as mediaCategory FROM  bp_settle_vw where client=?"
+	  ; DisbursementMediaCategoryMapper mapper = new DisbursementMediaCategoryMapper(); return
+	  jdbcTemplate.query(sql, mapper,new Object[]{client} );
+	  
+	  }
+	  
+	  private static final class DisbursementMediaCategoryMapper implements
+	  RowMapper<DisbursementsData>{
+	  
+	  @Override public DisbursementsData mapRow(ResultSet rs, int rowNum)
+	  throws SQLException {
+	  
+	  final Long mediaCategoryId = rs.getLong("mediaCategoryId");
+	  final String mediaCategory = rs.getString("mediaCategory");
+	  
+	  
+	  return new DisbursementsData(mediaCategoryId,mediaCategory); } }
+	  
+	  
+	  
 
 	@Override
 	public Collection<OperatorDeductionData> getOperatorDeduction(Long clientId) {
