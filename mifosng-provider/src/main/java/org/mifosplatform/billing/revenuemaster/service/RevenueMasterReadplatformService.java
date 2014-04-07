@@ -16,7 +16,7 @@ public interface RevenueMasterReadplatformService {
 
 	List<DeductionData> retriveOperatorDeductionData(Long entityId);
 
-	List<OperatorShareData> retriveOperatorRevenueShareData(Long clientId);
+	List<OperatorShareData> retriveRevenueShareData(Long clientId);
 
 	List<TaxMappingRateData> retrieveTaxMappingDate(Long clientId,
 			String chargeCode);
