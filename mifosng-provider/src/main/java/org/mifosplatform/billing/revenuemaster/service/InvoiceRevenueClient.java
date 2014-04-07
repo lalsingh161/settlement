@@ -100,17 +100,7 @@ public class InvoiceRevenueClient {
 				}else {
 					throw new NoInteractiveHeadersFoundException(headerData.getId());
 				}
-		
-			}/*else if(headerData.getMediaCategory().equalsIgnoreCase("Non Gam Wall Paper")){
-				detailDatas=this.revenueReadplatformService.retriveAllinteractiveDetails(headerData.getId());
-				if(detailDatas!=null)
-				{
-					invoiceAmount =  this.interactivedetailDeductions(detailDatas,deductionDatas);		
-				}else {
-					throw new NoInteractiveHeadersFoundException(headerData.getId());
-				}
-				}*/
-			
+			}			
 			}
 	
 	   }else{
@@ -122,9 +112,10 @@ public class InvoiceRevenueClient {
 
 	public BigDecimal interactivedetailDeductions(List<RevenueMasterData> detailDatas,
 			List<DeductionData> deductionDatas) {
+		
 		List<DeductionTaxesData> deductionTaxes=new ArrayList<DeductionTaxesData>();
 		List<DeductionTaxesData> deductionTax=new ArrayList<DeductionTaxesData>();
-		BigDecimal grossRevenueAmount=null;
+		  BigDecimal grossRevenueAmount=null;
 		  BigDecimal invoiceAmount=BigDecimal.ZERO;
 		//BigDecimal totalRevenueAmount=BigDecimal.ZERO;
 		if(detailDatas !=null)
@@ -203,14 +194,12 @@ public class InvoiceRevenueClient {
 				BigDecimal temAmount=grossRevenueAmount.subtract(WpcTaxAmount);
 				taxAmount=temAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2,RoundingMode.HALF_UP);
 			
-			}else if(deductionData.getDeductionCode().equalsIgnoreCase("ET")){
-				
-				if(deductionData.getCircle()>0){
+			}else if(isDeductionCodeEt(deductionData)&&deductionData.getCircle().equalsIgnoreCase("MP")){
 				deductionType=deductionData.getDeductionType();
 				deductionCode=deductionData.getDeductionCode();
 				deductionValue=deductionData.getDeductionValue();
 				taxAmount=grossRevenueAmount.multiply(deductionData.getDeductionValue().divide(new BigDecimal(100))).setScale(2, RoundingMode.HALF_UP);
-				}
+				
 			}else{ }
 			
 			tax=new DeductionTaxesData(deductionCode,deductionValue,deductionType,taxAmount,detailId);
@@ -226,6 +215,14 @@ public class InvoiceRevenueClient {
 			   deductionCode=true;
 		   }
 		return deductionCode;
+	}
+	
+	public boolean isDeductionCodeEt(DeductionData deductionData) {
+	    boolean deductionCode=false;
+	   if(deductionData.getDeductionCode().equalsIgnoreCase("ET")) {
+		   deductionCode=true;
+	   }
+	return deductionCode;
 	}
 	
 	public boolean isBusinessLineMobile(GenerateInteractiveHeaderData headerData) {
